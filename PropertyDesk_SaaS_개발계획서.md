@@ -150,40 +150,7 @@ export const useTenantData = <T>(
 - 테넌트별 도메인 라우팅 (abc.propertydesk.com)
 - 데이터 격리 및 보안 시스템
 
-#### Week 3-4: 구독 및 결제 시스템
-```typescript
-// Stripe 구독 관리
-export const SubscriptionPlans = {
-  basic: {
-    name: 'Basic',
-    price: 29000, // 월 29,000원
-    features: ['매물 100개', '사용자 3명', '기본 지원'],
-    priceId: 'price_basic_monthly'
-  },
-  professional: {
-    name: 'Professional', 
-    price: 59000, // 월 59,000원
-    features: ['매물 500개', '사용자 10명', '고급 분석', '우선 지원'],
-    priceId: 'price_pro_monthly'
-  },
-  enterprise: {
-    name: 'Enterprise',
-    price: 99000, // 월 99,000원
-    features: ['무제한 매물', '무제한 사용자', '맞춤 기능', '전담 지원'],
-    priceId: 'price_enterprise_monthly'
-  }
-}
-```
-
-**주요 작업**:
-- Stripe 결제 시스템 통합
-- 구독 플랜 관리 시스템
-- 사용량 제한 및 모니터링
-- 청구서 자동 발송
-
-### Phase 2: 고급 SaaS 기능 (6주)
-
-#### Week 5-6: 사용자 관리 및 권한 시스템
+#### Week 3-4: 사용자 관리 및 권한 시스템
 ```typescript
 // 역할 기반 접근 제어 (RBAC)
 export const UserRoles = {
@@ -208,7 +175,9 @@ export const Permissions = {
 - 사용자 활동 로그
 - SSO (Single Sign-On) 지원
 
-#### Week 7-8: 고급 매물 관리
+### Phase 2: 고급 SaaS 기능 (6주)
+
+#### Week 5-6: 고급 매물 관리
 ```typescript
 // 매물 템플릿 시스템
 export interface PropertyTemplate {
@@ -236,7 +205,7 @@ export const PropertyImporter = {
 - 매물 히스토리 추적
 - 자동 매물 상태 업데이트
 
-#### Week 9-10: 통합 CRM 시스템
+#### Week 7-8: 통합 CRM 시스템
 ```typescript
 // 고객 관리 시스템
 export interface Customer {
@@ -270,7 +239,7 @@ export const PropertyMatcher = {
 
 ### Phase 3: 고급 분석 및 자동화 (4주)
 
-#### Week 11-12: 비즈니스 인텔리전스
+#### Week 9-10: 비즈니스 인텔리전스
 ```typescript
 // 고급 분석 대시보드
 export const AnalyticsDashboard = () => {
@@ -302,7 +271,7 @@ export const AnalyticsDashboard = () => {
 - 시장 트렌드 분석
 - 맞춤형 리포트 생성
 
-#### Week 13-14: 자동화 및 워크플로우
+#### Week 11-12: 자동화 및 워크플로우
 ```typescript
 // 자동화 워크플로우
 export const AutomationWorkflows = {
@@ -333,7 +302,7 @@ export const AutomationWorkflows = {
 
 ### Phase 4: 엔터프라이즈 기능 (4주)
 
-#### Week 15-16: API 및 통합
+#### Week 13-14: API 및 통합
 ```typescript
 // Public API for integrations
 export const PropertyDeskAPI = {
@@ -360,7 +329,7 @@ export const PropertyDeskAPI = {
 - 써드파티 통합 (네이버, 직방 등)
 - API 문서화 (Swagger)
 
-#### Week 17-18: 고급 보안 및 컴플라이언스
+#### Week 15-16: 고급 보안 및 컴플라이언스
 ```typescript
 // 보안 강화
 export const SecurityFeatures = {
@@ -387,6 +356,38 @@ export const SecurityFeatures = {
 - 감사 로그 시스템
 - GDPR/개인정보보호법 준수
 - 보안 인증 취득 준비
+
+### Phase 5: 구독 및 결제 시스템 (2주)
+
+#### Week 17-18: 토스페이먼츠 결제 시스템
+```typescript
+// 토스페이먼츠 결제 시스템
+export const TossPayments = {
+  initialize: async (clientKey: string) => {
+    // 토스페이먼츠 SDK 초기화
+    return await loadTossPayments(clientKey)
+  },
+  requestPayment: async (paymentData: PaymentRequest) => {
+    // 결제 요청 처리
+    return await tossPayments.requestPayment(paymentData)
+  }
+}
+
+export interface PaymentRequest {
+  amount: number
+  orderId: string
+  orderName: string
+  customerName: string
+  successUrl: string
+  failUrl: string
+}
+```
+
+**주요 작업**:
+- 토스페이먼츠 SDK 통합
+- 결제 처리 시스템 구현
+- 결제 성공/실패 처리
+- 결제 내역 관리
 
 ## 💰 수익 모델 및 가격 정책
 

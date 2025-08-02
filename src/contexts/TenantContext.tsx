@@ -215,7 +215,7 @@ export const getTenantUrl = (path: string, tenant?: { slug: string } | null) => 
 export const useTenantSettings = () => {
   const { tenant, updateTenant } = useTenant()
   
-  const updateSettings = async (settings: Partial<typeof tenant.settings>) => {
+  const updateSettings = async (settings: any) => {
     if (!tenant) return
     
     await updateTenant({
@@ -239,7 +239,7 @@ export const useTenantSettings = () => {
 export const useTenantBranding = () => {
   const { tenant, updateTenant } = useTenant()
   
-  const updateBranding = async (branding: Partial<typeof tenant.branding>) => {
+  const updateBranding = async (branding: any) => {
     if (!tenant) return
     
     await updateTenant({

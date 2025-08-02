@@ -4,22 +4,28 @@
 
 import React, { useState } from 'react'
 import { Plus, Mail, Phone, Settings, Shield, UserCheck, UserX } from 'lucide-react'
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge, Input, Select } from '@/components/ui'
+import { Button, Card, CardContent, Badge, Input, Select } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
+import { usePermissions } from '@/hooks/usePermissions'
+import { PermissionGate } from '@/components/common/PermissionGate'
+import { InviteUserModal } from '@/components/team/InviteUserModal'
+import { ROLE_DEFINITIONS, type UserRole, type UserInvitation } from '@/types'
 
 const TeamPage: React.FC = () => {
   const { tenant } = useTenant()
+  const { canManageRole } = usePermissions()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedRole, setSelectedRole] = useState('전체')
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
-  // 임시 팀원 데이터
+  // 임시 팀원 데이터 (RBAC 역할로 업데이트)
   const teamMembers = [
     {
       id: 1,
       name: '김대표',
       email: 'ceo@propertydesk.com',
       phone: '010-1234-5678',
-      role: 'admin',
+      role: 'owner' as UserRole,
       status: 'active',
       joinedAt: '2023-01-15',
       lastLogin: '2시간 전',
@@ -30,7 +36,7 @@ const TeamPage: React.FC = () => {
       name: '이팀장',
       email: 'manager@propertydesk.com',
       phone: '010-2345-6789',
-      role: 'manager',
+      role: 'manager' as UserRole,
       status: 'active',
       joinedAt: '2023-03-20',
       lastLogin: '1일 전',
@@ -41,7 +47,7 @@ const TeamPage: React.FC = () => {
       name: '박사원',
       email: 'agent@propertydesk.com',
       phone: '010-3456-7890',
-      role: 'agent',
+      role: 'agent' as UserRole,
       status: 'inactive',
       joinedAt: '2023-06-10',
       lastLogin: '1주 전',
@@ -49,27 +55,37 @@ const TeamPage: React.FC = () => {
     },
   ]
 
-  const roleOptions = [
-    { value: '전체', label: '전체' },
-    { value: 'admin', label: '관리자' },
-    { value: 'manager', label: '팀장' },
-    { value: 'agent', label: '상담원' },
-  ]
-
-  const getRoleLabel = (role: string) => {
-    const roleMap: Record<string, string> = {
-      admin: '관리자',
-      manager: '팀장',
-      agent: '상담원',
+  // 팀원 초대 처리
+  const handleInviteUser = async (invitation: Omit<UserInvitation, 'id' | 'tenant_id' | 'invited_by' | 'status' | 'invited_at' | 'expires_at'>) => {
+    try {
+      // TODO: 실제 API 호출로 교체
+      console.log('팀원 초대:', invitation)
+      
+      // 성공 알림 (나중에 toast 시스템으로 교체)
+      alert(`${invitation.email}로 초대 메일을 발송했습니다.`)
+    } catch (error) {
+      throw new Error('초대 중 오류가 발생했습니다.')
     }
-    return roleMap[role] || role
   }
 
-  const getRoleBadgeVariant = (role: string) => {
-    const variantMap: Record<string, any> = {
-      admin: 'destructive',
+  const roleOptions = [
+    { value: '전체', label: '전체' },
+    { value: 'owner', label: '업체 대표' },
+    { value: 'manager', label: '팀장/실장' },
+    { value: 'agent', label: '중개사' },
+    { value: 'viewer', label: '조회자' },
+  ]
+
+  const getRoleLabel = (role: UserRole) => {
+    return ROLE_DEFINITIONS[role]?.name || role
+  }
+
+  const getRoleBadgeVariant = (role: UserRole) => {
+    const variantMap: Record<UserRole, any> = {
+      owner: 'destructive',
       manager: 'warning',
       agent: 'secondary',
+      viewer: 'outline',
     }
     return variantMap[role] || 'secondary'
   }
@@ -96,9 +112,14 @@ const TeamPage: React.FC = () => {
             총 <span className="font-semibold text-primary-600">{filteredMembers.length}</span>명의 팀원
           </p>
         </div>
-        <Button leftIcon={<Plus size={18} />}>
-          팀원 초대
-        </Button>
+        <PermissionGate permission="user.invite">
+          <Button 
+            leftIcon={<Plus size={18} />}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            팀원 초대
+          </Button>
+        </PermissionGate>
       </div>
 
       {/* 검색 및 필터 */}
@@ -194,21 +215,35 @@ const TeamPage: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                <Button size="sm" variant="outline" className="flex-1">
-                  <Settings size={14} className="mr-1" />
-                  권한 설정
-                </Button>
-                {member.status === 'active' ? (
+                <PermissionGate permission="user.update">
                   <Button size="sm" variant="outline" className="flex-1">
-                    <UserX size={14} className="mr-1" />
-                    비활성화
+                    <Settings size={14} className="mr-1" />
+                    권한 설정
                   </Button>
-                ) : (
-                  <Button size="sm" variant="primary" className="flex-1">
-                    <UserCheck size={14} className="mr-1" />
-                    활성화
-                  </Button>
-                )}
+                </PermissionGate>
+                <PermissionGate permission="user.update">
+                  {member.status === 'active' ? (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      disabled={!canManageRole(member.role)}
+                    >
+                      <UserX size={14} className="mr-1" />
+                      비활성화
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      variant="primary" 
+                      className="flex-1"
+                      disabled={!canManageRole(member.role)}
+                    >
+                      <UserCheck size={14} className="mr-1" />
+                      활성화
+                    </Button>
+                  )}
+                </PermissionGate>
               </div>
             </CardContent>
           </Card>
@@ -224,6 +259,13 @@ const TeamPage: React.FC = () => {
           <p className="text-gray-500">검색 조건에 맞는 팀원이 없습니다.</p>
         </Card>
       )}
+
+      {/* 팀원 초대 모달 */}
+      <InviteUserModal
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        onInvite={handleInviteUser}
+      />
     </div>
   )
 }

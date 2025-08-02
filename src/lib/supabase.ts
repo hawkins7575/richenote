@@ -131,7 +131,7 @@ export const handleSupabaseError = (error: any) => {
 // 헬스 체크
 export const checkSupabaseHealth = async () => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('tenants')
       .select('id')
       .limit(1)

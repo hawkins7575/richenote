@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React, { useState, useMemo } from 'react'
-import { Search, Plus, Grid, AlignLeft, Filter, Settings } from 'lucide-react'
+import { Search, Plus, Grid, AlignLeft, Settings } from 'lucide-react'
 import { Button, Card, Badge, Input, Select } from '@/components/ui'
 
 // MVP 샘플 데이터 (임시)

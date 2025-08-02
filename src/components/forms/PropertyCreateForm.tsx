@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React, { useState } from 'react'
-import { X, Save, AlertCircle } from 'lucide-react'
+import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
 import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
 

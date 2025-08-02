@@ -40,7 +40,20 @@ let mockProperties: Property[] = [
     exit_date: '2025-08-31',
     available_from: '2025-09-01',
     contract_end_date: undefined,
-    images: [],
+    images: [
+      {
+        id: 'img-1',
+        url: 'https://via.placeholder.com/400x300?text=Property+1',
+        order: 1,
+        is_primary: true
+      },
+      {
+        id: 'img-2',
+        url: 'https://via.placeholder.com/400x300?text=Property+1-2',
+        order: 2,
+        is_primary: false
+      }
+    ],
     videos: [],
     virtual_tour_url: undefined,
     description: '역세권 신축 럭셔리 아파트입니다. 남향, 고층, 풀옵션.',
@@ -99,6 +112,14 @@ let mockProperties: Property[] = [
     created_at: '2025-01-18T11:00:00Z',
     updated_at: '2025-01-22T16:45:00Z',
     published_at: '2025-01-18T12:00:00Z',
+    images: [],
+    videos: [],
+    virtual_tour_url: undefined,
+    private_notes: '',
+    expires_at: undefined,
+    custom_fields: {},
+    sync_status: 'synced',
+    external_listings: []
   },
   {
     id: '00000000-0000-0000-0000-000000000003',
@@ -137,6 +158,14 @@ let mockProperties: Property[] = [
     created_at: '2025-01-20T08:30:00Z',
     updated_at: '2025-01-25T10:15:00Z',
     published_at: '2025-01-20T09:00:00Z',
+    images: [],
+    videos: [],
+    virtual_tour_url: undefined,
+    private_notes: '',
+    expires_at: undefined,
+    custom_fields: {},
+    sync_status: 'synced',
+    external_listings: []
   }
 ]
 
@@ -229,7 +258,20 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     exit_date: propertyData.exit_date,
     available_from: undefined,
     contract_end_date: undefined,
-    images: [],
+    images: [
+      {
+        id: 'img-1',
+        url: 'https://via.placeholder.com/400x300?text=Property+1',
+        order: 1,
+        is_primary: true
+      },
+      {
+        id: 'img-2',
+        url: 'https://via.placeholder.com/400x300?text=Property+1-2',
+        order: 2,
+        is_primary: false
+      }
+    ],
     videos: [],
     virtual_tour_url: undefined,
     description: propertyData.description,

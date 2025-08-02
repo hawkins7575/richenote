@@ -4,16 +4,15 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, Plus, Grid, AlignLeft, Filter, Settings, Trash2, Edit, Eye, Heart } from 'lucide-react'
+import { Search, Plus, Grid, AlignLeft, Settings, Trash2, Edit, Eye, Heart } from 'lucide-react'
 import { Button, Card, Badge, Input, Select, Modal, Loading } from '@/components/ui'
 import { PropertyCreateForm } from '@/components/forms/PropertyCreateForm'
 import { useProperties } from '@/hooks/useProperties'
 import { useTenant } from '@/contexts/TenantContext'
-import { useAuth } from '@/contexts/AuthContext'
 import type { SimplePropertyFilters, Property, CreatePropertyData } from '@/types'
 
 const PropertiesPageNew: React.FC = () => {
-  const { user } = useAuth()
+  
   const { tenant } = useTenant()
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')

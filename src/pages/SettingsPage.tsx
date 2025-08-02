@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react'
 import { Save, Upload, Download, Trash2, Bell, Shield, CreditCard, Palette } from 'lucide-react'
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Select, Badge } from '@/components/ui'
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 
 const SettingsPage: React.FC = () => {

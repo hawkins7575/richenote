@@ -47,7 +47,7 @@ const TenantRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<DashboardPage />} />
-      <Route path="/properties" element={<PropertiesPage />} />
+      <Route path="/properties" element={<PropertiesPageNew />} />
       <Route path="/team" element={<TeamPage />} />
       <Route path="/settings" element={<SettingsPage />} />
     </Routes>

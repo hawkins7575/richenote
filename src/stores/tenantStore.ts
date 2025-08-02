@@ -257,7 +257,7 @@ export const useTenantStore = create<TenantState>()(
       },
 
       // 리소스 제한 확인
-      isWithinLimits: (resource: keyof Tenant['limits']) => {
+      isWithinLimits: (_resource: keyof Tenant['limits']) => {
         const { tenant } = get()
         if (!tenant) return false
         

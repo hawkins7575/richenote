@@ -119,7 +119,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
     try {
       const updatedProperty = await updateProperty(propertyId, propertyData, tenant.id)
       setProperties(prev => 
-        prev.map(p => p.id === propertyId ? updatedProperty : p)
+        prev.map(p => p.id === propertyId ? updatedProperty : p).filter((p): p is Property => p !== null)
       )
       return updatedProperty
     } catch (err) {
@@ -150,7 +150,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
     try {
       const updatedProperty = await updatePropertyStatus(propertyId, status, tenant.id)
       setProperties(prev => 
-        prev.map(p => p.id === propertyId ? updatedProperty : p)
+        prev.map(p => p.id === propertyId ? updatedProperty : p).filter((p): p is Property => p !== null)
       )
       return updatedProperty
     } catch (err) {

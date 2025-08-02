@@ -4,10 +4,16 @@
 
 import React from 'react'
 import { Home, Users, TrendingUp, Calendar } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent, Badge, Loading } from '@/components/ui'
+import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePropertyStats } from '@/hooks/useProperties'
+import { 
+  PropertyTrendChart, 
+  PropertyTypeChart, 
+  RevenueChart, 
+  PerformanceMetrics 
+} from '@/components/charts'
 
 const DashboardPage: React.FC = () => {
   const { tenant } = useTenant()
@@ -139,6 +145,23 @@ const DashboardPage: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* 차트 섹션 */}
+      <div className="space-y-6">
+        {/* 매물 트렌드 및 유형 분포 */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <PropertyTrendChart className="xl:col-span-2" />
+          <PropertyTypeChart />
+        </div>
+
+        {/* 수익 분석 및 성과 지표 */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <RevenueChart />
+          <div>
+            <PerformanceMetrics />
+          </div>
+        </div>
+      </div>
 
       {/* 최근 등록 매물 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

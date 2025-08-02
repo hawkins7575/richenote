@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User, Session, AuthError } from '@supabase/supabase-js'
+import { Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '@/services/supabase'
 import type { AuthUser, SignUpData, SignInData } from '@/types'
 
@@ -11,8 +11,8 @@ interface AuthContextType {
   user: AuthUser | null
   session: Session | null
   loading: boolean
-  signUp: (data: SignUpData) => Promise<{ user: User | null; error: AuthError | null }>
-  signIn: (data: SignInData) => Promise<{ user: User | null; error: AuthError | null }>
+  signUp: (data: SignUpData) => Promise<any>
+  signIn: (data: SignInData) => Promise<any>
   signOut: () => Promise<{ error: AuthError | null }>
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>
 }
