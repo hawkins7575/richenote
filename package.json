@@ -1,0 +1,63 @@
+{
+  "name": "propertydesk-saas",
+  "version": "1.0.0",
+  "description": "부동산 중개업소 전용 SaaS 매물관리 플랫폼",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "@hookform/resolvers": "^3.3.2",
+    "@supabase/supabase-js": "^2.53.0",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.39",
+    "@types/react-dom": "^18.2.17",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.20.1",
+    "tailwind-merge": "^3.3.1",
+    "typescript": "^5.3.2",
+    "zod": "^3.22.4",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^29.5.8",
+    "@vitejs/plugin-react": "^4.1.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.31",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.2"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "jest",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "real-estate",
+    "saas",
+    "property-management",
+    "multi-tenant",
+    "react",
+    "typescript"
+  ],
+  "author": "PropertyDesk Team",
+  "license": "MIT"
+}

@@ -1,0 +1,57 @@
+// ============================================================================
+// PropertyDesk SaaS - 메인 애플리케이션 컴포넌트
+// ============================================================================
+
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from '@/contexts/AuthContext'
+import { TenantProvider } from '@/contexts/TenantContext'
+import { AuthGuard } from '@/components/auth'
+import { AppLayout } from '@/components/layout'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { PropertiesPageNew } from '@/pages/PropertiesPageNew'
+import { TeamPage } from '@/pages/TeamPage'
+import { SettingsPage } from '@/pages/SettingsPage'
+import '@/styles/globals.css'
+
+function App() {
+  return (
+    <AuthProvider>
+      <TenantProvider>
+        <Router>
+          <AuthGuard>
+            <AppLayout>
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/properties" element={<PropertiesPageNew />} />
+                <Route path="/team" element={<TeamPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                
+                {/* 테넌트별 라우팅 */}
+                <Route path="/tenant/:tenantSlug/*" element={<TenantRoutes />} />
+                
+                {/* 404 처리 */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AppLayout>
+          </AuthGuard>
+        </Router>
+      </TenantProvider>
+    </AuthProvider>
+  )
+}
+
+// 테넌트별 라우팅 처리
+const TenantRoutes: React.FC = () => {
+  // TODO: 테넌트 슬러그 기반 라우팅 로직
+  return (
+    <Routes>
+      <Route path="/" element={<DashboardPage />} />
+      <Route path="/properties" element={<PropertiesPage />} />
+      <Route path="/team" element={<TeamPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Routes>
+  )
+}
+
+export default App
