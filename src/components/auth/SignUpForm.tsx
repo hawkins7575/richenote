@@ -109,6 +109,14 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* 베타 테스트 안내 */}
+              <div className="flex items-center space-x-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+                <CheckCircle size={16} />
+                <span className="text-sm">
+                  <strong>베타 테스트 중:</strong> 이메일 인증 없이 즉시 로그인 가능합니다.
+                </span>
+              </div>
+
               {/* 오류/성공 메시지 */}
               {error && (
                 <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
