@@ -5,25 +5,28 @@
 import { supabase } from './supabase'
 import type { Property, SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } from '@/types'
 
-// 개발 환경에서는 모킹된 서비스 사용
-const isDevelopment = import.meta.env.VITE_APP_ENV === 'development'
+// 🚨 강제로 프로덕션 모드 사용 - Mock 서비스 완전 비활성화
+const isDevelopment = false // import.meta.env.VITE_APP_ENV === 'development'
 
-// 개발 환경용 모킹된 서비스 동적 임포트
-let mockService: any = null
-if (isDevelopment) {
-  import('./mockPropertyService').then(service => {
-    mockService = service
-  })
-}
+// 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
+// let mockService: any = null
+// if (isDevelopment) {
+//   import('./mockPropertyService').then(service => {
+//     mockService = service
+//   })
+// }
 
 // 매물 조회 (테넌트별)
 export const getProperties = async (tenantId: string, filters?: SimplePropertyFilters) => {
-  // 개발 환경에서는 모킹된 서비스 사용
-  if (isDevelopment && mockService) {
-    return mockService.getProperties(tenantId, filters)
-  }
+  console.log('🔍 매물 조회 시작:', { tenantId, filters, isDevelopment })
+  
+  // 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
+  // if (isDevelopment && mockService) {
+  //   return mockService.getProperties(tenantId, filters)
+  // }
   
   try {
+    console.log('📡 실제 Supabase에서 매물 조회 중...')
     let query = supabase
       .from('properties')
       .select('*')
@@ -122,12 +125,16 @@ export const getProperty = async (propertyId: string, tenantId: string) => {
 
 // 매물 생성
 export const createProperty = async (propertyData: CreatePropertyData, tenantId: string, userId: string) => {
-  // 개발 환경에서는 모킹된 서비스 사용
-  if (isDevelopment && mockService) {
-    return mockService.createProperty(propertyData, tenantId, userId)
-  }
+  console.log('🏠 매물 생성 시작:', { propertyData, tenantId, userId, isDevelopment })
+  
+  // 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
+  // if (isDevelopment && mockService) {
+  //   console.log('⚠️ 개발 환경 - Mock 서비스 사용')
+  //   return mockService.createProperty(propertyData, tenantId, userId)
+  // }
   
   try {
+    console.log('📡 실제 Supabase에 매물 생성 요청 중...')
     // 프론트엔드 데이터를 데이터베이스 스키마에 맞게 변환
     const dbData = {
       tenant_id: tenantId,
@@ -151,6 +158,8 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       view_count: 0
     }
 
+    console.log('💾 데이터베이스 삽입 데이터:', dbData)
+    
     const { data, error } = await supabase
       .from('properties')
       .insert(dbData)
@@ -158,9 +167,11 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       .single()
 
     if (error) {
-      console.error('Error creating property:', error)
+      console.error('❌ 매물 생성 실패:', error)
       throw error
     }
+    
+    console.log('✅ 매물 생성 성공:', data)
 
     // 프론트엔드 타입에 맞게 변환
     const transformedData = {
@@ -270,6 +281,8 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
 
 // 매물 통계 조회
 export const getPropertyStats = async (tenantId: string) => {
+  console.log('📊 매물 통계 조회 시작:', { tenantId })
+  
   try {
     const { data, error } = await supabase
       .from('properties')
@@ -278,9 +291,12 @@ export const getPropertyStats = async (tenantId: string) => {
       .eq('is_active', true)
 
     if (error) {
-      console.error('Error fetching property stats:', error)
+      console.error('❌ 매물 통계 조회 실패:', error)
       throw error
     }
+
+    console.log('📊 조회된 매물 데이터:', data)
+    console.log('📊 데이터 개수:', data?.length || 0)
 
     const stats = {
       total: data.length,
@@ -299,6 +315,7 @@ export const getPropertyStats = async (tenantId: string) => {
       }
     }
 
+    console.log('📊 계산된 통계:', stats)
     return stats
   } catch (error) {
     console.error('Error in getPropertyStats:', error)

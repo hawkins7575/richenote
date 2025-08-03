@@ -26,6 +26,59 @@ const PROPERTY_STATUS: PropertyStatus[] = [
   '판매중', '예약중', '거래완료', '임시보관', '만료됨'
 ]
 
+// 🧪 테스트용 샘플 데이터
+const SAMPLE_PROPERTIES = [
+  {
+    title: '강남역 신축 오피스텔',
+    address: '서울시 강남구 강남대로 123',
+    type: '오피스텔' as PropertyType,
+    transaction_type: '월세' as TransactionType,
+    deposit: 2000,
+    monthly_rent: 120,
+    floor: 15,
+    total_floors: 20,
+    area: 33.0,
+    rooms: 1,
+    bathrooms: 1,
+    parking: true,
+    elevator: true,
+    description: '강남역 도보 3분 거리의 신축 오피스텔입니다. 깨끗하고 편리한 시설을 갖추고 있습니다.',
+    status: '판매중' as PropertyStatus
+  },
+  {
+    title: '홍대입구 투룸 원룸',
+    address: '서울시 마포구 와우산로 45',
+    type: '원룸' as PropertyType,
+    transaction_type: '전세' as TransactionType,
+    deposit: 15000,
+    floor: 3,
+    total_floors: 5,
+    area: 42.0,
+    rooms: 2,
+    bathrooms: 1,
+    parking: false,
+    elevator: false,
+    description: '홍대입구역 근처 조용한 주택가의 투룸 원룸입니다. 대학생이나 직장인에게 적합합니다.',
+    status: '판매중' as PropertyStatus
+  },
+  {
+    title: '잠실 리체타워 아파트',
+    address: '서울시 송파구 잠실로 789',
+    type: '아파트' as PropertyType,
+    transaction_type: '매매' as TransactionType,
+    price: 65000,
+    floor: 12,
+    total_floors: 25,
+    area: 84.0,
+    rooms: 3,
+    bathrooms: 2,
+    parking: true,
+    elevator: true,
+    description: '잠실 롯데타워 인근의 고급 아파트입니다. 한강뷰와 우수한 교통편을 자랑합니다.',
+    status: '판매중' as PropertyStatus
+  }
+]
+
 export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   isOpen,
   onClose,
@@ -62,6 +115,14 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         [field]: undefined
       }))
     }
+  }
+
+  // 🧪 테스트용 샘플 데이터 자동 입력
+  const fillSampleData = (index: number = 0) => {
+    const sample = SAMPLE_PROPERTIES[index % SAMPLE_PROPERTIES.length]
+    setFormData(sample)
+    setErrors({})
+    console.log('✅ 샘플 데이터 입력 완료:', sample.title)
   }
 
   const validateForm = (): boolean => {
@@ -155,14 +216,31 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>새 매물 등록</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="p-1 h-8 w-8"
-            >
-              <X size={16} />
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* 🧪 테스트용 샘플 데이터 버튼 */}
+              <div className="flex gap-1">
+                {SAMPLE_PROPERTIES.map((sample, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fillSampleData(index)}
+                    className="h-8 px-2 text-xs"
+                    type="button"
+                  >
+                    {sample.title.split(' ')[0]}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="p-1 h-8 w-8"
+              >
+                <X size={16} />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         
