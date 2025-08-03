@@ -293,6 +293,7 @@ export interface CreatePropertyData {
   landlord_phone?: string
   exit_date?: string
   description?: string
+  images?: string[]
   status?: PropertyStatus
 }
 

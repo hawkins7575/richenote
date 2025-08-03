@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTenant } from '@/contexts/TenantContext'
-import { getPropertyStats, createProperty, updateProperty, deleteProperty, updatePropertyStatus } from '@/services'
+import { getProperties, getPropertyStats, createProperty, updateProperty, deleteProperty, updatePropertyStatus } from '@/services'
 import type { Property, SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 export const useProperties = (filters?: SimplePropertyFilters) => {
@@ -29,82 +29,16 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
       setError(null)
       console.log('🔍 매물 데이터 로딩 중... (테넌트:', tenant.name, ')')
       
-      // 5초 타임아웃 설정
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('매물 로딩 시간 초과')), 5000)
-      )
+      // 실제 서비스 함수 호출
+      const data = await getProperties(tenant.id, filters)
       
-      const dataPromise = new Promise(resolve => {
-        // 1초 후 데이터 반환 (네트워크 지연 시뮬레이션)
-        setTimeout(() => resolve('data'), 1000)
-      })
-      
-      await Promise.race([dataPromise, timeoutPromise])
-      
-      // 임시: 직접 모의 데이터 제공
-      const mockData = [
-        {
-          id: '1',
-          tenant_id: tenant.id,
-          created_by: 'demo-user',
-          title: '강남구 신사동 럭셔리 아파트',
-          type: '아파트' as const,
-          transaction_type: '매매' as const,
-          status: '판매중' as const,
-          price: 350000,
-          address: '서울시 강남구 신사동 123-45',
-          area: 85,
-          floor: 15,
-          total_floors: 25,
-          rooms: 3,
-          bathrooms: 2,
-          parking: true,
-          elevator: true,
-          options: [],
-          images: [],
-          view_count: 45,
-          inquiry_count: 12,
-          is_featured: false,
-          is_urgent: false,
-          is_favorite: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          tenant_id: tenant.id,
-          created_by: 'demo-user',
-          title: '홍대 근처 깔끔한 원룸',
-          type: '원룸' as const,
-          transaction_type: '월세' as const,
-          status: '판매중' as const,
-          deposit: 1000,
-          monthly_rent: 50,
-          address: '서울시 마포구 홍익로 45-12',
-          area: 20,
-          floor: 3,
-          total_floors: 5,
-          rooms: 1,
-          bathrooms: 1,
-          parking: false,
-          elevator: false,
-          options: [],
-          images: [],
-          view_count: 32,
-          inquiry_count: 8,
-          is_featured: false,
-          is_urgent: false,
-          is_favorite: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      ]
-      
-      console.log('✅ 모의 데이터 로딩 성공:', mockData)
-      setProperties(mockData)
+      console.log('✅ 실제 데이터 로딩 성공:', data)
+      setProperties(data || [])
     } catch (err) {
       console.error('❌ 데이터 로딩 실패:', err)
       setError('매물을 불러오는 중 오류가 발생했습니다.')
+      // 에러 발생시 빈 배열로 설정
+      setProperties([])
     } finally {
       setLoading(false)
     }
