@@ -1,7 +1,7 @@
 {
-  "name": "propertydesk-saas",
+  "name": "richey-property-manager",
   "version": "1.0.0",
-  "description": "부동산 중개업소 전용 SaaS 매물관리 플랫폼",
+  "description": "리체 부동산 전용 매물관리 플랫폼",
   "type": "module",
   "private": true,
   "dependencies": {

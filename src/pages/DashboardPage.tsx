@@ -85,7 +85,7 @@ const DashboardPage: React.FC = () => {
       {/* 페이지 헤더 */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          안녕하세요, {user?.name}님! {tenant?.name || 'PropertyDesk'}에 오신 것을 환영합니다 👋
+          안녕하세요, {user?.name}님! {tenant?.name || '리체 매물장'}에 오신 것을 환영합니다 👋
         </h1>
         <p className="text-gray-600 mt-1">
           오늘의 매물 현황을 확인해보세요

@@ -57,7 +57,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  {tenant?.name || 'PropertyDesk'}
+                  {tenant?.name || '리체 매물장'}
                 </h1>
                 <p className="text-xs text-gray-500">{tenant?.plan} 플랜</p>
               </div>

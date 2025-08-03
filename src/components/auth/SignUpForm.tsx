@@ -85,10 +85,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
         {/* 로고 및 헤더 */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full text-white text-2xl font-bold mb-4">
-            P
+            리
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            PropertyDesk
+            리체 매물장
           </h1>
           <p className="text-gray-600">
             부동산 전문 관리 솔루션
@@ -265,7 +265,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
 
         {/* 푸터 */}
         <div className="text-center mt-8 text-sm text-gray-500">
-          <p>© 2025 PropertyDesk. All rights reserved.</p>
+          <p>© 2025 리체 매물장. All rights reserved.</p>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 {
-  "name": "PropertyDesk - 부동산 매물관리",
-  "short_name": "PropertyDesk",
-  "description": "부동산 중개업소 전용 매물관리 플랫폼",
+  "name": "리체 매물장 - 부동산 매물관리",
+  "short_name": "리체 매물장",
+  "description": "리체 부동산 전용 매물관리 플랫폼",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
