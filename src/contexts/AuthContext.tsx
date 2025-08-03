@@ -37,13 +37,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 개발 환경에서 데모 사용자 자동 로그인
-    if (import.meta.env.VITE_APP_ENV === 'development') {
+    // 개발 환경에서 데모 사용자 자동 로그인 (프로덕션에서는 비활성화)
+    if (import.meta.env.VITE_APP_ENV === 'development' && import.meta.env.DEV) {
       const demoUser: AuthUser = {
         id: '00000000-0000-0000-0000-000000000001',
         email: 'demo@propertydesk.com',
         name: '데모 관리자',
-        role: 'admin',
+        role: 'owner',
         tenant_id: '00000000-0000-0000-0000-000000000001',
         avatar_url: null,
         created_at: new Date().toISOString(),
@@ -55,29 +55,66 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return
     }
 
-    // 초기 세션 확인
+    // 초기 세션 확인 (타임아웃 포함)
     const getSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        // 5초 타임아웃 설정
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), 5000)
+        )
+        
+        const sessionPromise = supabase.auth.getSession()
+        
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise, 
+          timeoutPromise
+        ]) as any
+        
         if (error) {
           console.error('Error getting session:', error)
-        } else {
-          setSession(session)
-          if (session?.user) {
-            // 사용자 프로필 정보 가져오기
-            const { data: profile } = await supabase
+          setLoading(false)
+          return
+        }
+        
+        setSession(session)
+        if (session?.user) {
+          try {
+            // 사용자 프로필 정보 가져오기 (타임아웃 포함)
+            const profilePromise = supabase
               .from('user_profiles')
               .select('*')
               .eq('id', session.user.id)
               .single()
+              
+            const profileTimeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
+            )
+            
+            const { data: profile } = await Promise.race([
+              profilePromise,
+              profileTimeoutPromise
+            ]) as any
 
             setUser({
               id: session.user.id,
               email: session.user.email!,
               name: profile?.name || session.user.user_metadata?.name || '',
-              role: profile?.role || 'agent',
+              role: profile?.role || 'owner',
               tenant_id: profile?.tenant_id || null,
               avatar_url: profile?.avatar_url || null,
+              created_at: session.user.created_at,
+              last_sign_in_at: session.user.last_sign_in_at || null,
+            })
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError)
+            // 프로필 가져오기 실패 시 기본 사용자 정보만 설정
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              name: session.user.user_metadata?.name || session.user.email!,
+              role: 'owner',
+              tenant_id: null,
+              avatar_url: null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
             })
@@ -92,31 +129,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     getSession()
 
-    // 인증 상태 변경 리스너
+    // 인증 상태 변경 리스너 (타임아웃 포함)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session)
+        console.log('🔐 Auth state changed:', event, session?.user?.id, session?.user?.email)
         
         setSession(session)
         
         if (session?.user) {
-          // 사용자 프로필 정보 가져오기
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
+          try {
+            // 사용자 프로필 정보 가져오기 (타임아웃 포함)
+            const profilePromise = supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+              
+            const profileTimeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
+            )
+            
+            const { data: profile } = await Promise.race([
+              profilePromise,
+              profileTimeoutPromise
+            ]) as any
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            name: profile?.name || session.user.user_metadata?.name || '',
-            role: profile?.role || 'agent',
-            tenant_id: profile?.tenant_id || null,
-            avatar_url: profile?.avatar_url || null,
-            created_at: session.user.created_at,
-            last_sign_in_at: session.user.last_sign_in_at || null,
-          })
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              name: profile?.name || session.user.user_metadata?.name || '',
+              role: profile?.role || 'owner',
+              tenant_id: profile?.tenant_id || null,
+              avatar_url: profile?.avatar_url || null,
+              created_at: session.user.created_at,
+              last_sign_in_at: session.user.last_sign_in_at || null,
+            })
+          } catch (profileError) {
+            console.error('Error fetching profile in auth state change:', profileError)
+            // 프로필 가져오기 실패 시 기본 사용자 정보만 설정
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              name: session.user.user_metadata?.name || session.user.email!,
+              role: 'owner',
+              tenant_id: null,
+              avatar_url: null,
+              created_at: session.user.created_at,
+              last_sign_in_at: session.user.last_sign_in_at || null,
+            })
+          }
         } else {
           setUser(null)
         }
@@ -141,20 +202,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       })
 
-      // 회원가입 성공 시 user_profiles 테이블에 프로필 생성
+      // 회원가입 성공 시 새 테넌트 생성 및 사용자를 Owner로 설정
       if (result.data.user && !result.error) {
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: result.data.user.id,
-            email: data.email,
-            name: data.name,
-            role: 'admin', // 첫 번째 사용자는 관리자
-            tenant_id: null, // 추후 테넌트 생성 시 업데이트
+        try {
+          // create_tenant_and_owner 함수 호출하여 독립적인 테넌트 생성
+          console.log('🏢 Creating tenant for user:', result.data.user.id)
+          
+          const rpcPromise = supabase.rpc('create_tenant_and_owner', {
+            tenant_name: data.company || `${data.name}의 부동산`,
+            user_name: data.name,
+            user_company: data.company
           })
+          
+          const rpcTimeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Tenant creation timeout')), 10000)
+          )
+          
+          const { data: tenantData, error: tenantError } = await Promise.race([
+            rpcPromise,
+            rpcTimeoutPromise
+          ]) as any
 
-        if (profileError) {
-          console.error('Error creating user profile:', profileError)
+          if (tenantError) {
+            console.error('Error creating tenant:', tenantError)
+            // 테넌트 생성 실패 시 기본 프로필만 생성
+            const { error: profileError } = await supabase
+              .from('user_profiles')
+              .insert({
+                id: result.data.user.id,
+                email: data.email,
+                name: data.name,
+                role: 'owner', // 첫 번째 사용자는 Owner
+                tenant_id: null,
+              })
+
+            if (profileError) {
+              console.error('Error creating user profile:', profileError)
+            }
+          } else {
+            console.log('✅ 새 테넌트 생성 완료:', tenantData)
+          }
+        } catch (error) {
+          console.error('Error in tenant creation process:', error)
         }
       }
 

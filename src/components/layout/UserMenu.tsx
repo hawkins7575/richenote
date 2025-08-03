@@ -59,8 +59,9 @@ export const UserMenu: React.FC = () => {
         <div className="text-left hidden md:block">
           <p className="text-sm font-medium text-gray-900">{user.name}</p>
           <p className="text-xs text-gray-500">
-            {user.role === 'admin' ? '관리자' : 
-             user.role === 'manager' ? '팀장' : '상담원'}
+            {user.role === 'owner' ? '업체 대표' : 
+             user.role === 'manager' ? '팀장/실장' : 
+             user.role === 'agent' ? '중개사' : '조회자'}
           </p>
         </div>
         

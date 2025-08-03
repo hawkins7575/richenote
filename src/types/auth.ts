@@ -6,7 +6,7 @@ export interface AuthUser {
   id: string
   email: string
   name: string
-  role: 'admin' | 'manager' | 'agent'
+  role: 'owner' | 'manager' | 'agent' | 'viewer'
   tenant_id: string | null
   avatar_url: string | null
   created_at: string

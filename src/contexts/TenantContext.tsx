@@ -26,15 +26,17 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
     isWithinLimits,
   } = useTenantStore()
 
-  // 페이지 로드 시 URL에서 테넌트 감지 또는 개발 환경에서 데모 테넌트 설정
+  // 페이지 로드 시 URL에서 테넌트 감지 또는 자동 테넌트 설정
   useEffect(() => {
-    // 개발 환경에서 데모 테넌트 자동 설정
-    if (import.meta.env.VITE_APP_ENV === 'development' && !tenant) {
+    // 개발 및 프로덕션 환경에서 데모 테넌트 자동 설정 (베타 테스트용)
+    if (!tenant) {
+      console.log('🏢 자동 테넌트 설정 시작')
+      
       // 데모 테넌트 데이터를 Zustand 스토어에 직접 설정
       const demoTenant = {
         id: '00000000-0000-0000-0000-000000000001',
-        name: 'PropertyDesk 데모',
-        slug: 'propertydesk-demo',
+        name: 'PropertyDesk 베타',
+        slug: 'propertydesk-beta',
         plan: 'professional' as const,
         status: 'trial' as const,
         trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -75,6 +77,8 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
         isLoading: false,
         error: null 
       })
+      
+      console.log('✅ 자동 테넌트 설정 완료:', demoTenant.name)
       return
     }
 

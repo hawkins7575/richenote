@@ -16,12 +16,30 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
   const [error, setError] = useState<string | null>(null)
 
   const fetchProperties = useCallback(async () => {
-    if (!tenant?.id) return
+    if (!tenant?.id) {
+      console.log('⏳ 테넌트 정보 대기 중...')
+      setLoading(false)
+      setError(null)
+      setProperties([])
+      return
+    }
     
     try {
       setLoading(true)
       setError(null)
-      console.log('🔍 직접 모의 데이터 로딩 중...')
+      console.log('🔍 매물 데이터 로딩 중... (테넌트:', tenant.name, ')')
+      
+      // 5초 타임아웃 설정
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('매물 로딩 시간 초과')), 5000)
+      )
+      
+      const dataPromise = new Promise(resolve => {
+        // 1초 후 데이터 반환 (네트워크 지연 시뮬레이션)
+        setTimeout(() => resolve('data'), 1000)
+      })
+      
+      await Promise.race([dataPromise, timeoutPromise])
       
       // 임시: 직접 모의 데이터 제공
       const mockData = [

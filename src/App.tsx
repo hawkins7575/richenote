@@ -15,6 +15,7 @@ import { SettingsPage } from '@/pages/SettingsPage'
 import '@/styles/globals.css'
 
 function App() {
+
   return (
     <AuthProvider>
       <TenantProvider>
