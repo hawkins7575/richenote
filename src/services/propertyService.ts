@@ -275,6 +275,7 @@ export const getPropertyStats = async (tenantId: string) => {
       .from('properties')
       .select('status, transaction_type, created_at')
       .eq('tenant_id', tenantId)
+      .eq('is_active', true)
 
     if (error) {
       console.error('Error fetching property stats:', error)
@@ -283,18 +284,18 @@ export const getPropertyStats = async (tenantId: string) => {
 
     const stats = {
       total: data.length,
-      active: data.filter(p => p.status === 'available').length,
-      reserved: data.filter(p => p.status === 'reserved').length,
-      sold: data.filter(p => p.status === 'sold').length,
+      active: data.filter(p => p.status === '판매중').length,
+      reserved: data.filter(p => p.status === '예약중').length,
+      sold: data.filter(p => p.status === '거래완료').length,
       this_month: data.filter(p => {
         const created = new Date(p.created_at)
         const now = new Date()
         return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear()
       }).length,
       by_transaction_type: {
-        sale: data.filter(p => p.transaction_type === 'sale').length,
-        jeonse: data.filter(p => p.transaction_type === 'jeonse').length,
-        monthly: data.filter(p => p.transaction_type === 'monthly').length,
+        sale: data.filter(p => p.transaction_type === '매매').length,
+        jeonse: data.filter(p => p.transaction_type === '전세').length,
+        monthly: data.filter(p => p.transaction_type === '월세').length,
       }
     }
 
