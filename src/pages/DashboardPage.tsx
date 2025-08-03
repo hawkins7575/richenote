@@ -10,9 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { usePropertyStats } from '@/hooks/useProperties'
 import { 
   PropertyTrendChart, 
-  PropertyTypeChart, 
-  RevenueChart, 
-  PerformanceMetrics 
+  PropertyTypeChart
 } from '@/components/charts'
 
 const DashboardPage: React.FC = () => {
@@ -152,14 +150,6 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <PropertyTrendChart className="xl:col-span-2" />
           <PropertyTypeChart />
-        </div>
-
-        {/* 수익 분석 및 성과 지표 */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <RevenueChart />
-          <div>
-            <PerformanceMetrics />
-          </div>
         </div>
       </div>
 

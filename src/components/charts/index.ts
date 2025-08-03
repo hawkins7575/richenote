@@ -4,5 +4,3 @@
 
 export { PropertyTrendChart } from './PropertyTrendChart'
 export { PropertyTypeChart } from './PropertyTypeChart'
-export { RevenueChart } from './RevenueChart'
-export { PerformanceMetrics } from './PerformanceMetrics'
