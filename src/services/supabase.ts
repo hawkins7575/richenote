@@ -13,14 +13,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('문서를 참조하여 Supabase 환경 변수를 설정해주세요.')
 }
 
-// Supabase 클라이언트 생성
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+// Supabase 클라이언트 생성 (싱글톤 패턴)
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null
+
+export const supabase = (() => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storageKey: 'sb-auth-token'
+      }
+    })
   }
-})
+  return supabaseInstance
+})()
 
 // 타입 도우미 함수
 export type SupabaseClient = typeof supabase

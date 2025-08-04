@@ -3,7 +3,6 @@
 // ============================================================================
 
 export { DashboardPage } from './DashboardPage'
-export { PropertiesPage } from './PropertiesPage'
 export { PropertiesPageNew } from './PropertiesPageNew'
 export { TeamPage } from './TeamPage'
 export { SettingsPage } from './SettingsPage'

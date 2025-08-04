@@ -20,7 +20,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    host: 'localhost',
+    open: false,
+    strictPort: false,
+    cors: true
   },
   build: {
     outDir: 'dist',

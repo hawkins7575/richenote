@@ -418,7 +418,8 @@ export const PricingTiers = {
       features: [
         '고급 매물 관리', 'CRM 시스템', '분석 대시보드',
         '자동화 워크플로우', '우선 지원'
-      ]
+
+]
     },
     target: '중소형 부동산업체'
   },

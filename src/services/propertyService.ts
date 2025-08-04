@@ -6,7 +6,7 @@ import { supabase } from './supabase'
 import type { Property, SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 // 🚨 강제로 프로덕션 모드 사용 - Mock 서비스 완전 비활성화
-const isDevelopment = false // import.meta.env.VITE_APP_ENV === 'development'
+const isDevelopment = false
 
 // 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
 // let mockService: any = null
@@ -19,6 +19,8 @@ const isDevelopment = false // import.meta.env.VITE_APP_ENV === 'development'
 // 매물 조회 (테넌트별)
 export const getProperties = async (tenantId: string, filters?: SimplePropertyFilters) => {
   console.log('🔍 매물 조회 시작:', { tenantId, filters, isDevelopment })
+  console.log('🔧 Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
+  console.log('🔧 Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '설정됨' : '없음')
   
   // 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
   // if (isDevelopment && mockService) {
@@ -27,11 +29,16 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
   
   try {
     console.log('📡 실제 Supabase에서 매물 조회 중...')
+    console.log('📊 조회 쿼리 정보:', {
+      table: 'properties',
+      tenant_id: tenantId,
+      is_active: true
+    })
+    
     let query = supabase
       .from('properties')
       .select('*')
       .eq('tenant_id', tenantId)
-      .eq('is_active', true)
       .order('created_at', { ascending: false })
 
     // 필터 적용
@@ -43,18 +50,23 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
         query = query.eq('transaction_type', filters.transaction_type)
       }
       if (filters.property_type && filters.property_type !== '전체') {
-        query = query.eq('property_type', filters.property_type)
+        query = query.eq('type', filters.property_type)
       }
     }
 
     const { data, error } = await query
 
     if (error) {
-      console.error('Error fetching properties:', error)
+      console.error('❌ Supabase 조회 에러:', error)
+      console.error('❌ 에러 세부사항:', { message: error.message, details: error.details, hint: error.hint, code: error.code })
       throw error
     }
 
-    // 데이터 변환하여 프론트엔드 타입에 맞춤
+    console.log('✅ Supabase 조회 성공!')
+    console.log('📊 조회된 원본 데이터 개수:', data?.length || 0)
+    console.log('📋 첫 번째 데이터 샘플:', data?.[0])
+
+    // 데이터 변환하여 프론트엔드 타입에 맞춤 (실제 DB 컬럼명 사용)
     const transformedData = (data || []).map((item: any) => ({
       id: item.id,
       tenant_id: item.tenant_id,
@@ -73,22 +85,27 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
       monthly_rent: item.monthly_rent,
       description: item.description,
       images: item.images || [],
-      is_featured: item.featured || false,
-      view_count: item.view_count || 0,
+      is_featured: false,
+      view_count: 0,
       created_at: item.created_at,
       updated_at: item.updated_at,
-      status: '판매중' as const, // 기본 상태
-      parking: false, // 기본값
-      elevator: false, // 기본값
+      status: '판매중',
+      parking: false,
+      elevator: false,
       options: [],
       inquiry_count: 0,
       is_urgent: false,
       is_favorite: false
     }))
 
+    console.log('🔄 변환된 데이터:', transformedData)
+    console.log('📊 최종 반환 데이터 개수:', transformedData.length)
+    
     return transformedData
   } catch (error) {
-    console.error('Error in getProperties:', error)
+    console.error('💥 getProperties 전체 에러:', error)
+    console.error('💥 에러 타입:', typeof error)
+    console.error('💥 에러 정보:', error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error)
     throw error
   }
 }
@@ -152,10 +169,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       rooms: propertyData.rooms,
       bathrooms: propertyData.bathrooms,
       description: propertyData.description,
-      images: propertyData.images || [],
-      is_active: true,
-      featured: false,
-      view_count: 0
+      images: propertyData.images || []
     }
 
     console.log('💾 데이터베이스 삽입 데이터:', dbData)
@@ -173,7 +187,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     
     console.log('✅ 매물 생성 성공:', data)
 
-    // 프론트엔드 타입에 맞게 변환
+    // 프론트엔드 타입에 맞게 변환 (실제 DB 컬럼명 사용)
     const transformedData = {
       id: data.id,
       tenant_id: data.tenant_id,
@@ -192,8 +206,8 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       monthly_rent: data.monthly_rent,
       description: data.description,
       images: data.images || [],
-      is_featured: data.featured || false,
-      view_count: data.view_count || 0,
+      is_featured: false,
+      view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
       status: '판매중' as const,
@@ -286,9 +300,8 @@ export const getPropertyStats = async (tenantId: string) => {
   try {
     const { data, error } = await supabase
       .from('properties')
-      .select('status, transaction_type, created_at')
+      .select('transaction_type, created_at')
       .eq('tenant_id', tenantId)
-      .eq('is_active', true)
 
     if (error) {
       console.error('❌ 매물 통계 조회 실패:', error)
@@ -300,9 +313,9 @@ export const getPropertyStats = async (tenantId: string) => {
 
     const stats = {
       total: data.length,
-      active: data.filter(p => p.status === '판매중').length,
-      reserved: data.filter(p => p.status === '예약중').length,
-      sold: data.filter(p => p.status === '거래완료').length,
+      active: data.length, // 모든 매물을 활성으로 간주
+      reserved: 0,
+      sold: 0,
       this_month: data.filter(p => {
         const created = new Date(p.created_at)
         const now = new Date()
@@ -322,6 +335,7 @@ export const getPropertyStats = async (tenantId: string) => {
     throw error
   }
 }
+
 
 // 매물 즐겨찾기 토글
 export const togglePropertyFavorite = async (propertyId: string, tenantId: string) => {

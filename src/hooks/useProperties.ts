@@ -33,7 +33,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
       const data = await getProperties(tenant.id, filters)
       
       console.log('✅ 실제 데이터 로딩 성공:', data)
-      setProperties(data || [])
+      setProperties((data as Property[]) || [])
     } catch (err) {
       console.error('❌ 데이터 로딩 실패:', err)
       setError('매물을 불러오는 중 오류가 발생했습니다.')

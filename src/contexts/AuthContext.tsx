@@ -2,7 +2,7 @@
 // 인증 컨텍스트 - Supabase Auth 통합
 // ============================================================================
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '@/services/supabase'
 import type { AuthUser, SignUpData, SignInData } from '@/types'
@@ -37,12 +37,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 개발 환경에서 데모 사용자 자동 로그인 (프로덕션에서는 비활성화)
-    if (import.meta.env.VITE_APP_ENV === 'development' && import.meta.env.DEV) {
+    // 데모 모드 - 개발자 도구에서만 활성화 (일반 사용자는 사용 불가)
+    const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true' && import.meta.env.DEV
+    
+    console.log('🔍 환경 확인:', { 
+      hostname: window.location.hostname, 
+      isDemoMode,
+      VITE_APP_ENV: import.meta.env.VITE_APP_ENV,
+      DEV: import.meta.env.DEV 
+    })
+    
+    // 데모 모드는 개발자만 사용 (일반적으로 비활성화)
+    if (isDemoMode && false) { // false로 설정하여 데모 모드 완전 비활성화
+      console.log('🎭 데모 모드 - 자동 로그인')
       const demoUser: AuthUser = {
         id: '00000000-0000-0000-0000-000000000001',
         email: 'demo@propertydesk.com',
-        name: '데모 관리자',
+        name: '김대성',
         role: 'owner',
         tenant_id: '00000000-0000-0000-0000-000000000001',
         avatar_url: null,
@@ -291,7 +302,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     session,
     loading,
@@ -299,7 +310,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signOut,
     resetPassword,
-  }
+  }), [user, session, loading])
 
   return (
     <AuthContext.Provider value={value}>
