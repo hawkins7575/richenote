@@ -2,22 +2,41 @@
 // 대시보드 페이지
 // ============================================================================
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Home, Users, TrendingUp, Calendar } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
-import { usePropertyStats } from '@/hooks/useProperties'
+import { usePropertyStats, useProperties } from '@/hooks/useProperties'
 import { 
   PropertyTrendChart, 
   PropertyTypeChart
 } from '@/components/charts'
 import { StatCard } from '@/components/dashboard'
+import { PropertyCard, PropertyDetailModal } from '@/components/property'
+import { Property } from '@/types/property'
 
 const DashboardPage: React.FC = () => {
   const { tenant } = useTenant()
   const { user } = useAuth()
   const { stats, loading: statsLoading, error: statsError } = usePropertyStats()
+  const { properties } = useProperties()
+  
+  // 상세 모달 상태 관리
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // 매물 클릭 핸들러
+  const handlePropertyClick = (property: Property) => {
+    setSelectedProperty(property)
+    setIsModalOpen(true)
+  }
+
+  // 모달 닫기 핸들러
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedProperty(null)
+  }
 
   // 실제 통계 데이터 또는 기본값
   const dashboardStats = [
@@ -141,53 +160,54 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 최근 등록 매물 - 모바일 최적화 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">최근 등록 매물</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              {recentProperties.map((property) => (
-                <div key={property.id} className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 text-xs sm:text-sm truncate">
-                      {property.title}
-                    </h4>
-                    <div className="flex items-center space-x-1 sm:space-x-2 mt-1">
-                      <Badge variant="secondary" size="sm" className="text-xs">
-                        {property.type}
-                      </Badge>
-                      <Badge 
-                        variant={property.transactionType === '매매' ? 'sale' : property.transactionType === '전세' ? 'jeonse' : 'monthly'} 
-                        size="sm"
-                        className="text-xs"
-                      >
-                        {property.transactionType}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1 hidden sm:block">
-                      {property.createdAt}
-                    </p>
+      {/* 최근 등록 매물 - 새로운 카드 디자인 */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">최근 등록 매물</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {properties?.slice(0, 8).map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onClick={handlePropertyClick}
+              />
+            )) || recentProperties.map((property) => (
+              <div
+                key={property.id}
+                className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 space-y-3"
+                onClick={() => {/* Mock 데이터이므로 실제 Property 객체로 변환 필요 */}}
+              >
+                <h3 className="font-semibold text-gray-900 text-lg line-clamp-1">
+                  {property.title}
+                </h3>
+                <div className="flex items-center text-gray-600">
+                  <span className="text-sm">강남구</span>
+                </div>
+                <div className="flex items-center text-gray-900">
+                  <span className="font-bold text-lg">{property.price}</span>
+                </div>
+                <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">{property.type}</span>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-xs text-gray-500">{property.transactionType}</span>
                   </div>
-                  <div className="text-right ml-2">
-                    <p className="font-bold text-gray-900 text-xs sm:text-sm">
-                      {property.price}
-                    </p>
-                    <Badge 
-                      variant={property.status === '판매중' ? 'available' : 'reserved'}
-                      size="sm"
-                      className="text-xs mt-1"
-                    >
+                  <div className="flex items-center">
+                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${property.status === '판매중' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                    <span className={`text-xs font-medium ${property.status === '판매중' ? 'text-green-600' : 'text-yellow-600'}`}>
                       {property.status}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* 할 일 및 알림 섹션을 별도로 분리 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div></div> {/* 빈 공간 */}
 
         {/* 할 일 및 알림 - 모바일 최적화 */}
         <Card>
@@ -263,6 +283,18 @@ const DashboardPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* 매물 상세 모달 */}
+      <PropertyDetailModal
+        property={selectedProperty}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onEdit={(property) => {
+          // TODO: 매물 수정 페이지로 이동하는 로직 추가
+          console.log('Edit property:', property.id)
+          handleCloseModal()
+        }}
+      />
     </div>
   )
 }
