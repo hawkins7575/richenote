@@ -116,11 +116,11 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
         deposit: item.deposit ? parseFloat(item.deposit) : undefined,
         monthly_rent: item.monthly_rent ? parseFloat(item.monthly_rent) : undefined,
         description: item.description,
-        // 임대인 정보 - 로컬 저장소에서 가져오기
-        landlord_name: landlordInfo.landlord_name || item.landlord_name || undefined,
-        landlord_phone: landlordInfo.landlord_phone || item.landlord_phone || undefined,
-        // 퇴실 날짜 - 로컬 저장소에서 가져오기
-        exit_date: landlordInfo.exit_date || item.exit_date || undefined,
+        // 임대인 정보 - 로컬 저장소에서만 가져오기 (DB 컬럼 없음)
+        landlord_name: landlordInfo.landlord_name || undefined,
+        landlord_phone: landlordInfo.landlord_phone || undefined,
+        // 퇴실 날짜 - 로컬 저장소에서만 가져오기 (DB 컬럼 없음)
+        exit_date: landlordInfo.exit_date || undefined,
         images: item.images || [],
         is_featured: false,
         view_count: 0,
