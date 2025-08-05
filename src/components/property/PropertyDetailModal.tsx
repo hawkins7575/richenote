@@ -26,6 +26,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
   const price = formatPrice(property)
 
+  // 방갯수 포맷팅 (소수점 포함)
+  const formatRooms = (rooms: number) => {
+    return rooms % 1 === 0 ? `${rooms}룸` : `${rooms}룸`
+  }
+
   const handleEditClick = () => {
     if (onEdit) {
       onEdit(property)
@@ -148,7 +153,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-base text-gray-700 font-medium">구조</span>
-                    <span className="text-lg font-bold text-gray-900">{property.rooms}룸 {property.bathrooms}욕실</span>
+                    <span className="text-lg font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
                   </div>
                   
                   {/* 편의시설 */}
@@ -256,7 +261,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600">구조</span>
-                    <span className="text-sm font-bold text-gray-900">{property.rooms}룸 {property.bathrooms}욕실</span>
+                    <span className="text-sm font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
                   </div>
                   
                   {/* 편의시설 */}

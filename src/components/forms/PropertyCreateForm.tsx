@@ -282,14 +282,20 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   min="1"
                 />
                 
-                <Input
+                <Select
                   label="방 개수"
-                  type="number"
-                  value={formData.rooms || ''}
-                  onChange={(e) => handleInputChange('rooms', parseInt(e.target.value) || 1)}
+                  value={formData.rooms?.toString() || '1'}
+                  onChange={(e) => handleInputChange('rooms', parseFloat(e.target.value) || 1)}
                   error={errors.rooms}
-                  placeholder="3"
-                  min="1"
+                  options={[
+                    { value: '1', label: '1개' },
+                    { value: '1.5', label: '1.5개' },
+                    { value: '2', label: '2개' },
+                    { value: '2.5', label: '2.5개' },
+                    { value: '3', label: '3개' },
+                    { value: '4', label: '4개' },
+                    { value: '5', label: '5개' }
+                  ]}
                 />
                 
                 <Input
