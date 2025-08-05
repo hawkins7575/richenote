@@ -80,12 +80,11 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
     console.log('📋 첫 번째 데이터 샘플:', data?.[0])
 
     // 데이터 변환하여 프론트엔드 타입에 맞춤 (실제 DB 컬럼명 사용)
-    let transformedData = (data || []).map((item: any, index: number) => {
-      // 로컬 저장소에서 상태 확인, 없으면 기본 상태 할당
+    let transformedData = (data || []).map((item: any) => {
+      // 로컬 저장소에서 상태 확인, 없으면 기본 상태 '판매중'으로 설정
       const statusKey = `property_status_${item.id}`
       const savedStatus = localStorage.getItem(statusKey)
-      const statuses = ['판매중', '예약중', '거래완료']
-      const assignedStatus = savedStatus || item.status || statuses[index % 3]
+      const assignedStatus = savedStatus || item.status || '판매중'
       
       // 로컬 저장소에서 임대인 정보 확인
       const landlordKey = `property_landlord_${item.id}`
@@ -113,9 +112,9 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
         total_floors: item.floor_total,
         rooms: item.rooms,
         bathrooms: item.bathrooms,
-        price: item.price,
-        deposit: item.deposit,
-        monthly_rent: item.monthly_rent,
+        price: item.price ? parseFloat(item.price) : undefined,
+        deposit: item.deposit ? parseFloat(item.deposit) : undefined,
+        monthly_rent: item.monthly_rent ? parseFloat(item.monthly_rent) : undefined,
         description: item.description,
         // 임대인 정보 - 로컬 저장소에서 가져오기
         landlord_name: landlordInfo.landlord_name || item.landlord_name || undefined,
@@ -271,9 +270,9 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       total_floors: data.floor_total,
       rooms: data.rooms,
       bathrooms: data.bathrooms,
-      price: data.price,
-      deposit: data.deposit,
-      monthly_rent: data.monthly_rent,
+      price: data.price ? parseFloat(data.price) : undefined,
+      deposit: data.deposit ? parseFloat(data.deposit) : undefined,
+      monthly_rent: data.monthly_rent ? parseFloat(data.monthly_rent) : undefined,
       description: data.description,
       // 임대인 정보 - 폼 데이터 사용 (DB에 저장되지 않으므로)
       landlord_name: propertyData.landlord_name || undefined,
@@ -382,9 +381,9 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       total_floors: data.floor_total,
       rooms: data.rooms,
       bathrooms: data.bathrooms,
-      price: data.price,
-      deposit: data.deposit,
-      monthly_rent: data.monthly_rent,
+      price: data.price ? parseFloat(data.price) : undefined,
+      deposit: data.deposit ? parseFloat(data.deposit) : undefined,
+      monthly_rent: data.monthly_rent ? parseFloat(data.monthly_rent) : undefined,
       description: data.description,
       // 업데이트된 임대인 정보 포함
       landlord_name: propertyData.landlord_name || undefined,
