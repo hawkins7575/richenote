@@ -2,22 +2,104 @@
 // 대시보드 페이지
 // ============================================================================
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Home, Users, TrendingUp, Calendar } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui'
+import { Card, CardContent, Badge } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
-import { usePropertyStats } from '@/hooks/useProperties'
+import { usePropertyStats, useProperties } from '@/hooks/useProperties'
 import { 
   PropertyTrendChart, 
   PropertyTypeChart
 } from '@/components/charts'
 import { StatCard } from '@/components/dashboard'
+import { PropertyCard, PropertyDetailModal } from '@/components/property'
+import { PropertyEditForm } from '@/components/forms/PropertyEditForm'
+import { Property, UpdatePropertyData } from '@/types/property'
 
 const DashboardPage: React.FC = () => {
   const { tenant } = useTenant()
   const { user } = useAuth()
   const { stats, loading: statsLoading, error: statsError } = usePropertyStats()
+  const { 
+    properties, 
+    updateProperty,
+    deleteProperty,
+    refreshProperties 
+  } = useProperties()
+  
+  // 상세 모달 상태 관리
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  
+  // 수정 폼 상태 관리
+  const [editFormOpen, setEditFormOpen] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null)
+
+  // 매물 클릭 핸들러
+  const handlePropertyClick = (property: Property) => {
+    setSelectedProperty(property)
+    setIsModalOpen(true)
+  }
+
+  // 모달 닫기 핸들러
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedProperty(null)
+  }
+
+  // 매물 수정 핸들러
+  const handleEditProperty = async (data: UpdatePropertyData) => {
+    if (!editingProperty) return
+    
+    try {
+      setEditLoading(true)
+      await updateProperty(editingProperty.id, data)
+      setEditFormOpen(false)
+      setEditingProperty(null)
+      // 목록 새로고침
+      await refreshProperties()
+      alert('✅ 매물이 성공적으로 수정되었습니다!')
+    } catch (error) {
+      console.error('매물 수정 실패:', error)
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+      alert(`❌ 매물 수정 실패: ${errorMessage}`)
+      throw error
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  // 수정 폼 열기 핸들러
+  const handleOpenEditForm = (property: Property) => {
+    console.log('📝 대시보드에서 수정 폼 열기:', property.title)
+    setEditingProperty(property)
+    setEditFormOpen(true)
+    setIsModalOpen(false) // 상세 모달 닫기
+  }
+
+  // 삭제 확인 핸들러
+  const handleConfirmDelete = async (property: Property) => {
+    console.log('🗑️ 대시보드에서 삭제 요청:', property.title)
+    
+    const confirmDelete = window.confirm(`'${property.title}' 매물을 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)
+    
+    if (confirmDelete) {
+      try {
+        await deleteProperty(property.id)
+        setIsModalOpen(false)
+        setSelectedProperty(null)
+        // 목록 새로고침
+        await refreshProperties()
+        alert('✅ 매물이 성공적으로 삭제되었습니다!')
+      } catch (error) {
+        console.error('매물 삭제 실패:', error)
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+        alert(`❌ 매물 삭제 실패: ${errorMessage}`)
+      }
+    }
+  }
 
   // 실제 통계 데이터 또는 기본값
   const dashboardStats = [
@@ -141,100 +223,51 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 최근 등록 매물 - 모바일 최적화 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">최근 등록 매물</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              {recentProperties.map((property) => (
-                <div key={property.id} className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 text-xs sm:text-sm truncate">
-                      {property.title}
-                    </h4>
-                    <div className="flex items-center space-x-1 sm:space-x-2 mt-1">
-                      <Badge variant="secondary" size="sm" className="text-xs">
-                        {property.type}
-                      </Badge>
-                      <Badge 
-                        variant={property.transactionType === '매매' ? 'sale' : property.transactionType === '전세' ? 'jeonse' : 'monthly'} 
-                        size="sm"
-                        className="text-xs"
-                      >
-                        {property.transactionType}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1 hidden sm:block">
-                      {property.createdAt}
-                    </p>
+      {/* 최근 등록 매물 - 새로운 카드 디자인 */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">최근 등록 매물</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {properties?.slice(0, 4).map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onClick={handlePropertyClick}
+              />
+            )) || recentProperties.map((property) => (
+              <div
+                key={property.id}
+                className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 space-y-3"
+                onClick={() => {/* Mock 데이터이므로 실제 Property 객체로 변환 필요 */}}
+              >
+                <h3 className="font-semibold text-gray-900 text-lg line-clamp-1">
+                  {property.title}
+                </h3>
+                <div className="flex items-center text-gray-600">
+                  <span className="text-sm">강남구</span>
+                </div>
+                <div className="flex items-center text-gray-900">
+                  <span className="font-bold text-lg">{property.price}</span>
+                </div>
+                <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">{property.type}</span>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-xs text-gray-500">{property.transactionType}</span>
                   </div>
-                  <div className="text-right ml-2">
-                    <p className="font-bold text-gray-900 text-xs sm:text-sm">
-                      {property.price}
-                    </p>
-                    <Badge 
-                      variant={property.status === '판매중' ? 'available' : 'reserved'}
-                      size="sm"
-                      className="text-xs mt-1"
-                    >
+                  <div className="flex items-center">
+                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${property.status === '판매중' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                    <span className={`text-xs font-medium ${property.status === '판매중' ? 'text-green-600' : 'text-yellow-600'}`}>
                       {property.status}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 할 일 및 알림 - 모바일 최적화 */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">오늘의 할 일</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-yellow-50 rounded-lg">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    매물 사진 업데이트 필요
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    3개 매물의 사진을 업데이트해야 합니다
-                  </p>
-                </div>
               </div>
-              
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-blue-50 rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    고객 상담 예정
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    오후 2시 강남구 아파트 상담
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-green-50 rounded-lg">
-                <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    계약서 검토
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    분당구 전세 계약서 최종 검토
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </div>
       </div>
+      
 
       {/* 플랜 정보 (테넌트별) */}
       {tenant && (
@@ -262,6 +295,29 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* 매물 상세 모달 */}
+      <PropertyDetailModal
+        property={selectedProperty}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onEdit={handleOpenEditForm}
+        onDelete={handleConfirmDelete}
+      />
+
+      {/* 매물 수정 폼 모달 */}
+      {editingProperty && (
+        <PropertyEditForm
+          isOpen={editFormOpen}
+          onClose={() => {
+            setEditFormOpen(false)
+            setEditingProperty(null)
+          }}
+          onSubmit={handleEditProperty}
+          property={editingProperty}
+          loading={editLoading}
+        />
       )}
     </div>
   )

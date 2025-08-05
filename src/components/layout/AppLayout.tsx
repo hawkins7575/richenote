@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Plus, Users, Settings, Menu, X } from 'lucide-react'
+import { Home, Plus, Users, Settings, X, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { UserMenu } from './UserMenu'
@@ -24,6 +24,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     { name: '매물 관리', href: '/properties', icon: Home },
     { name: '팀 관리', href: '/team', icon: Users },
     { name: '설정', href: '/settings', icon: Settings },
+    { name: '사용설명서', href: '/guide', icon: BookOpen },
   ]
 
   return (
@@ -36,10 +37,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* 사이드바 */}
+      {/* 데스크톱 사이드바 */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 hidden lg:block',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
@@ -108,37 +109,87 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
           {/* 하단 정보 */}
           <div className="p-4 border-t border-gray-200">
-            <div className="text-xs text-gray-500">
-              <p>매물: {tenant?.limits.max_properties || 0}개 제한</p>
-              <p>사용자: {tenant?.limits.max_users || 0}명 제한</p>
+            <div className="text-xs text-gray-500 space-y-2">
+              <div>
+                <p>매물: {tenant?.limits.max_properties || 0}개 제한</p>
+                <p>사용자: {tenant?.limits.max_users || 0}명 제한</p>
+              </div>
+              
+              {/* 개발회사 정보 */}
+              <div className="pt-2 border-t border-gray-300 space-y-1">
+                <p><strong>개발회사:</strong> 리체부동산</p>
+                <p><strong>대표:</strong> 김선미 공인중개사</p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* 모바일 하단 네비게이션 - 고정 */}
+      <div className="lg:hidden bottom-nav-fixed bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
+        <div className="grid grid-cols-5 h-16 bg-white">
+          {navigation.map((item) => {
+            const isCurrent = location.pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  'flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-target',
+                  isCurrent
+                    ? 'text-primary-600 bg-primary-50 border-t-2 border-primary-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                <item.icon size={18} className="mb-1 flex-shrink-0" />
+                <span className="truncate text-center leading-tight">{item.name.split(' ')[0]}</span>
+              </Link>
+            )
+          })}
         </div>
       </div>
 
       {/* 메인 컨텐츠 */}
       <div className="lg:ml-64">
         {/* 상단 헤더 */}
-        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
+        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6">
           <div className="flex items-center">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-gray-400 hover:text-gray-600"
-            >
-              <Menu size={20} />
-            </button>
-            <h2 className="ml-4 lg:ml-0 text-lg font-semibold text-gray-900">
+            <div className="flex items-center space-x-3 lg:hidden">
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ 
+                  background: `linear-gradient(135deg, ${tenant?.branding.primary_color || '#3b82f6'}, ${tenant?.branding.secondary_color || '#1d4ed8'})` 
+                }}
+              >
+                <Home size={16} className="text-white" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {tenant?.name || '리체 매물장'}
+              </h2>
+            </div>
+            <h2 className="hidden lg:block text-lg font-semibold text-gray-900">
               매물장
             </h2>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* 모바일용 매물 등록 버튼 */}
+            <Link to="/properties?create=true" className="lg:hidden">
+              <Button
+                size="sm"
+                variant="tenant"
+                leftIcon={<Plus size={16} />}
+                className="px-3 py-2"
+              >
+                등록
+              </Button>
+            </Link>
             <UserMenu />
           </div>
         </header>
 
         {/* 페이지 컨텐츠 */}
-        <main className="p-6">
+        <main className="p-4 sm:p-6 pb-24 lg:pb-6 min-h-screen">
           {children}
         </main>
       </div>

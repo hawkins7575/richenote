@@ -1,16 +1,17 @@
 // ============================================================================
-// 매물 등록 폼 컴포넌트
+// 매물 수정 폼 컴포넌트
 // ============================================================================
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
-import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
+import type { Property, PropertyType, TransactionType, PropertyStatus, UpdatePropertyData } from '@/types'
 
-interface PropertyCreateFormProps {
+interface PropertyEditFormProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: CreatePropertyData) => Promise<void>
+  onSubmit: (data: UpdatePropertyData) => Promise<void>
+  property: Property
   loading?: boolean
 }
 
@@ -26,35 +27,47 @@ const PROPERTY_STATUS: PropertyStatus[] = [
   '판매중', '예약중', '거래완료', '임시보관', '만료됨'
 ]
 
-// 샘플 데이터 제거 - 실제 Supabase 데이터 사용
-
-export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
+export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  property,
   loading = false
 }) => {
-  const [formData, setFormData] = useState<CreatePropertyData>({
-    title: '',
-    type: '아파트',
-    transaction_type: '매매',
-    address: '',
-    area: 0,
-    floor: 1,
-    total_floors: 1,
-    rooms: 1,
-    bathrooms: 1,
-    parking: false,
-    elevator: false,
-    status: '판매중'
-  })
-
-  const [isVacant, setIsVacant] = useState(false)
-
-  const [errors, setErrors] = useState<Partial<Record<keyof CreatePropertyData, string>>>({})
+  const [formData, setFormData] = useState<UpdatePropertyData>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof UpdatePropertyData, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleInputChange = useCallback((field: keyof CreatePropertyData, value: any) => {
+  // 프로퍼티가 변경될 때 폼 데이터 초기화
+  useEffect(() => {
+    if (property && isOpen) {
+      setFormData({
+        title: property.title,
+        type: property.type,
+        transaction_type: property.transaction_type,
+        address: property.address,
+        detailed_address: property.detailed_address || '',
+        area: property.area,
+        floor: property.floor,
+        total_floors: property.total_floors,
+        rooms: property.rooms,
+        bathrooms: property.bathrooms,
+        parking: property.parking,
+        elevator: property.elevator,
+        price: property.price,
+        deposit: property.deposit,
+        monthly_rent: property.monthly_rent,
+        description: property.description || '',
+        landlord_name: property.landlord_name || '',
+        landlord_phone: property.landlord_phone || '',
+        exit_date: property.exit_date || '',
+        status: property.status
+      })
+      setErrors({})
+    }
+  }, [property, isOpen])
+
+  const handleInputChange = useCallback((field: keyof UpdatePropertyData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -69,17 +82,38 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     }
   }, [errors])
 
-  // 샘플 데이터 기능 제거
-
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof CreatePropertyData, string>> = {}
+    const newErrors: Partial<Record<keyof UpdatePropertyData, string>> = {}
 
-    // 필수항목 1: 매물 제목
-    if (!formData.title.trim()) {
+    if (!formData.title?.trim()) {
       newErrors.title = '제목을 입력해주세요'
     }
 
-    // 필수항목 2: 거래 유형별 가격 검증
+    if (!formData.address?.trim()) {
+      newErrors.address = '주소를 입력해주세요'
+    }
+
+    if (!formData.area || formData.area <= 0) {
+      newErrors.area = '면적은 0보다 커야 합니다'
+    }
+
+    if (!formData.floor || formData.floor < 1) {
+      newErrors.floor = '층수는 1층 이상이어야 합니다'
+    }
+
+    if (!formData.total_floors || formData.total_floors < (formData.floor || 1)) {
+      newErrors.total_floors = '전체 층수는 해당 층수보다 크거나 같아야 합니다'
+    }
+
+    if (!formData.rooms || formData.rooms < 1) {
+      newErrors.rooms = '방 개수는 1개 이상이어야 합니다'
+    }
+
+    if (!formData.bathrooms || formData.bathrooms < 1) {
+      newErrors.bathrooms = '화장실 개수는 1개 이상이어야 합니다'
+    }
+
+    // 거래 유형별 가격 검증
     if (formData.transaction_type === '매매' && (!formData.price || formData.price <= 0)) {
       newErrors.price = '매매가를 입력해주세요'
     }
@@ -97,11 +131,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
       }
     }
 
-    // 선택적 검증: 입력된 경우에만 유효성 검사
-    if (formData.total_floors && formData.floor && formData.total_floors < formData.floor) {
-      newErrors.total_floors = '전체 층수는 해당 층수보다 크거나 같아야 합니다'
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -109,65 +138,18 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    console.log('🚀 매물 등록 폼 제출 시작')
-    console.log('📋 폼 데이터:', formData)
-    console.log('✅ 폼 유효성 검사 시작...')
-    
-    const isValid = validateForm()
-    console.log('📊 폼 유효성 검사 결과:', isValid)
-    console.log('❌ 에러 목록:', errors)
-    
-    if (!isValid) {
-      console.log('❌ 폼 유효성 검사 실패 - 제출 중단')
-      return
-    }
-    
-    if (isSubmitting) {
-      console.log('⏳ 이미 제출 중 - 중복 제출 방지')
-      return
-    }
+    if (!validateForm() || isSubmitting) return
 
-    console.log('🔄 매물 등록 요청 시작...')
     setIsSubmitting(true)
-    
     try {
-      console.log('📡 onSubmit 함수 호출 중...')
       await onSubmit(formData)
-      console.log('✅ 매물 등록 성공!')
-      
-      // 폼 초기화
-      console.log('🧹 폼 초기화 중...')
-      setFormData({
-        title: '',
-        type: '아파트',
-        transaction_type: '매매',
-        address: '',
-        area: 0,
-        floor: 1,
-        total_floors: 1,
-        rooms: 1,
-        bathrooms: 1,
-        parking: false,
-        elevator: false,
-        status: '판매중'
-      })
-      setErrors({})
-      setIsVacant(false)
-      console.log('🚪 폼 닫기...')
+      alert('✅ 매물이 성공적으로 수정되었습니다!')
       onClose()
     } catch (error) {
-      console.error('💥 매물 등록 실패:', error)
-      console.error('💥 에러 타입:', typeof error)
-      console.error('💥 에러 상세:', error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      } : error)
-      
-      // 사용자에게 에러 메시지 표시
-      alert(`매물 등록에 실패했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`)
+      console.error('매물 수정 실패:', error)
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+      alert(`❌ 매물 수정 실패: ${errorMessage}`)
     } finally {
-      console.log('🏁 매물 등록 프로세스 완료')
       setIsSubmitting(false)
     }
   }
@@ -179,7 +161,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>새 매물 등록</CardTitle>
+            <CardTitle>매물 정보 수정</CardTitle>
             <Button
               variant="ghost"
               size="sm"
@@ -201,7 +183,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 <div className="md:col-span-2">
                   <Input
                     label="매물 제목"
-                    value={formData.title}
+                    value={formData.title || ''}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     error={errors.title}
                     placeholder="예: 강남구 신사동 럭셔리 아파트"
@@ -211,16 +193,18 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 
                 <Select
                   label="매물 유형"
-                  value={formData.type}
+                  value={formData.type || ''}
                   onChange={(e) => handleInputChange('type', e.target.value as PropertyType)}
                   options={PROPERTY_TYPES.map(type => ({ value: type, label: type }))}
+                  required
                 />
                 
                 <Select
                   label="거래 유형"
-                  value={formData.transaction_type}
+                  value={formData.transaction_type || ''}
                   onChange={(e) => handleInputChange('transaction_type', e.target.value as TransactionType)}
                   options={TRANSACTION_TYPES.map(type => ({ value: type, label: type }))}
+                  required
                 />
               </div>
             </div>
@@ -233,10 +217,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 <div className="md:col-span-2">
                   <Input
                     label="주소"
-                    value={formData.address}
+                    value={formData.address || ''}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     error={errors.address}
                     placeholder="예: 서울시 강남구 신사동 123-45"
+                    required
                   />
                 </div>
                 
@@ -263,6 +248,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   placeholder="85.0"
                   min="0"
                   step="0.1"
+                  required
                 />
                 
                 <Input
@@ -273,6 +259,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.floor}
                   placeholder="15"
                   min="1"
+                  required
                 />
                 
                 <Input
@@ -283,22 +270,18 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.total_floors}
                   placeholder="25"
                   min="1"
+                  required
                 />
                 
-                <Select
+                <Input
                   label="방 개수"
-                  value={formData.rooms?.toString() || '1'}
-                  onChange={(e) => handleInputChange('rooms', parseFloat(e.target.value) || 1)}
+                  type="number"
+                  value={formData.rooms || ''}
+                  onChange={(e) => handleInputChange('rooms', parseInt(e.target.value) || 1)}
                   error={errors.rooms}
-                  options={[
-                    { value: '1', label: '1개' },
-                    { value: '1.5', label: '1.5개' },
-                    { value: '2', label: '2개' },
-                    { value: '2.5', label: '2.5개' },
-                    { value: '3', label: '3개' },
-                    { value: '4', label: '4개' },
-                    { value: '5', label: '5개' }
-                  ]}
+                  placeholder="3"
+                  min="1"
+                  required
                 />
                 
                 <Input
@@ -309,6 +292,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.bathrooms}
                   placeholder="2"
                   min="1"
+                  required
                 />
               </div>
               
@@ -316,7 +300,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={formData.parking}
+                    checked={formData.parking || false}
                     onChange={(e) => handleInputChange('parking', e.target.checked)}
                     className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
@@ -326,7 +310,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={formData.elevator}
+                    checked={formData.elevator || false}
                     onChange={(e) => handleInputChange('elevator', e.target.checked)}
                     className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
@@ -407,39 +391,12 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
               <h3 className="text-lg font-medium text-gray-900">기타 정보</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* 퇴실예정일 / 공실 선택 */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    거주 현황
-                  </label>
-                  
-                  <div className="space-y-3">
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={isVacant}
-                        onChange={(e) => {
-                          setIsVacant(e.target.checked)
-                          if (e.target.checked) {
-                            handleInputChange('exit_date', undefined)
-                          }
-                        }}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <span className="text-sm font-medium text-gray-700">현재 공실</span>
-                    </label>
-                    
-                    {!isVacant && (
-                      <Input
-                        label="퇴실 예정일"
-                        type="date"
-                        value={formData.exit_date || ''}
-                        onChange={(e) => handleInputChange('exit_date', e.target.value)}
-                        placeholder="퇴실 예정일을 선택하세요"
-                      />
-                    )}
-                  </div>
-                </div>
+                <Input
+                  label="퇴실 예정일"
+                  type="date"
+                  value={formData.exit_date || ''}
+                  onChange={(e) => handleInputChange('exit_date', e.target.value)}
+                />
                 
                 <Select
                   label="매물 상태"
@@ -476,10 +433,10 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
               <Button
                 type="submit"
                 variant="primary"
-                loading={loading}
+                loading={loading || isSubmitting}
                 leftIcon={<Save size={16} />}
               >
-                매물 등록
+                수정 완료
               </Button>
             </div>
           </form>

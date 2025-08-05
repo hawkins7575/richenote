@@ -270,7 +270,7 @@ export interface SimplePropertyFilters {
   search?: string
   transaction_type?: string
   property_type?: string
-  status?: PropertyStatus
+  status?: PropertyStatus | string // 빈 문자열도 허용
 }
 
 export interface CreatePropertyData {
@@ -303,6 +303,7 @@ export interface UpdatePropertyData {
   transaction_type?: TransactionType
   status?: PropertyStatus
   address?: string
+  detailed_address?: string
   area?: number
   floor?: number
   total_floors?: number

@@ -8,10 +8,12 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { TenantProvider } from '@/contexts/TenantContext'
 import { AuthGuard } from '@/components/auth'
 import { AppLayout } from '@/components/layout'
+import { InstallPrompt } from '@/components/ui/InstallPrompt'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { PropertiesPageNew } from '@/pages/PropertiesPageNew'
 import { TeamPage } from '@/pages/TeamPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { UserGuidePage } from '@/pages/UserGuidePage'
 import '@/styles/globals.css'
 
 function App() {
@@ -27,6 +29,7 @@ function App() {
                 <Route path="/properties" element={<PropertiesPageNew />} />
                 <Route path="/team" element={<TeamPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/guide" element={<UserGuidePage />} />
                 
                 {/* 테넌트별 라우팅 */}
                 <Route path="/tenant/:tenantSlug/*" element={<TenantRoutes />} />
@@ -34,6 +37,9 @@ function App() {
                 {/* 404 처리 */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
+              
+              {/* PWA 설치 프롬프트 */}
+              <InstallPrompt />
             </AppLayout>
           </AuthGuard>
         </Router>
@@ -51,6 +57,7 @@ const TenantRoutes: React.FC = () => {
       <Route path="/properties" element={<PropertiesPageNew />} />
       <Route path="/team" element={<TeamPage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/guide" element={<UserGuidePage />} />
     </Routes>
   )
 }
