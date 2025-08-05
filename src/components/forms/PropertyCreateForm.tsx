@@ -49,6 +49,8 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     status: '판매중'
   })
 
+  const [isVacant, setIsVacant] = useState(false)
+
   const [errors, setErrors] = useState<Partial<Record<keyof CreatePropertyData, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -150,6 +152,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         status: '판매중'
       })
       setErrors({})
+      setIsVacant(false)
       console.log('🚪 폼 닫기...')
       onClose()
     } catch (error) {
@@ -404,12 +407,39 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
               <h3 className="text-lg font-medium text-gray-900">기타 정보</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="퇴실 예정일"
-                  type="date"
-                  value={formData.exit_date || ''}
-                  onChange={(e) => handleInputChange('exit_date', e.target.value)}
-                />
+                {/* 퇴실예정일 / 공실 선택 */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    거주 현황
+                  </label>
+                  
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={isVacant}
+                        onChange={(e) => {
+                          setIsVacant(e.target.checked)
+                          if (e.target.checked) {
+                            handleInputChange('exit_date', undefined)
+                          }
+                        }}
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">현재 공실</span>
+                    </label>
+                    
+                    {!isVacant && (
+                      <Input
+                        label="퇴실 예정일"
+                        type="date"
+                        value={formData.exit_date || ''}
+                        onChange={(e) => handleInputChange('exit_date', e.target.value)}
+                        placeholder="퇴실 예정일을 선택하세요"
+                      />
+                    )}
+                  </div>
+                </div>
                 
                 <Select
                   label="매물 상태"

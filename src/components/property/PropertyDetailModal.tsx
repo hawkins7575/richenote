@@ -384,7 +384,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   날짜 정보
                 </h3>
                 <div className="space-y-3">
-                  {property.exit_date && (
+                  {property.exit_date ? (
                     <div className="bg-red-100 border border-red-300 rounded-lg p-4">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center">
@@ -394,6 +394,16 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                         <span className="text-lg font-bold text-red-900">
                           {new Date(property.exit_date).toLocaleDateString('ko-KR')}
                         </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-green-100 border border-green-300 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <Calendar className="w-5 h-5 mr-2 text-green-500" />
+                          <span className="text-base font-semibold text-green-800">거주 현황</span>
+                        </div>
+                        <span className="text-lg font-bold text-green-900">공실</span>
                       </div>
                     </div>
                   )}
@@ -472,7 +482,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   날짜 정보
                 </h3>
                 <div className="space-y-2">
-                  {property.exit_date && (
+                  {property.exit_date ? (
                     <div className="flex items-center justify-between p-2 bg-red-50 rounded">
                       <div className="flex items-center">
                         <Calendar className="w-3 h-3 mr-1 text-red-500" />
@@ -481,6 +491,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       <span className="text-sm font-bold text-red-600">
                         {new Date(property.exit_date).toLocaleDateString('ko-KR')}
                       </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1 text-green-500" />
+                        <span className="text-xs text-gray-700">거주현황</span>
+                      </div>
+                      <span className="text-sm font-bold text-green-600">공실</span>
                     </div>
                   )}
                   
