@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react'
 import { Save, Upload, Download, Bell, Shield, CreditCard, Palette, RefreshCw } from 'lucide-react'
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Modal, InstallButton } from '@/components/ui'
+import { Button, Input, Badge, Modal, InstallButton } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { useProperties } from '@/hooks/useProperties'
 import { supabase } from '@/services/supabase'
@@ -103,92 +103,90 @@ const SettingsPage: React.FC = () => {
     switch (activeTab) {
       case 'general':
         return (
-          <div className="space-y-6">
-            {/* 기본 정보 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>기본 정보</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+          <div className="space-y-8">
+            {/* 기본 정보 - 전체 너비 활용 */}
+            <div className="bg-gray-50 rounded-xl p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">기본 정보</h2>
+                <Button leftIcon={<Save size={18} />} size="lg" className="h-12 px-6 text-base">
+                  변경사항 저장
+                </Button>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                       회사명
                     </label>
                     <Input 
                       defaultValue={tenant?.name || 'PropertyDesk'}
                       placeholder="회사명을 입력하세요"
-                      className="text-base"
+                      className="text-base h-12 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                       도메인 주소
                     </label>
                     <Input 
                       defaultValue={tenant?.slug || 'propertydesk'}
                       placeholder="도메인 주소"
                       readOnly
-                      className="bg-gray-50 text-base"
+                      className="bg-gray-100 text-base h-12"
                     />
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                <div className="space-y-2">
+                  <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                     회사 소개
                   </label>
                   <textarea 
-                    className="w-full p-3 sm:p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none text-base"
-                    rows={3}
+                    className="w-full p-4 sm:p-5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none text-base bg-white"
+                    rows={4}
                     placeholder="회사 소개를 입력하세요"
                     defaultValue="부동산 전문 관리 솔루션 PropertyDesk입니다."
                   />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                       대표 전화번호
                     </label>
                     <Input 
                       placeholder="02-1234-5678"
                       defaultValue="02-1234-5678"
-                      className="text-base"
+                      className="text-base h-12 bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                       대표 이메일
                     </label>
                     <Input 
                       type="email"
                       placeholder="contact@propertydesk.com"
                       defaultValue="contact@propertydesk.com"
-                      className="text-base"
+                      className="text-base h-12 bg-white"
                     />
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="flex justify-end">
-                  <Button leftIcon={<Save size={16} />}>
-                    변경사항 저장
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 앱 설치 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>앱 설치</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 sm:p-6 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+            {/* 앱 설치 - 전체 너비 활용 */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 sm:p-8 border border-blue-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">앱 설치</h2>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* 설치 버튼 영역 */}
+                <div className="lg:col-span-2 bg-white rounded-lg p-6 border border-blue-300">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                     <div className="flex-1">
-                      <h4 className="font-medium text-base sm:text-lg text-gray-900 mb-2">PC에 바로가기 만들기</h4>
-                      <p className="text-sm sm:text-base text-gray-600">
+                      <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-3">PC에 바로가기 만들기</h3>
+                      <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
                         리체 매물장을 PC 바탕화면에 설치하여 더 편리하게 사용하세요.
                       </p>
                     </div>
@@ -198,372 +196,480 @@ const SettingsPage: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-700">
-                    <strong>💡 PWA 설치 혜택:</strong>
-                  </p>
-                  <ul className="mt-2 text-sm text-gray-600 space-y-1">
-                    <li>• 브라우저 없이 독립 실행</li>
-                    <li>• 더 빠른 로딩 속도</li>
-                    <li>• 오프라인에서도 일부 기능 사용</li>
-                    <li>• 푸시 알림 수신 가능</li>
+                {/* PWA 혜택 */}
+                <div className="bg-white rounded-lg p-6 border border-blue-300">
+                  <h4 className="font-bold text-lg text-gray-900 mb-4">💡 PWA 설치 혜택</h4>
+                  <ul className="space-y-3 text-base text-gray-700">
+                    <li className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span>브라우저 없이 독립 실행</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span>더 빠른 로딩 속도</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span>오프라인 일부 기능 사용</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span>푸시 알림 수신 가능</span>
+                    </li>
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* 데이터 관리 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>데이터 관리</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" leftIcon={<Upload size={18} />} className="h-12 text-base">
-                    데이터 가져오기
+            {/* 데이터 관리 - 전체 너비 활용 */}
+            <div className="bg-gray-50 rounded-xl p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">데이터 관리</h2>
+              
+              <div className="space-y-6">
+                {/* 데이터 작업 버튼들 */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <Button 
+                    variant="outline" 
+                    leftIcon={<Upload size={20} />} 
+                    size="lg"
+                    className="h-16 text-base font-semibold bg-white hover:bg-green-50 border-2 hover:border-green-300"
+                  >
+                    <div className="text-center">
+                      <div>데이터 가져오기</div>
+                      <div className="text-xs text-gray-500 mt-1">Excel, CSV 파일 지원</div>
+                    </div>
                   </Button>
-                  <Button variant="outline" leftIcon={<Download size={18} />} className="h-12 text-base">
-                    데이터 내보내기
+                  <Button 
+                    variant="outline" 
+                    leftIcon={<Download size={20} />} 
+                    size="lg"
+                    className="h-16 text-base font-semibold bg-white hover:bg-blue-50 border-2 hover:border-blue-300"
+                  >
+                    <div className="text-center">
+                      <div>데이터 내보내기</div>
+                      <div className="text-xs text-gray-500 mt-1">백업 및 분석용</div>
+                    </div>
                   </Button>
                   <Button 
                     variant="destructive" 
-                    leftIcon={<RefreshCw size={18} />}
+                    leftIcon={<RefreshCw size={20} />}
                     onClick={() => setResetModalOpen(true)}
-                    className="h-12 text-base"
+                    size="lg"
+                    className="h-16 text-base font-semibold"
                   >
-                    샘플 데이터 초기화
+                    <div className="text-center">
+                      <div>샘플 데이터 초기화</div>
+                      <div className="text-xs text-red-100 mt-1">복구 불가능</div>
+                    </div>
                   </Button>
                 </div>
                 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm sm:text-base text-blue-800">
-                    <strong>💡 샘플 데이터 초기화:</strong> 회원가입 시 제공된 샘플 매물 데이터를 모두 삭제하여 깨끗한 상태에서 시작할 수 있습니다.
-                  </p>
+                {/* 안내 메시지들 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-blue-100 border-l-4 border-blue-500 rounded-lg p-6">
+                    <div className="flex items-start space-x-3">
+                      <div className="text-blue-600 text-2xl">💡</div>
+                      <div>
+                        <h4 className="font-bold text-lg text-blue-900 mb-2">샘플 데이터 초기화</h4>
+                        <p className="text-base text-blue-800 leading-relaxed">
+                          회원가입 시 제공된 샘플 매물 데이터를 모두 삭제하여 깨끗한 상태에서 시작할 수 있습니다.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-yellow-100 border-l-4 border-yellow-500 rounded-lg p-6">
+                    <div className="flex items-start space-x-3">
+                      <div className="text-yellow-600 text-2xl">⚠️</div>
+                      <div>
+                        <h4 className="font-bold text-lg text-yellow-900 mb-2">중요 주의사항</h4>
+                        <p className="text-base text-yellow-800 leading-relaxed">
+                          초기화된 데이터는 복구할 수 없습니다. 실제 매물 데이터를 등록하기 전에 진행해주세요.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm sm:text-base text-yellow-800">
-                    <strong>주의:</strong> 초기화된 데이터는 복구할 수 없습니다. 실제 매물 데이터를 등록하기 전에 진행해주세요.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )
 
       case 'billing':
         return (
-          <div className="space-y-6">
-            {/* 현재 플랜 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>현재 플랜</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {tenant && (
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gradient-to-r from-primary-50 to-blue-50 rounded-lg border border-primary-200 space-y-3 sm:space-y-0">
+          <div className="space-y-8">
+            {/* 현재 플랜 - 전체 너비 활용 */}
+            <div className="bg-gradient-to-r from-primary-50 via-blue-50 to-indigo-50 rounded-xl p-6 sm:p-8 border border-primary-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">현재 플랜</h2>
+              
+              {tenant && (
+                <div className="space-y-6">
+                  {/* 플랜 정보 헤더 */}
+                  <div className="bg-white rounded-lg p-6 border border-primary-300 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                       <div className="flex-1">
-                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                        <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                           {tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)} 플랜
                         </h3>
-                        <p className="text-sm sm:text-base text-gray-600 mt-1">
+                        <p className="text-base sm:text-lg text-gray-700">
                           매물 {tenant.limits.max_properties}개 · 팀원 {tenant.limits.max_users}명 · 스토리지 {tenant.limits.max_storage_gb}GB
                         </p>
                       </div>
-                      <div className="text-left sm:text-right">
-                        <Badge variant="tenant" size="lg" className="text-sm">
-                          {tenant.status === 'trial' ? '체험 중' : '활성'}
+                      <div className="text-left lg:text-right">
+                        <Badge variant="tenant" size="lg" className="text-base px-4 py-2">
+                          {tenant.status === 'trial' ? '체험 중' : '활성 상태'}
                         </Badge>
                         {tenant.trial_ends_at && (
-                          <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                          <p className="text-sm sm:text-base text-gray-600 mt-2">
                             체험 종료: {new Date(tenant.trial_ends_at).toLocaleDateString()}
                           </p>
                         )}
                       </div>
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 sm:p-6 bg-gray-50 rounded-lg">
-                        <p className="text-sm sm:text-base text-gray-600">사용 중인 매물</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900">156</p>
-                        <p className="text-xs sm:text-sm text-gray-500">/ {tenant.limits.max_properties}개</p>
+                  {/* 사용량 통계 */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="text-center p-6 sm:p-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+                      <div className="text-3xl sm:text-4xl font-bold text-primary-600 mb-2">156</div>
+                      <p className="text-base sm:text-lg font-semibold text-gray-800 mb-1">사용 중인 매물</p>
+                      <p className="text-sm sm:text-base text-gray-500">/ {tenant.limits.max_properties}개 제한</p>
+                      <div className="mt-3 bg-gray-200 rounded-full h-2">
+                        <div className="bg-primary-600 h-2 rounded-full" style={{width: `${(156/tenant.limits.max_properties)*100}%`}}></div>
                       </div>
-                      <div className="text-center p-4 sm:p-6 bg-gray-50 rounded-lg">
-                        <p className="text-sm sm:text-base text-gray-600">팀원 수</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900">8</p>
-                        <p className="text-xs sm:text-sm text-gray-500">/ {tenant.limits.max_users}명</p>
+                    </div>
+                    <div className="text-center p-6 sm:p-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+                      <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">8</div>
+                      <p className="text-base sm:text-lg font-semibold text-gray-800 mb-1">팀원 수</p>
+                      <p className="text-sm sm:text-base text-gray-500">/ {tenant.limits.max_users}명 제한</p>
+                      <div className="mt-3 bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-600 h-2 rounded-full" style={{width: `${(8/tenant.limits.max_users)*100}%`}}></div>
                       </div>
-                      <div className="text-center p-4 sm:p-6 bg-gray-50 rounded-lg">
-                        <p className="text-sm sm:text-base text-gray-600">스토리지 사용량</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900">2.3</p>
-                        <p className="text-xs sm:text-sm text-gray-500">/ {tenant.limits.max_storage_gb}GB</p>
+                    </div>
+                    <div className="text-center p-6 sm:p-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+                      <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">2.3</div>
+                      <p className="text-base sm:text-lg font-semibold text-gray-800 mb-1">스토리지 사용량</p>
+                      <p className="text-sm sm:text-base text-gray-500">/ {tenant.limits.max_storage_gb}GB 제한</p>
+                      <div className="mt-3 bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-600 h-2 rounded-full" style={{width: `${(2.3/tenant.limits.max_storage_gb)*100}%`}}></div>
                       </div>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </div>
+              )}
+            </div>
 
-            {/* 플랜 변경 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>플랜 변경</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {planOptions.map(plan => (
-                    <div 
-                      key={plan.value}
-                      className={`p-4 sm:p-6 border rounded-lg cursor-pointer transition-colors ${
-                        tenant?.plan === plan.value
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-base sm:text-lg text-gray-900">
-                          {plan.label.split(' (')[0]}
-                        </h3>
-                        {tenant?.plan === plan.value && (
-                          <Badge variant="primary" size="sm" className="text-xs sm:text-sm">현재 플랜</Badge>
-                        )}
-                      </div>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-                        {plan.price.toLocaleString()}원<span className="text-sm font-normal text-gray-500">/월</span>
-                      </p>
-                      {tenant?.plan !== plan.value && (
-                        <Button size="sm" variant="outline" className="w-full h-10 text-base">
-                          플랜 변경
-                        </Button>
+            {/* 플랜 변경 - 전체 너비 활용 */}
+            <div className="bg-gray-50 rounded-xl p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">플랜 변경</h2>
+              
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {planOptions.map(plan => (
+                  <div 
+                    key={plan.value}
+                    className={`p-6 sm:p-8 border-2 rounded-xl cursor-pointer transition-all duration-200 bg-white ${
+                      tenant?.plan === plan.value
+                        ? 'border-primary-500 shadow-lg ring-2 ring-primary-100'
+                        : 'border-gray-200 hover:border-primary-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-xl sm:text-2xl text-gray-900">
+                        {plan.label.split(' (')[0]}
+                      </h3>
+                      {tenant?.plan === plan.value && (
+                        <Badge variant="primary" size="lg" className="text-sm px-3 py-1">현재 플랜</Badge>
                       )}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 결제 정보 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>결제 정보</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 sm:p-6 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-base">등록된 카드</span>
-                    <Badge variant="success" size="sm" className="text-xs sm:text-sm">활성</Badge>
+                    <div className="mb-6">
+                      <span className="text-3xl sm:text-4xl font-bold text-gray-900">
+                        {plan.price.toLocaleString()}원
+                      </span>
+                      <span className="text-lg text-gray-500 ml-1">/월</span>
+                    </div>
+                    {tenant?.plan !== plan.value && (
+                      <Button size="lg" variant="outline" className="w-full h-12 text-base font-semibold">
+                        이 플랜으로 변경
+                      </Button>
+                    )}
                   </div>
-                  <p className="text-gray-600 text-base sm:text-lg">•••• •••• •••• 4567</p>
-                  <p className="text-sm sm:text-base text-gray-500">만료일: 12/25</p>
+                ))}
+              </div>
+            </div>
+
+            {/* 결제 정보 - 전체 너비 활용 */}
+            <div className="bg-gray-50 rounded-xl p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">결제 정보</h2>
+              
+              <div className="space-y-6">
+                {/* 등록된 카드 정보 */}
+                <div className="bg-white p-6 sm:p-8 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center">
+                        <CreditCard size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-3 mb-1">
+                          <span className="font-bold text-lg text-gray-900">등록된 카드</span>
+                          <Badge variant="success" size="sm" className="text-sm">활성</Badge>
+                        </div>
+                        <p className="text-gray-600 text-lg font-mono">•••• •••• •••• 4567</p>
+                        <p className="text-base text-gray-500">만료일: 12/25</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                  <Button variant="outline" className="flex-1 h-12 text-base">
+                {/* 결제 관리 버튼들 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="h-14 text-base font-semibold bg-white hover:bg-blue-50 border-2 hover:border-blue-300"
+                  >
+                    <CreditCard size={20} className="mr-2" />
                     결제 수단 변경
                   </Button>
-                  <Button variant="outline" className="flex-1 h-12 text-base">
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="h-14 text-base font-semibold bg-white hover:bg-green-50 border-2 hover:border-green-300"
+                  >
+                    <Download size={20} className="mr-2" />
                     결제 내역 보기
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )
 
       case 'branding':
         return (
-          <div className="space-y-6">
-            {/* 브랜드 설정 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>브랜드 설정</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                      로고 업로드
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 text-center">
-                      <Upload className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400" />
-                      <p className="mt-2 text-sm sm:text-base text-gray-600">
-                        이미지를 드래그하거나 클릭하여 업로드
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        PNG, JPG 최대 2MB
-                      </p>
-                    </div>
+          <div className="space-y-8">
+            {/* 브랜드 설정 - 전체 너비 활용 */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 sm:p-8 border border-purple-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">브랜드 설정</h2>
+                <Button leftIcon={<Save size={20} />} size="lg" className="h-12 px-6 text-base">
+                  브랜드 설정 저장
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {/* 로고 업로드 섹션 */}
+                <div className="bg-white rounded-lg p-6 sm:p-8 border border-purple-200 shadow-sm">
+                  <label className="block text-lg sm:text-xl font-bold text-gray-800 mb-4">
+                    로고 업로드
+                  </label>
+                  <div className="border-3 border-dashed border-purple-300 rounded-xl p-8 sm:p-10 text-center hover:border-purple-400 transition-colors cursor-pointer">
+                    <Upload className="mx-auto h-16 w-16 sm:h-20 sm:w-20 text-purple-400 mb-4" />
+                    <p className="text-base sm:text-lg text-gray-700 font-medium mb-2">
+                      이미지를 드래그하거나 클릭하여 업로드
+                    </p>
+                    <p className="text-sm sm:text-base text-gray-500">
+                      PNG, JPG 파일 / 최대 2MB
+                    </p>
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                      브랜드 커러
-                    </label>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs sm:text-sm text-gray-600 mb-1">주 커러</label>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="color" 
-                            defaultValue="#3b82f6"
-                            className="w-12 h-12 sm:w-14 sm:h-14 rounded border border-gray-300"
-                          />
-                          <Input 
-                            defaultValue="#3b82f6"
-                            placeholder="#3b82f6"
-                            className="flex-1 text-base"
-                          />
-                        </div>
+                </div>
+                
+                {/* 브랜드 컬러 섹션 */}
+                <div className="bg-white rounded-lg p-6 sm:p-8 border border-purple-200 shadow-sm">
+                  <label className="block text-lg sm:text-xl font-bold text-gray-800 mb-4">
+                    브랜드 컬러
+                  </label>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-base sm:text-lg font-semibold text-gray-700 mb-3">주 컬러</label>
+                      <div className="flex items-center space-x-4">
+                        <input 
+                          type="color" 
+                          defaultValue="#3b82f6"
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <Input 
+                          defaultValue="#3b82f6"
+                          placeholder="#3b82f6"
+                          className="flex-1 text-base h-12 bg-gray-50"
+                        />
                       </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm text-gray-600 mb-1">보조 커러</label>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="color" 
-                            defaultValue="#1d4ed8"
-                            className="w-12 h-12 sm:w-14 sm:h-14 rounded border border-gray-300"
-                          />
-                          <Input 
-                            defaultValue="#1d4ed8"
-                            placeholder="#1d4ed8"
-                            className="flex-1 text-base"
-                          />
-                        </div>
+                    </div>
+                    <div>
+                      <label className="block text-base sm:text-lg font-semibold text-gray-700 mb-3">보조 컬러</label>
+                      <div className="flex items-center space-x-4">
+                        <input 
+                          type="color" 
+                          defaultValue="#1d4ed8"
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <Input 
+                          defaultValue="#1d4ed8"
+                          placeholder="#1d4ed8"
+                          className="flex-1 text-base h-12 bg-gray-50"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-base sm:text-lg text-gray-900 mb-3">미리보기</h4>
-                  <div className="p-4 sm:p-6 bg-gradient-to-r from-primary-50 to-blue-50 rounded-lg border">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold text-base">
-                        P
-                      </div>
-                      <div>
-                        <p className="font-semibold text-base sm:text-lg text-gray-900">PropertyDesk</p>
-                        <p className="text-sm sm:text-base text-gray-600">새로운 브랜드 스타일</p>
-                      </div>
+              {/* 미리보기 섹션 */}
+              <div className="mt-8 bg-white rounded-lg p-6 sm:p-8 border border-purple-200 shadow-sm">
+                <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-4">브랜드 미리보기</h3>
+                <div className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-lg p-6 sm:p-8 border border-primary-200">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-lg">
+                      P
+                    </div>
+                    <div>
+                      <p className="font-bold text-xl sm:text-2xl text-gray-900">PropertyDesk</p>
+                      <p className="text-base sm:text-lg text-gray-600 mt-1">새로운 브랜드 스타일 적용</p>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex justify-end">
-                  <Button leftIcon={<Save size={18} />} className="h-12 text-base">
-                    브랜드 설정 저장
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )
 
       case 'notifications':
         return (
-          <div className="space-y-6">
-            {/* 알림 설정 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>알림 설정</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 rounded-lg space-y-3 sm:space-y-0">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-base sm:text-lg text-gray-900">새로운 매물 등록</h4>
-                      <p className="text-sm sm:text-base text-gray-600">매물이 새로 등록될 때 알림</p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">이메일</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">앱 알림</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 rounded-lg space-y-3 sm:space-y-0">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-base sm:text-lg text-gray-900">계약 완료</h4>
-                      <p className="text-sm sm:text-base text-gray-600">계약이 완료될 때 알림</p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">이메일</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">앱 알림</span>
-                      </label>
+          <div className="space-y-8">
+            {/* 알림 설정 - 전체 너비 활용 */}
+            <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 sm:p-8 border border-green-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">알림 설정</h2>
+                <Button leftIcon={<Save size={20} />} size="lg" className="h-12 px-6 text-base">
+                  알림 설정 저장
+                </Button>
+              </div>
+              
+              <div className="space-y-6">
+                {/* 알림 항목들 */}
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-white rounded-lg p-6 sm:p-8 border border-green-200 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                      <div className="flex items-start space-x-3">
+                        <Bell className="w-6 h-6 text-green-600 mt-1" />
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-1">새로운 매물 등록</h3>
+                          <p className="text-base sm:text-lg text-gray-600">매물이 새로 등록될 때 알림을 받습니다</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-green-600" />
+                          <span className="text-base font-medium">이메일</span>
+                        </label>
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-green-600" />
+                          <span className="text-base font-medium">앱 알림</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 rounded-lg space-y-3 sm:space-y-0">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-base sm:text-lg text-gray-900">팀원 초대</h4>
-                      <p className="text-sm sm:text-base text-gray-600">새로운 팀원이 초대될 때 알림</p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">이메일</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">앱 알림</span>
-                      </label>
+                  <div className="bg-white rounded-lg p-6 sm:p-8 border border-green-200 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                      <div className="flex items-start space-x-3">
+                        <Bell className="w-6 h-6 text-blue-600 mt-1" />
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-1">계약 완료</h3>
+                          <p className="text-base sm:text-lg text-gray-600">계약이 완료될 때 알림을 받습니다</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-blue-600" />
+                          <span className="text-base font-medium">이메일</span>
+                        </label>
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" className="rounded w-5 h-5 text-blue-600" />
+                          <span className="text-base font-medium">앱 알림</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 rounded-lg space-y-3 sm:space-y-0">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-base sm:text-lg text-gray-900">시스템 업데이트</h4>
-                      <p className="text-sm sm:text-base text-gray-600">시스템 업데이트 및 유지보수 알림</p>
+                  <div className="bg-white rounded-lg p-6 sm:p-8 border border-green-200 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                      <div className="flex items-start space-x-3">
+                        <Bell className="w-6 h-6 text-purple-600 mt-1" />
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-1">팀원 초대</h3>
+                          <p className="text-base sm:text-lg text-gray-600">새로운 팀원이 초대될 때 알림을 받습니다</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-purple-600" />
+                          <span className="text-base font-medium">이메일</span>
+                        </label>
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-purple-600" />
+                          <span className="text-base font-medium">앱 알림</span>
+                        </label>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">이메일</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded w-4 h-4" />
-                        <span className="text-sm sm:text-base">앱 알림</span>
-                      </label>
+                  </div>
+
+                  <div className="bg-white rounded-lg p-6 sm:p-8 border border-green-200 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                      <div className="flex items-start space-x-3">
+                        <Bell className="w-6 h-6 text-orange-600 mt-1" />
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-1">시스템 업데이트</h3>
+                          <p className="text-base sm:text-lg text-gray-600">시스템 업데이트 및 유지보수 알림을 받습니다</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="rounded w-5 h-5 text-orange-600" />
+                          <span className="text-base font-medium">이메일</span>
+                        </label>
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input type="checkbox" className="rounded w-5 h-5 text-orange-600" />
+                          <span className="text-base font-medium">앱 알림</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-base sm:text-lg text-gray-900 mb-3">알림 시간 설정</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 알림 시간 설정 */}
+                <div className="bg-white rounded-lg p-6 sm:p-8 border border-green-200 shadow-sm">
+                  <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-6">알림 시간 설정</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                      <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                         알림 시작 시간
                       </label>
-                      <Input type="time" defaultValue="09:00" className="text-base h-12" />
+                      <Input 
+                        type="time" 
+                        defaultValue="09:00" 
+                        className="text-base h-14 bg-gray-50 text-lg font-mono"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                      <label className="block text-base sm:text-lg font-semibold text-gray-800 mb-3">
                         알림 종료 시간
                       </label>
-                      <Input type="time" defaultValue="18:00" className="text-base h-12" />
+                      <Input 
+                        type="time" 
+                        defaultValue="18:00" 
+                        className="text-base h-14 bg-gray-50 text-lg font-mono"
+                      />
                     </div>
                   </div>
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-base text-blue-800">
+                      💡 <strong>알림 시간 안내:</strong> 설정된 시간 외에는 긴급하지 않은 알림이 발송되지 않습니다.
+                    </p>
+                  </div>
                 </div>
-
-                <div className="flex justify-end">
-                  <Button leftIcon={<Save size={18} />} className="h-12 text-base">
-                    알림 설정 저장
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )
 
@@ -573,44 +679,57 @@ const SettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 페이지 헤더 */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">설정</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">
-          시스템 설정을 관리하고 커스터마이징할 수 있습니다
-        </p>
+    <div className="max-w-none space-y-6">
+      {/* 페이지 헤더 - 전체 너비 활용 */}
+      <div className="bg-white rounded-lg p-6 sm:p-8 shadow-sm border border-gray-200">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">설정</h1>
+            <p className="text-base sm:text-lg text-gray-600 mt-2">
+              시스템 설정을 관리하고 커스터마이징할 수 있습니다
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Badge variant="success" size="lg" className="text-sm">
+              {tenant?.status === 'trial' ? '체험 중' : '활성 상태'}
+            </Badge>
+            <Badge variant="primary" size="lg" className="text-sm">
+              {tenant?.plan || 'Professional'} 플랜
+            </Badge>
+          </div>
+        </div>
       </div>
 
-      {/* 탭 메뉴 - 모바일 최적화 */}
-      <Card>
+      {/* 탭 메뉴 - 전체 너비 최적화 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="border-b border-gray-200">
-          <nav className="flex overflow-x-auto px-4 sm:px-6 scrollbar-hide">
+          <nav className="flex overflow-x-auto px-6 sm:px-8 scrollbar-hide">
             {tabs.map(tab => {
               const Icon = tab.icon
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-4 px-3 sm:px-4 border-b-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap min-w-max ${
+                  className={`flex items-center space-x-2 py-5 px-4 sm:px-6 border-b-2 font-medium text-base sm:text-lg transition-colors whitespace-nowrap min-w-max touch-target ${
                     activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-primary-500 text-primary-600 bg-primary-50'
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon size={20} className="flex-shrink-0" />
+                  <Icon size={22} className="flex-shrink-0" />
                   <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
+                  <span className="sm:hidden text-sm font-medium">{tab.label.split(' ')[0]}</span>
                 </button>
               )
             })}
           </nav>
         </div>
         
-        <div className="p-4 sm:p-6">
+        {/* 컨텐츠 영역 - 전체 너비 활용 */}
+        <div className="px-6 sm:px-8 py-6 sm:py-8">
           {renderTabContent()}
         </div>
-      </Card>
+      </div>
 
       {/* 샘플 데이터 초기화 확인 모달 */}
       <Modal
