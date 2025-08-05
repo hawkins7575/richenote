@@ -207,17 +207,17 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       tenant_id: tenantId,
       user_id: userId,
       title: propertyData.title,
-      address: propertyData.address,
+      address: propertyData.address || '', // 기본값 설정
       property_type: propertyData.type,
       transaction_type: propertyData.transaction_type,
       price: propertyData.price || null,
       deposit: propertyData.deposit || null,
       monthly_rent: propertyData.monthly_rent || null,
-      floor_current: propertyData.floor,
-      floor_total: propertyData.total_floors,
-      area_exclusive: propertyData.area,
-      rooms: propertyData.rooms,
-      bathrooms: propertyData.bathrooms,
+      floor_current: propertyData.floor || 1, // 기본값 설정
+      floor_total: propertyData.total_floors || 1, // 기본값 설정
+      area_exclusive: propertyData.area || 0, // 기본값 설정
+      rooms: propertyData.rooms || 1, // 기본값 설정
+      bathrooms: propertyData.bathrooms || 1, // 기본값 설정
       description: propertyData.description || null
       // landlord_name, landlord_phone, exit_date 컬럼이 DB에 없어서 제거
     }

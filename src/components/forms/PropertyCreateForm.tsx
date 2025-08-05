@@ -72,35 +72,12 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreatePropertyData, string>> = {}
 
+    // 필수항목 1: 매물 제목
     if (!formData.title.trim()) {
       newErrors.title = '제목을 입력해주세요'
     }
 
-    if (!formData.address.trim()) {
-      newErrors.address = '주소를 입력해주세요'
-    }
-
-    if (formData.area <= 0) {
-      newErrors.area = '면적은 0보다 커야 합니다'
-    }
-
-    if (formData.floor < 1) {
-      newErrors.floor = '층수는 1층 이상이어야 합니다'
-    }
-
-    if (formData.total_floors < formData.floor) {
-      newErrors.total_floors = '전체 층수는 해당 층수보다 크거나 같아야 합니다'
-    }
-
-    if (formData.rooms < 1) {
-      newErrors.rooms = '방 개수는 1개 이상이어야 합니다'
-    }
-
-    if (formData.bathrooms < 1) {
-      newErrors.bathrooms = '화장실 개수는 1개 이상이어야 합니다'
-    }
-
-    // 거래 유형별 가격 검증
+    // 필수항목 2: 거래 유형별 가격 검증
     if (formData.transaction_type === '매매' && (!formData.price || formData.price <= 0)) {
       newErrors.price = '매매가를 입력해주세요'
     }
@@ -116,6 +93,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
       if (!formData.monthly_rent || formData.monthly_rent <= 0) {
         newErrors.monthly_rent = '월세를 입력해주세요'
       }
+    }
+
+    // 선택적 검증: 입력된 경우에만 유효성 검사
+    if (formData.total_floors && formData.floor && formData.total_floors < formData.floor) {
+      newErrors.total_floors = '전체 층수는 해당 층수보다 크거나 같아야 합니다'
     }
 
     setErrors(newErrors)
@@ -229,7 +211,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value as PropertyType)}
                   options={PROPERTY_TYPES.map(type => ({ value: type, label: type }))}
-                  required
                 />
                 
                 <Select
@@ -237,7 +218,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   value={formData.transaction_type}
                   onChange={(e) => handleInputChange('transaction_type', e.target.value as TransactionType)}
                   options={TRANSACTION_TYPES.map(type => ({ value: type, label: type }))}
-                  required
                 />
               </div>
             </div>
@@ -254,7 +234,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     error={errors.address}
                     placeholder="예: 서울시 강남구 신사동 123-45"
-                    required
                   />
                 </div>
                 
@@ -281,7 +260,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   placeholder="85.0"
                   min="0"
                   step="0.1"
-                  required
                 />
                 
                 <Input
@@ -292,7 +270,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.floor}
                   placeholder="15"
                   min="1"
-                  required
                 />
                 
                 <Input
@@ -303,7 +280,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.total_floors}
                   placeholder="25"
                   min="1"
-                  required
                 />
                 
                 <Input
@@ -314,7 +290,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.rooms}
                   placeholder="3"
                   min="1"
-                  required
                 />
                 
                 <Input
@@ -325,7 +300,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   error={errors.bathrooms}
                   placeholder="2"
                   min="1"
-                  required
                 />
               </div>
               
