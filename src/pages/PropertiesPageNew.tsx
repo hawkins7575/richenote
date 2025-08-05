@@ -219,19 +219,20 @@ const PropertiesPageNew: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 페이지 헤더 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">매물 관리</h1>
-          <p className="text-gray-600 mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">매물 관리</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             {tenant?.name}  •  총 <span className="font-semibold text-primary-600">{properties.length}</span>개의 매물
             {tenant?.limits.max_properties && (
               <span className="text-gray-500"> / {tenant.limits.max_properties}개 제한</span>
             )}
           </p>
         </div>
+        <div className="flex sm:hidden"></div> {/* 모바일에서는 상단 헤더의 등록 버튼 사용 */}
         <button 
           onClick={() => setCreateFormOpen(true)}
-          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="hidden sm:inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus size={18} className="mr-2" />
           매물 등록
@@ -239,7 +240,7 @@ const PropertiesPageNew: React.FC = () => {
       </div>
 
       {/* 검색 및 필터 영역 */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="space-y-4">
           {/* 검색바 */}
           <div className="relative">
@@ -247,20 +248,21 @@ const PropertiesPageNew: React.FC = () => {
               placeholder="매물명, 주소로 검색하세요..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              leftIcon={<Search size={20} />}
-              className="text-base"
+              leftIcon={<Search size={18} />}
+              className="text-base h-12"
             />
           </div>
 
-          {/* 필터 및 뷰 옵션 */}
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center space-x-4">
+          {/* 필터 영역 - 모바일 최적화 */}
+          <div className="space-y-3">
+            {/* 첫 번째 줄: 필터들 */}
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:space-x-3">
               {/* 거래유형 필터 */}
               <Select
                 options={transactionTypeOptions}
                 value={selectedTransactionType}
                 onChange={(e) => setSelectedTransactionType(e.target.value)}
-                className="w-32"
+                className="w-full sm:w-24 text-sm"
               />
 
               {/* 매물유형 필터 */}
@@ -268,7 +270,7 @@ const PropertiesPageNew: React.FC = () => {
                 options={propertyTypeOptions}
                 value={selectedPropertyType}
                 onChange={(e) => setSelectedPropertyType(e.target.value)}
-                className="w-32"
+                className="w-full sm:w-24 text-sm"
               />
 
               {/* 상태 필터 */}
@@ -276,44 +278,48 @@ const PropertiesPageNew: React.FC = () => {
                 options={statusOptions}
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-32"
+                className="w-full sm:w-24 text-sm"
               />
             </div>
 
-            <div className="flex items-center space-x-3">
-              {/* 뷰 모드 */}
+            {/* 두 번째 줄: 뷰 모드와 초기화 */}
+            <div className="flex items-center justify-between">
+              {/* 뷰 모드 - 모바일 최적화 */}
               <div className="flex items-center bg-white rounded-lg p-1 border border-gray-300">
                 <button
                   onClick={() => setViewMode('card')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
+                  className={`flex items-center justify-center px-2 sm:px-3 py-2 rounded-md transition-colors text-xs sm:text-sm font-medium touch-target ${
                     viewMode === 'card' 
                       ? 'bg-primary-600 text-white' 
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
                   }`}
                 >
-                  <Grid size={16} />
-                  <span>카드</span>
+                  <Grid size={14} className="sm:mr-1" />
+                  <span className="hidden sm:inline">카드</span>
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
+                  className={`flex items-center justify-center px-2 sm:px-3 py-2 rounded-md transition-colors text-xs sm:text-sm font-medium touch-target ${
                     viewMode === 'list' 
                       ? 'bg-primary-600 text-white' 
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
                   }`}
                 >
-                  <AlignLeft size={16} />
-                  <span>리스트</span>
+                  <AlignLeft size={14} className="sm:mr-1" />
+                  <span className="hidden sm:inline">리스트</span>
                 </button>
               </div>
 
-              {/* 초기화 버튼 */}
+              {/* 초기화 버튼 - 모바일 최적화 */}
               <Button 
                 variant="outline"
                 onClick={resetFilters}
-                leftIcon={<Settings size={16} />}
+                size="sm"
+                leftIcon={<Settings size={14} />}
+                className="text-xs sm:text-sm px-3 py-2"
               >
-                초기화
+                <span className="hidden sm:inline">초기화</span>
+                <span className="sm:hidden">리셋</span>
               </Button>
             </div>
           </div>
@@ -434,8 +440,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
 }) => {
   return (
     <Card>
-      {/* 테이블 헤더 */}
-      <div className="bg-gray-50 border-b border-gray-200 px-4 py-3">
+      {/* 테이블 헤더 - 데스크톱만 표시 */}
+      <div className="hidden lg:block bg-gray-50 border-b border-gray-200 px-4 py-3">
         <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-700">
           <div className="col-span-1">거래유형</div>
           <div className="col-span-3">매물정보</div>
@@ -451,10 +457,11 @@ const PropertyList: React.FC<PropertyListProps> = ({
         {properties.map(property => (
           <div 
             key={property.id} 
-            className="border-b border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer"
+            className="border-b border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer touch-target"
             onClick={() => onView(property)}
           >
-            <div className="px-4 py-3">
+            {/* 데스크톱 레이아웃 */}
+            <div className="hidden lg:block px-4 py-3">
               <div className="grid grid-cols-12 gap-2 items-center text-sm">
                 
                 {/* 거래유형 */}
@@ -541,6 +548,67 @@ const PropertyList: React.FC<PropertyListProps> = ({
                   </div>
                 </div>
 
+              </div>
+            </div>
+
+            {/* 모바일 레이아웃 */}
+            <div className="lg:hidden px-4 py-4">
+              <div className="space-y-3">
+                {/* 첫 번째 줄: 거래유형, 상태, 가격 */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Badge size="sm" variant={
+                      property.transaction_type === '매매' ? 'sale' : 
+                      property.transaction_type === '전세' ? 'jeonse' : 'monthly'
+                    }>
+                      {property.transaction_type}
+                    </Badge>
+                    <Badge size="sm" variant={
+                      property.status === '판매중' ? 'success' : 
+                      property.status === '예약중' ? 'warning' : 'default'
+                    }>
+                      {property.status}
+                    </Badge>
+                  </div>
+                  <div className="font-bold text-primary-600 text-base">
+                    {formatPrice(property)}
+                  </div>
+                </div>
+                
+                {/* 두 번째 줄: 매물 제목 */}
+                <div className="font-medium text-gray-900 text-base">
+                  {property.title}
+                </div>
+                
+                {/* 세 번째 줄: 주소 */}
+                <div className="text-sm text-gray-600">
+                  📍 {property.address}
+                </div>
+                
+                {/* 네 번째 줄: 매물 상세 정보 */}
+                <div className="text-sm text-gray-500">
+                  {property.type} • {property.area}m² ({Math.floor(property.area/3.3)}평) • {property.floor}/{property.total_floors}층 • {property.rooms}룸 {property.bathrooms}욕실
+                </div>
+                
+                {/* 다섯 번째 줄: 부가 정보 */}
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center space-x-3">
+                    <span className={`${property.parking ? 'text-green-600' : 'text-gray-400'}`}>
+                      🚗{property.parking ? '주차' : '주차X'}
+                    </span>
+                    <span className={`${property.elevator ? 'text-green-600' : 'text-gray-400'}`}>
+                      🏢{property.elevator ? '엘베' : '엘베X'}
+                    </span>
+                    {property.exit_date && (
+                      <span className="text-orange-600">
+                        퇴실: {new Date(property.exit_date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    등록: {property.created_at && new Date(property.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
