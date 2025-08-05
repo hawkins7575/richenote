@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react'
 import { Home, Users, TrendingUp, Calendar } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui'
+import { Card, CardContent, Badge } from '@/components/ui'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePropertyStats, useProperties } from '@/hooks/useProperties'
@@ -14,17 +14,28 @@ import {
 } from '@/components/charts'
 import { StatCard } from '@/components/dashboard'
 import { PropertyCard, PropertyDetailModal } from '@/components/property'
-import { Property } from '@/types/property'
+import { PropertyEditForm } from '@/components/forms/PropertyEditForm'
+import { Property, UpdatePropertyData } from '@/types/property'
 
 const DashboardPage: React.FC = () => {
   const { tenant } = useTenant()
   const { user } = useAuth()
   const { stats, loading: statsLoading, error: statsError } = usePropertyStats()
-  const { properties } = useProperties()
+  const { 
+    properties, 
+    updateProperty,
+    deleteProperty,
+    refreshProperties 
+  } = useProperties()
   
   // 상세 모달 상태 관리
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  
+  // 수정 폼 상태 관리
+  const [editFormOpen, setEditFormOpen] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null)
 
   // 매물 클릭 핸들러
   const handlePropertyClick = (property: Property) => {
@@ -36,6 +47,58 @@ const DashboardPage: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setSelectedProperty(null)
+  }
+
+  // 매물 수정 핸들러
+  const handleEditProperty = async (data: UpdatePropertyData) => {
+    if (!editingProperty) return
+    
+    try {
+      setEditLoading(true)
+      await updateProperty(editingProperty.id, data)
+      setEditFormOpen(false)
+      setEditingProperty(null)
+      // 목록 새로고침
+      await refreshProperties()
+      alert('✅ 매물이 성공적으로 수정되었습니다!')
+    } catch (error) {
+      console.error('매물 수정 실패:', error)
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+      alert(`❌ 매물 수정 실패: ${errorMessage}`)
+      throw error
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  // 수정 폼 열기 핸들러
+  const handleOpenEditForm = (property: Property) => {
+    console.log('📝 대시보드에서 수정 폼 열기:', property.title)
+    setEditingProperty(property)
+    setEditFormOpen(true)
+    setIsModalOpen(false) // 상세 모달 닫기
+  }
+
+  // 삭제 확인 핸들러
+  const handleConfirmDelete = async (property: Property) => {
+    console.log('🗑️ 대시보드에서 삭제 요청:', property.title)
+    
+    const confirmDelete = window.confirm(`'${property.title}' 매물을 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)
+    
+    if (confirmDelete) {
+      try {
+        await deleteProperty(property.id)
+        setIsModalOpen(false)
+        setSelectedProperty(null)
+        // 목록 새로고침
+        await refreshProperties()
+        alert('✅ 매물이 성공적으로 삭제되었습니다!')
+      } catch (error) {
+        console.error('매물 삭제 실패:', error)
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+        alert(`❌ 매물 삭제 실패: ${errorMessage}`)
+      }
+    }
   }
 
   // 실제 통계 데이터 또는 기본값
@@ -165,7 +228,7 @@ const DashboardPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">최근 등록 매물</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {properties?.slice(0, 8).map((property) => (
+            {properties?.slice(0, 4).map((property) => (
               <PropertyCard
                 key={property.id}
                 property={property}
@@ -205,56 +268,6 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
       
-      {/* 할 일 및 알림 섹션을 별도로 분리 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        <div></div> {/* 빈 공간 */}
-
-        {/* 할 일 및 알림 - 모바일 최적화 */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">오늘의 할 일</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-yellow-50 rounded-lg">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    매물 사진 업데이트 필요
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    3개 매물의 사진을 업데이트해야 합니다
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-blue-50 rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    고객 상담 예정
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    오후 2시 강남구 아파트 상담
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-green-50 rounded-lg">
-                <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">
-                    계약서 검토
-                  </p>
-                  <p className="text-xs text-gray-600 hidden sm:block">
-                    분당구 전세 계약서 최종 검토
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* 플랜 정보 (테넌트별) */}
       {tenant && (
@@ -289,12 +302,23 @@ const DashboardPage: React.FC = () => {
         property={selectedProperty}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        onEdit={(property) => {
-          // TODO: 매물 수정 페이지로 이동하는 로직 추가
-          console.log('Edit property:', property.id)
-          handleCloseModal()
-        }}
+        onEdit={handleOpenEditForm}
+        onDelete={handleConfirmDelete}
       />
+
+      {/* 매물 수정 폼 모달 */}
+      {editingProperty && (
+        <PropertyEditForm
+          isOpen={editFormOpen}
+          onClose={() => {
+            setEditFormOpen(false)
+            setEditingProperty(null)
+          }}
+          onSubmit={handleEditProperty}
+          property={editingProperty}
+          loading={editLoading}
+        />
+      )}
     </div>
   )
 }

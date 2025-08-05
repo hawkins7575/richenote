@@ -61,6 +61,27 @@
   .card-hover {
     @apply transition-all duration-200 hover:shadow-md hover:border-gray-300 transform hover:-translate-y-0.5;
   }
+  
+  /* 모바일 터치 타겟 */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 스크롤바 숨기기 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* iOS Safe Area 지원 */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 @layer utilities {
