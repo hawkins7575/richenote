@@ -125,9 +125,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* 모바일 하단 네비게이션 */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-area-inset-bottom">
-        <div className="grid grid-cols-5 h-16">
+      {/* 모바일 하단 네비게이션 - 고정 */}
+      <div className="lg:hidden bottom-nav-fixed bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
+        <div className="grid grid-cols-5 h-16 bg-white">
           {navigation.map((item) => {
             const isCurrent = location.pathname === item.href
             return (
@@ -135,14 +135,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-colors touch-target',
+                  'flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-target',
                   isCurrent
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-primary-600 bg-primary-50 border-t-2 border-primary-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 )}
               >
-                <item.icon size={20} className="mb-1" />
-                <span className="truncate">{item.name.split(' ')[0]}</span>
+                <item.icon size={18} className="mb-1 flex-shrink-0" />
+                <span className="truncate text-center leading-tight">{item.name.split(' ')[0]}</span>
               </Link>
             )
           })}
@@ -189,7 +189,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
 
         {/* 페이지 컨텐츠 */}
-        <main className="p-4 sm:p-6 pb-20 lg:pb-6">
+        <main className="p-4 sm:p-6 pb-24 lg:pb-6 min-h-screen">
           {children}
         </main>
       </div>
