@@ -6,6 +6,7 @@ import React from 'react'
 import { X, MapPin, Calendar, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
+import '@/styles/mobile-modal.css'
 
 interface PropertyDetailModalProps {
   property: Property | null
@@ -44,19 +45,20 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl h-[95vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50 touch-manipulation">
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] sm:max-h-[85vh] lg:h-[95vh] overflow-hidden flex flex-col shadow-2xl">
         {/* 헤더 - 모바일 최적화 */}
         <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           {/* 모바일: 세로 배치 */}
-          <div className="lg:hidden p-4 sm:p-6 space-y-4">
+          <div className="lg:hidden p-3 sm:p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex-1 pr-4">
                 {property.title}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+                className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="닫기"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -67,8 +69,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <span className="text-sm sm:text-base text-gray-600 leading-relaxed">{property.address}</span>
             </div>
             
-            <div className="text-center py-3 bg-white rounded-lg border border-blue-200">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{price}</div>
+            <div className="text-center py-2 bg-white rounded-lg border border-blue-200">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">{price}</div>
               <div className="flex flex-wrap justify-center gap-2">
                 <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                   {property.type}
@@ -130,46 +132,46 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         </div>
 
         {/* 콘텐츠 - 모바일 최적화 */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 pb-safe">
             
             {/* 모바일: 세로 스택 레이아웃 */}
-            <div className="lg:hidden space-y-4">
+            <div className="lg:hidden space-y-3">
               
               {/* 기본 정보 */}
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
                   기본 정보
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                    <span className="text-base text-gray-700 font-medium">전용면적</span>
-                    <span className="text-lg font-bold text-gray-900">{formatArea(property.area)}</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center py-1 border-b border-blue-200">
+                    <span className="text-sm text-gray-700 font-medium">전용면적</span>
+                    <span className="text-base font-bold text-gray-900">{formatArea(property.area)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                    <span className="text-base text-gray-700 font-medium">층수</span>
-                    <span className="text-lg font-bold text-gray-900">{property.floor}F / {property.total_floors}F</span>
+                  <div className="flex justify-between items-center py-1 border-b border-blue-200">
+                    <span className="text-sm text-gray-700 font-medium">층수</span>
+                    <span className="text-base font-bold text-gray-900">{property.floor}F / {property.total_floors}F</span>
                   </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-base text-gray-700 font-medium">구조</span>
-                    <span className="text-lg font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-700 font-medium">구조</span>
+                    <span className="text-base font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
                   </div>
                   
                   {/* 편의시설 */}
-                  <div className="pt-3 border-t border-blue-200">
-                    <div className="text-base font-bold text-gray-800 mb-3">편의시설</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className={`flex items-center justify-center py-3 px-4 rounded-lg text-sm font-medium ${
+                  <div className="pt-2 border-t border-blue-200">
+                    <div className="text-sm font-bold text-gray-800 mb-2">편의시설</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className={`flex items-center justify-center py-2 px-3 rounded-lg text-xs font-medium ${
                         property.parking ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
                       }`}>
-                        <Car className="w-4 h-4 mr-2" />
+                        <Car className="w-3 h-3 mr-1" />
                         <span>주차 {property.parking ? '가능' : '불가'}</span>
                       </div>
-                      <div className={`flex items-center justify-center py-3 px-4 rounded-lg text-sm font-medium ${
+                      <div className={`flex items-center justify-center py-2 px-3 rounded-lg text-xs font-medium ${
                         property.elevator ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
                       }`}>
-                        <ChevronUp className="w-4 h-4 mr-2" />
+                        <ChevronUp className="w-3 h-3 mr-1" />
                         <span>엘리베이터 {property.elevator ? '있음' : '없음'}</span>
                       </div>
                     </div>
@@ -178,36 +180,34 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </div>
 
               {/* 위치 정보 */}
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                   위치 정보
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-green-200">
-                    <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <div className="text-base sm:text-lg font-semibold text-gray-900 leading-relaxed">{property.address}</div>
-                      {property.detailed_address && (
-                        <div className="text-sm sm:text-base text-gray-600 mt-1 leading-relaxed">{property.detailed_address}</div>
-                      )}
-                    </div>
+                <div className="flex items-start space-x-2 p-2 bg-white rounded-lg border border-green-200">
+                  <MapPin className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-gray-900">{property.address}</div>
+                    {property.detailed_address && (
+                      <div className="text-xs text-gray-600 mt-1">{property.detailed_address}</div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* 가격 정보 */}
-              <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+              <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
                   가격 정보
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {property.transaction_type === '매매' && property.price && (
-                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
+                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-base font-semibold text-blue-800">매매가</span>
-                        <span className="text-xl sm:text-2xl font-bold text-blue-900">
+                        <span className="text-sm font-semibold text-blue-800">매매가</span>
+                        <span className="text-base font-bold text-blue-900">
                           {formatMoney(property.price)}
                         </span>
                       </div>
@@ -215,12 +215,12 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   )}
                   
                   {(property.transaction_type === '전세' || property.transaction_type === '월세') && property.deposit !== undefined && (
-                    <div className="bg-green-100 border border-green-300 rounded-lg p-4">
+                    <div className="bg-green-100 border border-green-300 rounded-lg p-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-base font-semibold text-green-800">
+                        <span className="text-sm font-semibold text-green-800">
                           {property.transaction_type === '전세' ? '전세금' : '보증금'}
                         </span>
-                        <span className="text-xl sm:text-2xl font-bold text-green-900">
+                        <span className="text-base font-bold text-green-900">
                           {formatMoney(property.deposit)}
                         </span>
                       </div>
@@ -228,10 +228,10 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   )}
                   
                   {property.transaction_type === '월세' && property.monthly_rent && (
-                    <div className="bg-orange-100 border border-orange-300 rounded-lg p-4">
+                    <div className="bg-orange-100 border border-orange-300 rounded-lg p-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-base font-semibold text-orange-800">월세</span>
-                        <span className="text-xl sm:text-2xl font-bold text-orange-900">
+                        <span className="text-sm font-semibold text-orange-800">월세</span>
+                        <span className="text-base font-bold text-orange-900">
                           {property.monthly_rent}만원/월
                         </span>
                       </div>
@@ -554,15 +554,15 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* 액션 버튼 섹션 - 모바일 최적화 */}
         <div className="border-t border-gray-200 bg-white">
           {/* 모바일: 세로 스택 레이아웃 */}
-          <div className="lg:hidden p-4 sm:p-6 space-y-4">
+          <div className="lg:hidden p-3 sm:p-4 pb-safe space-y-3 mb-4 sm:mb-6">
             {/* 통계 정보 */}
-            <div className="flex justify-center space-x-6 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+            <div className="flex justify-center space-x-4 text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-1"></div>
                 <span>조회 {property.view_count || 0}회</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
                 <span>문의 {property.inquiry_count || 0}회</span>
               </div>
             </div>
@@ -571,24 +571,27 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={onClose}
-                className="py-3 px-4 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 border border-gray-300 hover:border-gray-400 touch-target"
+                className="py-4 px-4 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-all duration-200 border border-gray-300 hover:border-gray-400 min-h-[48px] flex items-center justify-center"
+                aria-label="모달 닫기"
               >
                 닫기
               </button>
               
               <button
                 onClick={handleEditClick}
-                className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium text-base touch-target"
+                className="py-4 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 font-medium text-base min-h-[48px] flex items-center justify-center"
+                aria-label="매물 정보 수정"
               >
-                <Edit className="w-4 h-4 inline mr-2" />
+                <Edit className="w-4 h-4 mr-2" />
                 수정
               </button>
               
               <button
                 onClick={handleDeleteClick}
-                className="py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium text-base touch-target"
+                className="py-4 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 font-medium text-base min-h-[48px] flex items-center justify-center"
+                aria-label="매물 삭제"
               >
-                <Trash2 className="w-4 h-4 inline mr-2" />
+                <Trash2 className="w-4 h-4 mr-2" />
                 삭제
               </button>
             </div>

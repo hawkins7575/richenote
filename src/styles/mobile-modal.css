@@ -1,0 +1,69 @@
+/* 모바일 모달 전용 CSS */
+
+/* iOS Safari 뷰포트 처리 */
+@supports (padding: max(0px)) {
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* 터치 최적화 */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* 스크롤 오버행 방지 */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* 모바일 텍스트 선택 방지 (UI 요소) */
+.select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 모바일 터치 피드백 */
+@media (hover: none) and (pointer: coarse) {
+  button:active {
+    transform: scale(0.98);
+  }
+}
+
+/* 접근성 - 포커스 표시 개선 */
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* 모바일 모달 애니메이션 */
+@media (max-width: 1023px) {
+  .modal-enter {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  
+  .modal-enter-active {
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 300ms ease-out, opacity 300ms ease-out;
+  }
+  
+  .modal-exit {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .modal-exit-active {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 250ms ease-in, opacity 250ms ease-in;
+  }
+}
