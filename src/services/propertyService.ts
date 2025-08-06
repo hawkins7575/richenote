@@ -10,24 +10,67 @@ import { ERROR_MESSAGES, DEFAULT_VALUES } from '@/constants/propertyConstants'
 
 // 실제 Supabase 서비스 사용
 
-// 매물 조회 (사용자별 개별 관리)
+// 매물 조회 (사용자별 개별 관리) - 자동 복구 로직 포함
 export const getProperties = async (userId: string, filters?: SimplePropertyFilters) => {
   try {
     console.log('🔍 getProperties 시작 - userId:', userId)
     
-    // 사용자의 올바른 tenant_id 조회
-    const { data: userProfile, error: userError } = await supabase
+    // 사용자의 올바른 tenant_id 조회 (자동 복구 로직 포함)
+    let { data: userProfile, error: userError } = await supabase
       .from('user_profiles')
       .select('tenant_id')
       .eq('id', userId)
       .single()
 
-    if (userError) {
-      console.error('❌ 사용자 정보 조회 실패:', userError)
-      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    // user_profile이 없는 경우 자동 생성
+    if (userError || !userProfile) {
+      console.log('⚠️ user_profile 누락 감지 - 자동 복구 시작')
+      
+      // 사용자 이메일 조회
+      const { data: authUser } = await supabase.auth.getUser()
+      if (!authUser.user?.email) {
+        throw new Error('사용자 정보를 찾을 수 없습니다.')
+      }
+      
+      // 자동 테넌트 및 프로필 생성 (트리거가 실행되지 않았을 경우의 fallback)
+      const userName = authUser.user.email.split('@')[0]
+      
+      // 테넌트 생성
+      const { data: newTenant } = await supabase
+        .from('tenants')
+        .insert({
+          name: `${userName}의 부동산`,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+      
+      if (newTenant) {
+        // 프로필 생성
+        await supabase
+          .from('user_profiles')
+          .insert({
+            id: userId,
+            tenant_id: newTenant.id,
+            name: userName,
+            role: 'admin',
+            company: `${userName}의 부동산`,
+            created_at: new Date().toISOString()
+          })
+        
+        // 다시 조회
+        const { data: recoveredProfile } = await supabase
+          .from('user_profiles')
+          .select('tenant_id')
+          .eq('id', userId)
+          .single()
+        
+        userProfile = recoveredProfile
+        console.log('✅ 자동 복구 완료 - tenant_id:', userProfile?.tenant_id)
+      }
     }
 
-    const actualTenantId = userProfile.tenant_id
+    const actualTenantId = userProfile?.tenant_id
     if (!actualTenantId) {
       throw new Error('사용자에게 할당된 테넌트가 없습니다.')
     }
