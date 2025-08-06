@@ -163,14 +163,23 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     // 임대인 정보와 기타 정보를 description에 구조화하여 저장
     let structuredDescription = propertyData.description || ''
     
-    // 임대인 정보 추가
+    // 임대인 정보 추가 (디버그 로깅 포함)
     if (propertyData.landlord_name || propertyData.landlord_phone) {
+      console.log('📝 임대인 정보 저장 중:', { 
+        name: propertyData.landlord_name, 
+        phone: propertyData.landlord_phone 
+      })
+      
       const landlordInfo = []
       if (propertyData.landlord_name) landlordInfo.push(`임대인: ${propertyData.landlord_name}`)
       if (propertyData.landlord_phone) landlordInfo.push(`연락처: ${propertyData.landlord_phone}`)
       
       const landlordSection = `[임대인정보] ${landlordInfo.join(' | ')}`
       structuredDescription = landlordSection + (structuredDescription ? `\n\n${structuredDescription}` : '')
+      
+      console.log('✅ 임대인 정보가 포함된 description:', structuredDescription)
+    } else {
+      console.log('⚠️ 임대인 정보 없음 - description에 추가하지 않음')
     }
     
     // 퇴실 예정일 또는 공실 상태 추가
