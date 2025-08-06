@@ -340,12 +340,39 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   </div>
                 </div>
 
-                {/* 날짜 & 통계 */}
+                {/* 임대인 & 날짜 정보 */}
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 border border-purple-200">
                   <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
                     <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                    날짜 & 통계
+                    임대인 & 날짜 정보
                   </h3>
+                  <div className="space-y-1.5 mb-2">
+                    {(property.landlord_name || property.landlord_phone) ? (
+                      <>
+                        {property.landlord_name && (
+                          <div className="bg-white rounded p-1.5 border border-purple-200">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-medium text-gray-700">임대인</span>
+                              <span className="text-sm font-bold text-gray-900">{property.landlord_name}</span>
+                            </div>
+                          </div>
+                        )}
+                        {property.landlord_phone && (
+                          <div className="bg-white rounded p-1.5 border border-purple-200">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-medium text-gray-700">연락처</span>
+                              <span className="text-sm font-bold text-gray-900">{property.landlord_phone}</span>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="bg-white rounded p-1.5 border border-purple-200 text-center text-gray-500">
+                        <User className="w-3 h-3 mx-auto mb-0.5 opacity-50" />
+                        <div className="text-xs">임대인 정보 없음</div>
+                      </div>
+                    )}
+                  </div>
                   <div className="space-y-1.5">
                     {property.exit_date ? (
                       <div className="bg-red-100 border border-red-300 rounded p-1.5">
@@ -373,289 +400,46 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                         </span>
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-1">
-                      <div className="bg-blue-100 border border-blue-300 rounded p-1.5 text-center">
-                        <div className="text-sm font-bold text-blue-900">{property.view_count || 0}</div>
-                        <div className="text-xs font-medium text-blue-800">조회</div>
-                      </div>
-                      <div className="bg-green-100 border border-green-300 rounded p-1.5 text-center">
-                        <div className="text-sm font-bold text-green-900">{property.inquiry_count || 0}</div>
-                        <div className="text-xs font-medium text-green-800">문의</div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* 두 번째 행: 임대인 정보 + 상세 설명 */}
-              <div className={`grid gap-3 ${property.description ? 'grid-cols-3' : 'grid-cols-1'}`}>
-                
-                {/* 임대인 정보 */}
-                <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-3 border border-indigo-200">
+              {/* 두 번째 행: 상세 설명만 (임대인 정보는 첫 번째 행에 통합) */}
+              {property.description && (
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-3 border border-amber-200">
                   <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
-                    임대인 정보
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
+                    상세 설명
                   </h3>
-                  <div className={`${property.description ? 'space-y-1.5' : 'grid grid-cols-2 gap-3'}`}>
-                    {(property.landlord_name || property.landlord_phone) ? (
-                      <>
-                        {property.landlord_name && (
-                          <div className="bg-white rounded p-1.5 border border-indigo-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs font-medium text-gray-700">이름</span>
-                              <span className="text-sm font-bold text-gray-900">{property.landlord_name}</span>
-                            </div>
-                          </div>
-                        )}
-                        {property.landlord_phone && (
-                          <div className="bg-white rounded p-1.5 border border-indigo-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs font-medium text-gray-700">연락처</span>
-                              <span className="text-sm font-bold text-gray-900">{property.landlord_phone}</span>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="bg-white rounded p-3 border border-indigo-200 text-center text-gray-500 col-span-2">
-                        <User className="w-4 h-4 mx-auto mb-1 opacity-50" />
-                        <div className="text-xs">임대인 정보 없음</div>
-                      </div>
-                    )}
+                  <div className="bg-white p-3 rounded border border-amber-200 h-24 overflow-y-auto">
+                    <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {property.description}
+                    </p>
                   </div>
                 </div>
-
-                {/* 상세 설명 */}
-                {property.description && (
-                  <div className="col-span-2 bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-3 border border-amber-200">
-                    <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
-                      <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
-                      상세 설명
-                    </h3>
-                    <div className="bg-white p-2 rounded border border-amber-200 h-20 overflow-y-auto">
-                      <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {property.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
 
 
-            {/* 모바일: 임대인, 날짜, 통계 정보 */}
+            {/* 모바일: 상세 설명 (임대인, 날짜 정보는 위에 포함됨) */}
             <div className="lg:hidden space-y-4">
-              
-              {/* 임대인 정보 */}
-              <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-indigo-500 rounded-full mr-3"></div>
-                  임대인 정보
-                </h3>
-                <div className="space-y-3">
-                  {(property.landlord_name || property.landlord_phone) ? (
-                    <>
-                      {property.landlord_name && (
-                        <div className="bg-white rounded-lg p-4 border border-indigo-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-base font-medium text-gray-700">이름</span>
-                            <span className="text-lg font-bold text-gray-900">{property.landlord_name}</span>
-                          </div>
-                        </div>
-                      )}
-                      {property.landlord_phone && (
-                        <div className="bg-white rounded-lg p-4 border border-indigo-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-base font-medium text-gray-700">연락처</span>
-                            <span className="text-lg font-bold text-gray-900">{property.landlord_phone}</span>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="bg-white rounded-lg p-6 border border-indigo-200 text-center text-gray-500">
-                      <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <div className="text-base">임대인 정보 없음</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* 날짜 정보 */}
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                  날짜 정보
-                </h3>
-                <div className="space-y-3">
-                  {property.exit_date ? (
-                    <div className="bg-red-100 border border-red-300 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <Calendar className="w-5 h-5 mr-2 text-red-500" />
-                          <span className="text-base font-semibold text-red-800">퇴실예정일</span>
-                        </div>
-                        <span className="text-lg font-bold text-red-900">
-                          {new Date(property.exit_date).toLocaleDateString('ko-KR')}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-green-100 border border-green-300 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <Calendar className="w-5 h-5 mr-2 text-green-500" />
-                          <span className="text-base font-semibold text-green-800">거주 현황</span>
-                        </div>
-                        <span className="text-lg font-bold text-green-900">공실</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="bg-white border border-purple-200 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <Calendar className="w-5 h-5 mr-2 text-purple-500" />
-                        <span className="text-base font-semibold text-gray-800">등록일</span>
-                      </div>
-                      <span className="text-lg font-bold text-gray-900">
-                        {new Date(property.created_at).toLocaleDateString('ko-KR')}
-                      </span>
-                    </div>
+              {/* 상세 설명만 표시 */}
+              {property.description && (
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
+                    상세 설명
+                  </h3>
+                  <div className="bg-white p-4 sm:p-6 rounded-lg border border-amber-200 shadow-sm">
+                    <p className="text-base sm:text-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {property.description}
+                    </p>
                   </div>
                 </div>
-              </div>
-
-              {/* 통계 정보 */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
-                  통계 정보
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-center">
-                    <div className="text-2xl sm:text-3xl font-bold text-blue-900 mb-1">{property.view_count || 0}</div>
-                    <div className="text-sm font-medium text-blue-800">조회수</div>
-                  </div>
-                  <div className="bg-green-100 border border-green-300 rounded-lg p-4 text-center">
-                    <div className="text-2xl sm:text-3xl font-bold text-green-900 mb-1">{property.inquiry_count || 0}</div>
-                    <div className="text-sm font-medium text-green-800">문의수</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* 데스크톱: 개선된 2열 그리드 레이아웃 */}
-            <div className="hidden lg:grid grid-cols-2 gap-6">
-              
-              {/* 임대인 정보 */}
-              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-5 border border-indigo-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-indigo-500 rounded-full mr-3"></div>
-                  임대인 정보
-                </h3>
-                <div className="space-y-3">
-                  {(property.landlord_name || property.landlord_phone) ? (
-                    <>
-                      {property.landlord_name && (
-                        <div className="bg-white rounded-lg p-3 border border-indigo-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-gray-700">이름</span>
-                            <span className="text-base font-bold text-gray-900">{property.landlord_name}</span>
-                          </div>
-                        </div>
-                      )}
-                      {property.landlord_phone && (
-                        <div className="bg-white rounded-lg p-3 border border-indigo-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-gray-700">연락처</span>
-                            <span className="text-base font-bold text-gray-900">{property.landlord_phone}</span>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="bg-white rounded-lg p-5 border border-indigo-200 text-center text-gray-500">
-                      <User className="w-6 h-6 mx-auto mb-2 opacity-50" />
-                      <div className="text-sm">임대인 정보 없음</div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              {/* 날짜 & 통계 정보 */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                  날짜 & 통계
-                </h3>
-                <div className="space-y-3">
-                  {property.exit_date ? (
-                    <div className="bg-red-100 border border-red-300 rounded-lg p-3">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-red-500" />
-                          <span className="text-sm font-semibold text-red-800">퇴실예정일</span>
-                        </div>
-                        <span className="text-base font-bold text-red-900">
-                          {new Date(property.exit_date).toLocaleDateString('ko-KR')}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-green-100 border border-green-300 rounded-lg p-3">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-green-500" />
-                          <span className="text-sm font-semibold text-green-800">거주현황</span>
-                        </div>
-                        <span className="text-base font-bold text-green-900">공실</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="bg-white border border-purple-200 rounded-lg p-3">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-purple-500" />
-                        <span className="text-sm font-semibold text-gray-800">등록일</span>
-                      </div>
-                      <span className="text-base font-bold text-gray-900">
-                        {new Date(property.created_at).toLocaleDateString('ko-KR')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 통계 정보 */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 text-center">
-                      <div className="text-lg font-bold text-blue-900 mb-1">{property.view_count || 0}</div>
-                      <div className="text-xs font-medium text-blue-800">조회수</div>
-                    </div>
-                    <div className="bg-green-100 border border-green-300 rounded-lg p-3 text-center">
-                      <div className="text-lg font-bold text-green-900 mb-1">{property.inquiry_count || 0}</div>
-                      <div className="text-xs font-medium text-green-800">문의수</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 상세 설명 */}
-            {property.description && (
-              <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-4 sm:p-6 lg:p-6">
-                <h3 className="text-lg sm:text-xl lg:text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
-                  상세 설명
-                </h3>
-                <div className="bg-white p-4 sm:p-6 lg:p-6 rounded-lg border border-amber-200 shadow-sm">
-                  <p className="text-base sm:text-lg lg:text-base text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {property.description}
-                  </p>
-                </div>
-              </div>
-            )}
             
           </div>
         </div>
@@ -664,17 +448,6 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         <div className="border-t border-gray-200 bg-white">
           {/* 모바일: 세로 스택 레이아웃 */}
           <div className="lg:hidden p-3 sm:p-4 pb-safe space-y-3 mb-4 sm:mb-6">
-            {/* 통계 정보 */}
-            <div className="flex justify-center space-x-4 text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-1"></div>
-                <span>조회 {property.view_count || 0}회</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
-                <span>문의 {property.inquiry_count || 0}회</span>
-              </div>
-            </div>
             
             {/* 액션 버튼들 */}
             <div className="grid grid-cols-3 gap-3">
@@ -708,17 +481,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           
           {/* 데스크톱: 개선된 가로 레이아웃 */}
           <div className="hidden lg:flex items-center justify-between p-6 bg-gray-50">
-            {/* 통계 정보 */}
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <div className="flex items-center bg-white px-3 py-2 rounded-lg border">
-                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
-                <span>조회 {property.view_count || 0}회</span>
-              </div>
-              <div className="flex items-center bg-white px-3 py-2 rounded-lg border">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                <span>문의 {property.inquiry_count || 0}회</span>
-              </div>
-            </div>
+            <div></div>
             
             {/* 액션 버튼들 */}
             <div className="flex items-center space-x-3">
