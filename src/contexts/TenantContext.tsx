@@ -3,7 +3,9 @@
 // ============================================================================
 
 import React, { createContext, useContext, useEffect, ReactNode } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 import { useTenantStore } from '@/stores/tenantStore'
+import { supabase } from '@/services/supabase'
 import type { TenantContextType } from '@/types/tenant'
 
 const TenantContext = createContext<TenantContextType | null>(null)
@@ -13,6 +15,7 @@ interface TenantProviderProps {
 }
 
 export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
+  const { user } = useAuth() // 인증된 사용자 정보 가져오기
   const {
     tenant,
     isLoading,
@@ -28,82 +31,109 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
 
   // 페이지 로드 시 URL에서 테넌트 감지 또는 자동 테넌트 설정
   useEffect(() => {
-    // 개발 및 프로덕션 환경에서 데모 테넌트 자동 설정 (베타 테스트용)
-    if (!tenant) {
-      console.log('🏢 자동 테넌트 설정 시작')
+    // 사용자별 개별 테넌트 자동 설정
+    if (user && !tenant) {
+      console.log('🏢 사용자별 개별 테넌트 설정 시작:', user.id)
       
-      // 데모 테넌트 데이터를 Zustand 스토어에 직접 설정
-      const demoTenant = {
-        id: '00000000-0000-0000-0000-000000000001',
-        name: 'PropertyDesk 베타',
-        slug: 'propertydesk-beta',
-        plan: 'professional' as const,
-        status: 'trial' as const,
-        trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        branding: {
-          primary_color: '#3b82f6',
-          secondary_color: '#1d4ed8',
-          accent_color: '#f59e0b',
-        },
-        limits: {
-          max_properties: 1000,
-          max_users: 10,
-          max_storage_gb: 10,
-          max_api_calls_per_month: 50000,
-          features_enabled: ['advanced_analytics', 'api_access', 'custom_fields'],
-        },
-        settings: {
-          timezone: 'Asia/Seoul',
-          date_format: 'YYYY-MM-DD',
-          currency: 'KRW',
-          language: 'ko',
-          default_property_status: '판매중',
-          require_exit_date: true,
-          require_landlord_info: true,
-          email_notifications: true,
-          sms_notifications: false,
-          browser_notifications: true,
-          require_2fa: false,
-          session_timeout_minutes: 480,
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        created_by: '00000000-0000-0000-0000-000000000001',
+      // 사용자별 개별 테넌트를 실제 DB에 생성/조회
+      const initializeTenant = async () => {
+        try {
+          // 1. 기존 테넌트 조회
+          const { data: existingTenant } = await supabase
+            .from('tenants')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+          
+          if (existingTenant) {
+            // 기존 테넌트가 있으면 스토어에 설정
+            useTenantStore.setState({ 
+              tenant: existingTenant,
+              isLoading: false,
+              error: null 
+            })
+            console.log('✅ 기존 테넌트 조회 완료:', existingTenant.name)
+            return
+          }
+        } catch (error) {
+          // 테넌트가 없으면 새로 생성
+          console.log('📝 새 테넌트 생성 필요')
+        }
+        
+        try {
+          // 2. 새 테넌트 생성
+          const userTenant = {
+            id: user.id, // 사용자 ID = 테넌트 ID
+            name: 'PropertyDesk 베타',
+            slug: `user-${user.id.slice(0, 8)}`,
+            plan: 'professional',
+            status: 'trial',
+            trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            created_by: user.id,
+          }
+          
+          const { data: newTenant, error } = await supabase
+            .from('tenants')
+            .insert(userTenant)
+            .select()
+            .single()
+          
+          if (error) {
+            console.error('❌ 테넌트 생성 실패:', error)
+            throw error
+          }
+          
+          // 생성된 테넌트를 스토어에 설정 (추가 속성 포함)
+          const fullTenant = {
+            ...newTenant,
+            branding: {
+              primary_color: '#3b82f6',
+              secondary_color: '#1d4ed8',
+              accent_color: '#f59e0b',
+            },
+            limits: {
+              max_properties: 1000,
+              max_users: 10,
+              max_storage_gb: 10,
+              max_api_calls_per_month: 50000,
+              features_enabled: ['advanced_analytics', 'api_access', 'custom_fields'],
+            },
+            settings: {
+              timezone: 'Asia/Seoul',
+              date_format: 'YYYY-MM-DD',
+              currency: 'KRW',
+              language: 'ko',
+              default_property_status: '판매중',
+              require_exit_date: true,
+              require_landlord_info: true,
+              email_notifications: true,
+              sms_notifications: false,
+              browser_notifications: true,
+              require_2fa: false,
+              session_timeout_minutes: 480,
+            },
+          }
+          
+          useTenantStore.setState({ 
+            tenant: fullTenant,
+            isLoading: false,
+            error: null 
+          })
+          
+          console.log('✅ 새 테넌트 생성 완료:', newTenant.name, 'User ID:', user.id)
+        } catch (error) {
+          console.error('❌ 테넌트 초기화 실패:', error)
+          useTenantStore.setState({ 
+            tenant: null,
+            isLoading: false,
+            error: '테넌트 초기화에 실패했습니다.' 
+          })
+        }
       }
       
-      // 직접 스토어 상태 업데이트
-      useTenantStore.setState({ 
-        tenant: demoTenant,
-        isLoading: false,
-        error: null 
-      })
-      
-      console.log('✅ 자동 테넌트 설정 완료:', demoTenant.name)
-      return
+      initializeTenant()
     }
-
-    const detectTenantFromUrl = () => {
-      // 서브도메인에서 테넌트 추출 (abc.propertydesk.com)
-      const subdomain = window.location.hostname.split('.')[0]
-      if (subdomain && subdomain !== 'www' && subdomain !== 'propertydesk') {
-        // TODO: 서브도메인으로 테넌트 조회 및 설정
-        console.log('감지된 테넌트 서브도메인:', subdomain)
-      }
-
-      // URL 경로에서 테넌트 추출 (/tenant/abc-realty)
-      const pathTenant = window.location.pathname.match(/^\/tenant\/([^\/]+)/)
-      if (pathTenant) {
-        const tenantSlug = pathTenant[1]
-        console.log('감지된 테넌트 슬러그:', tenantSlug)
-        // TODO: 슬러그로 테넌트 조회 및 설정
-      }
-    }
-
-    // 테넌트가 없는 경우에만 URL에서 감지
-    if (!tenant) {
-      detectTenantFromUrl()
-    }
-  }, [tenant])
+  }, [user, tenant]) // user 의존성 추가
 
   // 테넌트별 CSS 변수 설정 (동적 브랜딩)
   useEffect(() => {

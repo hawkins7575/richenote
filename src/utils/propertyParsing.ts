@@ -11,10 +11,7 @@ const parseCache = new Map<string, ParsedPropertyInfo>()
 
 // 구조화된 description 파싱 (캐싱 적용)
 export const parseStructuredDescription = (desc: string | null): ParsedPropertyInfo => {
-  console.log('🔍 description 파싱 시작:', desc)
-  
   if (!desc) {
-    console.log('⚠️ description이 null/undefined - 기본값 반환')
     return {
       landlord_name: undefined,
       landlord_phone: undefined,
@@ -50,29 +47,21 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
     cleanDescription = cleanDescription.replace(statusMatch[0], '').trim()
   }
 
-  // 임대인 정보 파싱 (디버그 로깅 포함)
+  // 임대인 정보 파싱
   const landlordMatch = desc.match(DESCRIPTION_PATTERNS.LANDLORD)
-  console.log('🔍 임대인 정보 매칭 결과:', landlordMatch)
-  
   if (landlordMatch) {
     const landlordText = landlordMatch[1]
-    console.log('📝 임대인 텍스트:', landlordText)
-    
     const nameMatch = landlordText.match(DESCRIPTION_PATTERNS.LANDLORD_NAME)
     const phoneMatch = landlordText.match(DESCRIPTION_PATTERNS.LANDLORD_PHONE)
     
     if (nameMatch) {
       landlord_name = nameMatch[1].trim()
-      console.log('✅ 임대인 이름 파싱:', landlord_name)
     }
     if (phoneMatch) {
       landlord_phone = phoneMatch[1].trim()
-      console.log('✅ 임대인 연락처 파싱:', landlord_phone)
     }
     
     cleanDescription = cleanDescription.replace(landlordMatch[0], '').trim()
-  } else {
-    console.log('⚠️ 임대인 정보 매칭 실패 - description에서 찾을 수 없음')
   }
 
   // 퇴실 예정일 파싱
@@ -119,18 +108,6 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
     is_vacant,
     status: parsedStatus
   }
-
-  console.log('✅ 파싱 완료 결과:', {
-    landlord_name,
-    landlord_phone,
-    exit_date,
-    detailed_address,
-    parking,
-    elevator,
-    has_clean_description: !!cleanDescription,
-    is_vacant,
-    status: parsedStatus
-  })
 
   // 결과 캐싱 (메모리 제한)
   if (parseCache.size > 100) {

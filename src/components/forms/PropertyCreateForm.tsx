@@ -26,15 +26,15 @@ const PROPERTY_STATUS: PropertyStatus[] = [
   '판매중', '예약중', '거래완료', '임시보관', '만료됨'
 ]
 
-// 방 개수 옵션을 상수로 추출
+// 방 개수 옵션 (정수만 지원 - DB integer 컬럼)
 const ROOM_OPTIONS = [
   { value: '1', label: '1개' },
-  { value: '1.5', label: '1.5개' },
   { value: '2', label: '2개' },
-  { value: '2.5', label: '2.5개' },
   { value: '3', label: '3개' },
   { value: '4', label: '4개' },
-  { value: '5', label: '5개' }
+  { value: '5', label: '5개' },
+  { value: '6', label: '6개' },
+  { value: '7', label: '7개' }
 ]
 
 // 샘플 데이터 제거 - 실제 Supabase 데이터 사용
@@ -99,11 +99,16 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     const newErrors: Partial<Record<keyof CreatePropertyData, string>> = {}
 
     // 필수항목 1: 매물 제목
-    if (!formData.title.trim()) {
+    if (!formData.title?.trim()) {
       newErrors.title = '제목을 입력해주세요'
     }
 
-    // 필수항목 2: 거래 유형별 가격 검증
+    // 필수항목 2: 주소
+    if (!formData.address?.trim()) {
+      newErrors.address = '주소를 입력해주세요'
+    }
+
+    // 필수항목 3: 거래 유형별 가격 검증
     if (formData.transaction_type === '매매' && (!formData.price || formData.price <= 0)) {
       newErrors.price = '매매가를 입력해주세요'
     }
@@ -124,6 +129,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     // 선택적 검증: 입력된 경우에만 유효성 검사
     if (formData.total_floors && formData.floor && formData.total_floors < formData.floor) {
       newErrors.total_floors = '전체 층수는 해당 층수보다 크거나 같아야 합니다'
+    }
+
+    // 면적 검증
+    if (!formData.area || formData.area <= 0) {
+      newErrors.area = '면적을 입력해주세요'
     }
 
     setErrors(newErrors)
@@ -261,6 +271,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     error={errors.address}
                     placeholder="예: 서울시 강남구 신사동 123-45"
+                    required
                   />
                 </div>
                 
@@ -287,6 +298,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   placeholder="85.0"
                   min="0"
                   step="0.1"
+                  required
                 />
                 
                 <Input
@@ -312,7 +324,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 <Select
                   label="방 개수"
                   value={formData.rooms?.toString() || '1'}
-                  onChange={(e) => handleInputChange('rooms', parseFloat(e.target.value) || 1)}
+                  onChange={(e) => handleInputChange('rooms', parseInt(e.target.value) || 1)}
                   error={errors.rooms}
                   options={ROOM_OPTIONS}
                 />

@@ -8,61 +8,51 @@ import type { PropertyDbRow } from '@/types/propertyService'
 import { parseStructuredDescription, transformDbRowToProperty } from '@/utils/propertyParsing'
 import { ERROR_MESSAGES, DEFAULT_VALUES } from '@/constants/propertyConstants'
 
-// 🚨 강제로 프로덕션 모드 사용 - Mock 서비스 완전 비활성화
-const isDevelopment = false
-
-// 🚨 Mock 서비스 완전 비활성화 - 항상 실제 Supabase 사용
-// let mockService: any = null
-// if (isDevelopment) {
-//   import('./mockPropertyService').then(service => {
-//     mockService = service
-//   })
-// }
+// 실제 Supabase 서비스 사용
 
 // 매물 조회 (사용자별 개별 관리)
-export const getProperties = async (tenantId: string, filters?: SimplePropertyFilters) => {
-  console.log('🔍 매물 조회 시작 (사용자별):', { tenantId, filters })
-  console.log('🔧 Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
-  console.log('🔧 Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '설정됨' : '없음')
-  
+export const getProperties = async (userId: string, filters?: SimplePropertyFilters) => {
   try {
-    console.log('📡 사용자별 매물 조회 중...')
-    console.log('📊 조회 쿼리 정보:', {
-      table: 'properties',
-      tenant_id: tenantId,
-      user_id: tenantId // 사용자 ID와 tenant_id가 동일
-    })
+    console.log('🔍 getProperties 시작 - userId:', userId)
     
-    // 사용자별 개별 데이터 조회: tenant_id 또는 user_id로 필터링
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
+
+    console.log('📋 실제 tenant_id:', actualTenantId)
+    
+    // 사용자의 실제 tenant_id로 매물 조회
     let query = supabase
       .from('properties')
       .select('*')
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .order('created_at', { ascending: false })
 
     // 필터 적용
     if (filters) {
-      console.log('🔧 필터 적용 중:', filters)
-      
       if (filters.search) {
-        console.log('🔍 검색 필터 적용:', filters.search)
         query = query.or(`title.ilike.%${filters.search}%,address.ilike.%${filters.search}%`)
       }
       
       if (filters.transaction_type && filters.transaction_type !== '전체') {
-        console.log('💰 거래유형 필터 적용:', filters.transaction_type)
         query = query.eq('transaction_type', filters.transaction_type)
       }
       
       if (filters.property_type && filters.property_type !== '전체') {
-        console.log('🏠 매물유형 필터 적용:', filters.property_type)
         query = query.eq('property_type', filters.property_type)
-      }
-      
-      if (filters.status && filters.status !== '') {
-        console.log('📊 상태 필터 적용:', filters.status)
-        // DB에 status 컬럼이 아직 없으므로 프론트엔드에서 필터링 처리
-        // 실제 DB 컬럼이 추가되면 이 로직을 query.eq로 변경
       }
     }
 
@@ -74,9 +64,6 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
       throw error
     }
 
-    console.log('✅ Supabase 조회 성공!')
-    console.log('📊 조회된 원본 데이터 개수:', data?.length || 0)
-    console.log('📋 첫 번째 데이터 샘플:', data?.[0])
 
     // 데이터 변환하여 프론트엔드 타입에 맞춤
     let transformedData = (data || []).map((item: PropertyDbRow) => {
@@ -98,8 +85,6 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
       transformedData = transformedData.filter(item => item.status === filters.status)
     }
 
-    console.log('🔄 변환된 데이터:', transformedData)
-    console.log('📊 최종 반환 데이터 개수:', transformedData.length)
     
     return transformedData
   } catch (error) {
@@ -142,7 +127,6 @@ export const getProperty = async (propertyId: string, tenantId: string) => {
 
 // 매물 생성
 export const createProperty = async (propertyData: CreatePropertyData, tenantId: string, userId: string) => {
-  console.log('🏠 매물 생성 시작:', { propertyData, tenantId, userId, isDevelopment })
   
   // 필수 파라미터 검증
   if (!tenantId || !userId) {
@@ -157,29 +141,35 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
   }
   
   try {
-    console.log('📡 실제 Supabase에 매물 생성 요청 중...')
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
     // 프론트엔드 데이터를 데이터베이스 스키마에 맞게 변환
     
     // 임대인 정보와 기타 정보를 description에 구조화하여 저장
     let structuredDescription = propertyData.description || ''
     
-    // 임대인 정보 추가 (디버그 로깅 포함)
+    // 임대인 정보 추가
     if (propertyData.landlord_name || propertyData.landlord_phone) {
-      console.log('📝 임대인 정보 저장 중:', { 
-        name: propertyData.landlord_name, 
-        phone: propertyData.landlord_phone 
-      })
-      
       const landlordInfo = []
       if (propertyData.landlord_name) landlordInfo.push(`임대인: ${propertyData.landlord_name}`)
       if (propertyData.landlord_phone) landlordInfo.push(`연락처: ${propertyData.landlord_phone}`)
       
       const landlordSection = `[임대인정보] ${landlordInfo.join(' | ')}`
       structuredDescription = landlordSection + (structuredDescription ? `\n\n${structuredDescription}` : '')
-      
-      console.log('✅ 임대인 정보가 포함된 description:', structuredDescription)
-    } else {
-      console.log('⚠️ 임대인 정보 없음 - description에 추가하지 않음')
     }
     
     // 퇴실 예정일 또는 공실 상태 추가
@@ -207,9 +197,9 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + addressInfo
     }
     
-    // 실제 DB에 존재하는 컬럼만 사용 - 사용자별 개별 관리
+    // 실제 DB에 존재하는 컬럼만 사용 - 올바른 tenant_id 사용
     const dbData = {
-      tenant_id: userId, // 사용자 ID를 tenant_id로 사용하여 완전 개별 관리
+      tenant_id: actualTenantId, // 사용자의 실제 tenant_id 사용
       user_id: userId,
       title: propertyData.title,
       address: propertyData.address || '',
@@ -226,11 +216,6 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       description: structuredDescription || null
     }
 
-    console.log('💾 데이터베이스 삽입 데이터:', dbData)
-    console.log('🔍 Supabase 연결 정보:', {
-      url: import.meta.env.VITE_SUPABASE_URL ? '설정됨' : '없음',
-      key: import.meta.env.VITE_SUPABASE_ANON_KEY ? '설정됨' : '없음'
-    })
     
     const { data, error } = await supabase
       .from('properties')
@@ -247,11 +232,11 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       throw new Error(`${ERROR_MESSAGES.DATABASE_ERROR}: ${error.message}`)
     }
     
-    console.log('✅ 매물 생성 성공:', data)
 
     const parsedInfo = parseStructuredDescription(data.description)
     const transformedData = transformDbRowToProperty(data as PropertyDbRow, parsedInfo)
     transformedData.status = propertyData.status as any || DEFAULT_VALUES.PROPERTY_STATUS as any
+    transformedData.updated_at = data.updated_at
 
     return transformedData
   } catch (error) {
@@ -261,16 +246,32 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
 }
 
 // 매물 수정
-export const updateProperty = async (propertyId: string, propertyData: UpdatePropertyData, tenantId: string) => {
-  console.log('🔄 매물 수정 시작:', { propertyId, propertyData, tenantId })
+export const updateProperty = async (propertyId: string, propertyData: UpdatePropertyData, userId: string) => {
   
   try {
-    // 기존 데이터 조회 (사용자별 개별 관리)
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
+
+    // 기존 데이터 조회 (실제 tenant_id 사용)
     const { data: existingData } = await supabase
       .from('properties')
       .select('description')
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .single()
 
     // 기존 description에서 정보 파싱
@@ -345,13 +346,12 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
     // 구조화된 description 저장
     dbData.description = newStructuredDescription || null
 
-    console.log('💾 데이터베이스 업데이트 데이터:', dbData)
 
     const { data, error } = await supabase
       .from('properties')
       .update(dbData)
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .select()
       .single()
 
@@ -360,7 +360,6 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       throw new Error(`데이터베이스 오류: ${error.message}`)
     }
 
-    console.log('✅ 데이터베이스 수정 성공:', data)
 
     // description에서 구조화된 정보 파싱
     const parseStructuredDescription = (desc: string | null) => {
@@ -451,7 +450,6 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       is_favorite: false
     }
 
-    console.log('✅ 매물 수정 완료:', transformedData)
     return transformedData
   } catch (error) {
     console.error('💥 updateProperty 전체 에러:', error)
@@ -460,23 +458,38 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
 }
 
 // 매물 삭제
-export const deleteProperty = async (propertyId: string, tenantId: string) => {
-  console.log('🗑️ 매물 삭제 시작:', { propertyId, tenantId })
+export const deleteProperty = async (propertyId: string, userId: string) => {
   
   try {
-    // 데이터베이스에서 삭제 (사용자별 개별 관리)
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
+
+    // 데이터베이스에서 삭제 (실제 tenant_id 사용)
     const { error } = await supabase
       .from('properties')
       .delete()
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
 
     if (error) {
       console.error('❌ 매물 삭제 실패:', error)
       throw new Error(`데이터베이스 오류: ${error.message}`)
     }
 
-    console.log('✅ 매물 삭제 완료')
     return true
   } catch (error) {
     console.error('💥 deleteProperty 전체 에러:', error)
@@ -485,16 +498,31 @@ export const deleteProperty = async (propertyId: string, tenantId: string) => {
 }
 
 // 매물 상태 업데이트 (description에 상태 정보 저장)
-export const updatePropertyStatus = async (propertyId: string, status: Property['status'], tenantId: string) => {
+export const updatePropertyStatus = async (propertyId: string, status: Property['status'], userId: string) => {
   try {
-    console.log('🔄 매물 상태 업데이트:', { propertyId, status, tenantId })
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
     
-    // 기존 데이터 조회 (사용자별 개별 관리)
+    // 기존 데이터 조회 (실제 tenant_id 사용)
     const { data: existingData, error: fetchError } = await supabase
       .from('properties')
       .select('*')
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .single()
 
     if (fetchError) {
@@ -512,12 +540,12 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
     const statusInfo = `[상태] ${status}`
     updatedDescription = statusInfo + (updatedDescription ? `\n\n${updatedDescription}` : '')
 
-    // 상태 정보가 포함된 description 업데이트 (사용자별 개별 관리)
+    // 상태 정보가 포함된 description 업데이트 (실제 tenant_id 사용)
     const { data, error } = await supabase
       .from('properties')
       .update({ description: updatedDescription })
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .select('*')
       .single()
 
@@ -605,7 +633,7 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
       parking: parsedInfo.parking,
       elevator: parsedInfo.elevator,
       status: parsedInfo.status,
-      updated_at: data.updated_at || new Date().toISOString(),
+      updated_at: data.updated_at,
       created_at: data.created_at,
       images: [],
       is_featured: false,
@@ -616,7 +644,6 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
       is_favorite: false
     }
 
-    console.log('✅ 매물 상태 업데이트 완료:', updatedData)
     return updatedData
   } catch (error) {
     console.error('Error in updatePropertyStatus:', error)
@@ -625,22 +652,36 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
 }
 
 // 매물 통계 조회 (사용자별 개별 관리)
-export const getPropertyStats = async (tenantId: string) => {
-  console.log('📊 사용자별 매물 통계 조회:', { tenantId })
+export const getPropertyStats = async (userId: string) => {
   
   try {
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
+
     const { data, error } = await supabase
       .from('properties')
       .select('transaction_type, created_at')
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
 
     if (error) {
       console.error('❌ 매물 통계 조회 실패:', error)
       throw error
     }
 
-    console.log('📊 조회된 매물 데이터:', data)
-    console.log('📊 데이터 개수:', data?.length || 0)
 
     const stats = {
       total: data.length,
@@ -659,7 +700,6 @@ export const getPropertyStats = async (tenantId: string) => {
       }
     }
 
-    console.log('📊 계산된 통계:', stats)
     return stats
   } catch (error) {
     console.error('Error in getPropertyStats:', error)
@@ -669,26 +709,43 @@ export const getPropertyStats = async (tenantId: string) => {
 
 
 // 매물 즐겨찾기 토글
-export const togglePropertyFavorite = async (propertyId: string, tenantId: string) => {
+export const togglePropertyFavorite = async (propertyId: string, userId: string) => {
   try {
-    // 현재 즐겨찾기 상태 조회 (사용자별 개별 관리)
+    // 사용자의 올바른 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) {
+      console.error('❌ 사용자 정보 조회 실패:', userError)
+      throw new Error('사용자 정보를 찾을 수 없습니다.')
+    }
+
+    const actualTenantId = userProfile.tenant_id
+    if (!actualTenantId) {
+      throw new Error('사용자에게 할당된 테넌트가 없습니다.')
+    }
+
+    // 현재 즐겨찾기 상태 조회 (실제 tenant_id 사용)
     const { data: currentProperty } = await supabase
       .from('properties')
       .select('is_favorite')
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .single()
 
     if (!currentProperty) {
       throw new Error(ERROR_MESSAGES.PROPERTY_NOT_FOUND)
     }
 
-    // 즐겨찾기 상태 토글 (사용자별 개별 관리)
+    // 즐겨찾기 상태 토글 (실제 tenant_id 사용)
     const { data, error } = await supabase
       .from('properties')
       .update({ is_favorite: !currentProperty.is_favorite })
       .eq('id', propertyId)
-      .or(`tenant_id.eq.${tenantId},user_id.eq.${tenantId}`) // 기존 데이터 호환성
+      .eq('tenant_id', actualTenantId) // 정확한 tenant_id로 필터링
       .select()
       .single()
 

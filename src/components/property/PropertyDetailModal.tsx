@@ -89,29 +89,29 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             </div>
           </div>
           
-          {/* 데스크톱: 기존 가로 배치 */}
-          <div className="hidden lg:flex items-center justify-between p-4 space-x-4">
-            <div className="flex-1 flex items-center space-x-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">
+          {/* 데스크톱: 개선된 가로 배치 */}
+          <div className="hidden lg:flex items-center justify-between p-6 space-x-6">
+            <div className="flex-1 flex items-center space-x-6">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {property.title}
                 </h2>
-                <div className="flex items-center text-gray-600 mt-1">
-                  <MapPin className="w-3 h-3 mr-1" />
-                  <span className="text-sm">{property.address}</span>
+                <div className="flex items-center text-gray-600">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <span className="text-base">{property.address}</span>
                 </div>
               </div>
               
               <div className="text-right">
-                <div className="text-xl font-bold text-gray-900">{price}</div>
-                <div className="flex items-center space-x-1 text-sm mt-1">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+                <div className="text-3xl font-bold text-blue-600 mb-2">{price}</div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full font-medium text-sm">
                     {property.type}
                   </span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full font-medium">
+                  <span className="px-3 py-1.5 bg-green-100 text-green-800 rounded-full font-medium text-sm">
                     {property.transaction_type}
                   </span>
-                  <span className={`px-2 py-1 rounded-full font-medium ${
+                  <span className={`px-3 py-1.5 rounded-full font-medium text-sm ${
                     property.status === '판매중' ? 'bg-green-100 text-green-800' : 
                     property.status === '예약중' ? 'bg-yellow-100 text-yellow-800' : 
                     'bg-gray-100 text-gray-800'
@@ -124,9 +124,9 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+              className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -241,100 +241,110 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </div>
             </div>
 
-            {/* 데스크톱: 기존 3열 그리드 레이아웃 */}
-            <div className="hidden lg:grid grid-cols-3 gap-4">
+            {/* 데스크톱: 개선된 2열 카드 레이아웃 */}
+            <div className="hidden lg:grid grid-cols-2 gap-6">
               
               {/* 기본 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                   기본 정보
                 </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">전용면적</span>
-                    <span className="text-sm font-bold text-gray-900">{formatArea(property.area)}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center bg-white rounded-lg p-3 border border-blue-200">
+                    <span className="text-sm text-gray-700 font-medium">전용면적</span>
+                    <span className="text-base font-bold text-gray-900">{formatArea(property.area)}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">층수</span>
-                    <span className="text-sm font-bold text-gray-900">{property.floor}F/{property.total_floors}F</span>
+                  <div className="flex justify-between items-center bg-white rounded-lg p-3 border border-blue-200">
+                    <span className="text-sm text-gray-700 font-medium">층수</span>
+                    <span className="text-base font-bold text-gray-900">{property.floor}F / {property.total_floors}F</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">구조</span>
-                    <span className="text-sm font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
+                  <div className="flex justify-between items-center bg-white rounded-lg p-3 border border-blue-200">
+                    <span className="text-sm text-gray-700 font-medium">구조</span>
+                    <span className="text-base font-bold text-gray-900">{formatRooms(property.rooms)} {property.bathrooms}욕실</span>
                   </div>
                   
                   {/* 편의시설 */}
-                  <div className="pt-2 border-t border-gray-200">
-                    <div className="text-xs font-medium text-gray-700 mb-2">편의시설</div>
-                    <div className="flex space-x-2">
-                      <div className={`flex items-center px-2 py-1 rounded text-xs ${property.parking ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
-                        <Car className="w-3 h-3 mr-1" />
-                        <span>주차{property.parking ? '가능' : '불가'}</span>
+                  <div className="pt-2 border-t border-blue-200">
+                    <div className="text-sm font-bold text-gray-800 mb-3">편의시설</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className={`flex items-center justify-center py-2 px-3 rounded-lg text-sm font-medium ${
+                        property.parking ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
+                      }`}>
+                        <Car className="w-4 h-4 mr-2" />
+                        <span>주차 {property.parking ? '가능' : '불가'}</span>
                       </div>
-                      <div className={`flex items-center px-2 py-1 rounded text-xs ${property.elevator ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
-                        <ChevronUp className="w-3 h-3 mr-1" />
-                        <span>엘베{property.elevator ? '있음' : '없음'}</span>
+                      <div className={`flex items-center justify-center py-2 px-3 rounded-lg text-sm font-medium ${
+                        property.elevator ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
+                      }`}>
+                        <ChevronUp className="w-4 h-4 mr-2" />
+                        <span>엘리베이터 {property.elevator ? '있음' : '없음'}</span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 위치 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  위치 정보
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-start">
-                    <MapPin className="w-3 h-3 text-gray-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-medium text-gray-900 leading-tight">{property.address}</div>
-                      {property.detailed_address && (
-                        <div className="text-xs text-gray-600 mt-1">{property.detailed_address}</div>
-                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* 가격 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-5 border border-yellow-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
                   가격 정보
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {property.transaction_type === '매매' && property.price && (
-                    <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                      <span className="text-xs text-gray-700">매매가</span>
-                      <span className="text-sm font-bold text-blue-700">
-                        {formatMoney(property.price)}
-                      </span>
+                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-blue-800">매매가</span>
+                        <span className="text-base font-bold text-blue-900">
+                          {formatMoney(property.price)}
+                        </span>
+                      </div>
                     </div>
                   )}
                   
                   {(property.transaction_type === '전세' || property.transaction_type === '월세') && property.deposit !== undefined && (
-                    <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                      <span className="text-xs text-gray-700">
-                        {property.transaction_type === '전세' ? '전세금' : '보증금'}
-                      </span>
-                      <span className="text-sm font-bold text-green-700">
-                        {formatMoney(property.deposit)}
-                      </span>
+                    <div className="bg-green-100 border border-green-300 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-green-800">
+                          {property.transaction_type === '전세' ? '전세금' : '보증금'}
+                        </span>
+                        <span className="text-base font-bold text-green-900">
+                          {formatMoney(property.deposit)}
+                        </span>
+                      </div>
                     </div>
                   )}
                   
                   {property.transaction_type === '월세' && property.monthly_rent && (
-                    <div className="flex justify-between items-center p-2 bg-orange-50 rounded">
-                      <span className="text-xs text-gray-700">월세</span>
-                      <span className="text-sm font-bold text-orange-700">
-                        {property.monthly_rent}만원/월
-                      </span>
+                    <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-orange-800">월세</span>
+                        <span className="text-base font-bold text-orange-900">
+                          {property.monthly_rent}만원/월
+                        </span>
+                      </div>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+
+            {/* 위치 정보 - 전체 너비 */}
+            <div className="hidden lg:block bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                위치 정보
+              </h3>
+              <div className="bg-white rounded-lg p-4 border border-green-200">
+                <div className="flex items-start">
+                  <MapPin className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-base font-semibold text-gray-900 leading-relaxed">{property.address}</div>
+                    {property.detailed_address && (
+                      <div className="text-sm text-gray-600 mt-1">{property.detailed_address}</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -441,107 +451,111 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </div>
             </div>
 
-            {/* 데스크톱: 기존 3열 그리드 레이아웃 */}
-            <div className="hidden lg:grid grid-cols-3 gap-4">
+            {/* 데스크톱: 개선된 2열 그리드 레이아웃 */}
+            <div className="hidden lg:grid grid-cols-2 gap-6">
               
               {/* 임대인 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-5 border border-indigo-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-3 h-3 bg-indigo-500 rounded-full mr-3"></div>
                   임대인 정보
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {(property.landlord_name || property.landlord_phone) ? (
                     <>
                       {property.landlord_name && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">이름</span>
-                          <span className="text-sm font-medium text-gray-900">{property.landlord_name}</span>
+                        <div className="bg-white rounded-lg p-3 border border-indigo-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">이름</span>
+                            <span className="text-base font-bold text-gray-900">{property.landlord_name}</span>
+                          </div>
                         </div>
                       )}
                       {property.landlord_phone && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">연락처</span>
-                          <span className="text-sm font-medium text-gray-900">{property.landlord_phone}</span>
+                        <div className="bg-white rounded-lg p-3 border border-indigo-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">연락처</span>
+                            <span className="text-base font-bold text-gray-900">{property.landlord_phone}</span>
+                          </div>
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="text-center py-3 text-gray-500">
-                      <User className="w-4 h-4 mx-auto mb-1 opacity-50" />
-                      <div className="text-xs">정보 없음</div>
+                    <div className="bg-white rounded-lg p-5 border border-indigo-200 text-center text-gray-500">
+                      <User className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                      <div className="text-sm">임대인 정보 없음</div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* 날짜 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                  날짜 정보
+              {/* 날짜 & 통계 정보 */}
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                  날짜 & 통계
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {property.exit_date ? (
-                    <div className="flex items-center justify-between p-2 bg-red-50 rounded">
-                      <div className="flex items-center">
-                        <Calendar className="w-3 h-3 mr-1 text-red-500" />
-                        <span className="text-xs text-gray-700">퇴실예정</span>
+                    <div className="bg-red-100 border border-red-300 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-red-500" />
+                          <span className="text-sm font-semibold text-red-800">퇴실예정일</span>
+                        </div>
+                        <span className="text-base font-bold text-red-900">
+                          {new Date(property.exit_date).toLocaleDateString('ko-KR')}
+                        </span>
                       </div>
-                      <span className="text-sm font-bold text-red-600">
-                        {new Date(property.exit_date).toLocaleDateString('ko-KR')}
-                      </span>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                      <div className="flex items-center">
-                        <Calendar className="w-3 h-3 mr-1 text-green-500" />
-                        <span className="text-xs text-gray-700">거주현황</span>
+                    <div className="bg-green-100 border border-green-300 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-green-500" />
+                          <span className="text-sm font-semibold text-green-800">거주현황</span>
+                        </div>
+                        <span className="text-base font-bold text-green-900">공실</span>
                       </div>
-                      <span className="text-sm font-bold text-green-600">공실</span>
                     </div>
                   )}
                   
-                  <div className="flex items-center justify-between p-2 bg-gray-100 rounded">
-                    <div className="flex items-center">
-                      <Calendar className="w-3 h-3 mr-1 text-gray-500" />
-                      <span className="text-xs text-gray-700">등록일</span>
+                  <div className="bg-white border border-purple-200 rounded-lg p-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-purple-500" />
+                        <span className="text-sm font-semibold text-gray-800">등록일</span>
+                      </div>
+                      <span className="text-base font-bold text-gray-900">
+                        {new Date(property.created_at).toLocaleDateString('ko-KR')}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {new Date(property.created_at).toLocaleDateString('ko-KR')}
-                    </span>
                   </div>
-                </div>
-              </div>
 
-              {/* 통계 & 기타 정보 */}
-              <div className="bg-gray-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                  통계 정보
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
-                    <span className="text-xs text-gray-700">조회수</span>
-                    <span className="text-sm font-bold text-blue-700">{property.view_count || 0}회</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                    <span className="text-xs text-gray-700">문의수</span>
-                    <span className="text-sm font-bold text-green-700">{property.inquiry_count || 0}회</span>
+                  {/* 통계 정보 */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-blue-900 mb-1">{property.view_count || 0}</div>
+                      <div className="text-xs font-medium text-blue-800">조회수</div>
+                    </div>
+                    <div className="bg-green-100 border border-green-300 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-green-900 mb-1">{property.inquiry_count || 0}</div>
+                      <div className="text-xs font-medium text-green-800">문의수</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 상세 설명 - 모바일 최적화 */}
+            {/* 상세 설명 */}
             {property.description && (
-              <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center">
+              <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-4 sm:p-6 lg:p-6">
+                <h3 className="text-lg sm:text-xl lg:text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
                   상세 설명
                 </h3>
-                <div className="bg-white p-4 sm:p-6 rounded-lg border border-amber-200 shadow-sm">
-                  <p className="text-base sm:text-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
+                <div className="bg-white p-4 sm:p-6 lg:p-6 rounded-lg border border-amber-200 shadow-sm">
+                  <p className="text-base sm:text-lg lg:text-base text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {property.description}
                   </p>
                 </div>
@@ -597,42 +611,42 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             </div>
           </div>
           
-          {/* 데스크톱: 기존 가로 레이아웃 */}
-          <div className="hidden lg:flex items-center justify-between p-4">
+          {/* 데스크톱: 개선된 가로 레이아웃 */}
+          <div className="hidden lg:flex items-center justify-between p-6 bg-gray-50">
             {/* 통계 정보 */}
-            <div className="flex items-center space-x-3 text-xs text-gray-600">
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-1"></div>
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center bg-white px-3 py-2 rounded-lg border">
+                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
                 <span>조회 {property.view_count || 0}회</span>
               </div>
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
+              <div className="flex items-center bg-white px-3 py-2 rounded-lg border">
+                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                 <span>문의 {property.inquiry_count || 0}회</span>
               </div>
             </div>
             
             {/* 액션 버튼들 */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={onClose}
-                className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-all duration-200 border border-gray-300 hover:border-gray-400"
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 border border-gray-300 hover:border-gray-400 font-medium"
               >
                 닫기
               </button>
               
               <button
                 onClick={handleEditClick}
-                className="px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200 font-medium text-xs"
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium text-sm flex items-center"
               >
-                <Edit className="w-3 h-3 inline mr-1" />
+                <Edit className="w-4 h-4 mr-2" />
                 수정하기
               </button>
               
               <button
                 onClick={handleDeleteClick}
-                className="px-4 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-all duration-200 font-medium text-xs"
+                className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium text-sm flex items-center"
               >
-                <Trash2 className="w-3 h-3 inline mr-1" />
+                <Trash2 className="w-4 h-4 mr-2" />
                 삭제하기
               </button>
             </div>

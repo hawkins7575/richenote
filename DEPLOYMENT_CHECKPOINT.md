@@ -173,4 +173,75 @@ VITE_MOCK_API=false
 - **매물 목록**: 공실/퇴실예정 상태 명확한 시각적 구분
 - **상세보기**: 임대인 정보 포함 모든 데이터 완전 표시
 
-**새 배포 URL**: https://propertydesk-saas-9yx5u3c5p-daesung75-6440s-projects.vercel.app
+**새 배포 URL**: https://propertydesk-saas-halkks4uc-daesung75-6440s-projects.vercel.app
+
+---
+
+## 👥 v1.3.0 사용자별 개별 데이터 관리 구현
+
+**배포일**: 2025-08-06 14:45:55 KST  
+**커밋**: 3f28fbc 🐛 임대인 정보 저장/파싱 디버그 로깅 추가
+
+### 핵심 개선사항
+- **완전한 데이터 격리**: 사용자 ID = tenant_id로 개별 데이터 관리
+- **회원별 독립성**: 각 회원이 자신만의 매물 데이터 소유
+- **기존 데이터 호환성**: OR 조건으로 기존 데이터도 접근 가능
+- **코드 품질 향상**: 타입 안전성, 성능 최적화, 모듈화
+
+### 기술적 구현
+- **AuthContext**: 사용자 ID를 tenant_id로 설정하여 완전 격리
+- **propertyService**: 모든 CRUD 작업에 사용자별 필터링 적용
+- **데이터 호환성**: `tenant_id.eq.${userId},user_id.eq.${userId}` OR 조건
+- **성능 최적화**: React.memo, 파싱 캐싱, 상수 중앙화
+
+### 디버그 기능
+- **임대인 정보 추적**: 저장 및 파싱 과정 상세 로깅
+- **데이터 변환 추적**: DB → Frontend 변환 과정 모니터링
+- **사용자별 조회 확인**: 개별 데이터 격리 검증
+
+**최신 배포 URL**: https://propertydesk-saas-qelelgeuw-daesung75-6440s-projects.vercel.app
+
+---
+
+## 🎯 v1.4.0 사용자별 데이터 완전 격리 완료
+
+**배포일**: 2025-08-06 18:36:55 KST  
+**커밋**: 사용자별 데이터 완전 격리 구현 완료
+
+### 🔧 핵심 해결사항
+- **임대인 정보 사라지는 문제**: ✅ 완전 해결
+- **사용자별 데이터 격리**: ✅ 완전 구현
+- **데이터 공유 문제**: ✅ 해결됨
+
+### 기술적 구현
+- **TenantContext**: 사용자 ID = 테넌트 ID로 완전 개별 관리
+- **useProperties**: tenant.id 의존성 제거, user.id 직접 사용
+- **propertyService**: 모든 CRUD 작업을 user.id 기반으로 수정
+- **데이터 호환성**: 기존 데이터 접근 가능하게 OR 조건 유지
+
+### 검증 결과
+- **신규 사용자**: 8065db5a-5c5d-4626-afe5-4a3555024364 → 0개 매물 (완전 격리)
+- **데이터 조회**: 사용자별 독립적 조회 확인
+- **코드 품질**: 디버그 로깅 제거, 타입 오류 해결
+
+**최종 배포 URL**: https://propertydesk-saas-c9m7vkgqt-daesung75-6440s-projects.vercel.app
+
+---
+
+## 🔍 v1.5.0 검색 및 폼 오류 수정
+
+**배포일**: 2025-08-06 19:18:57 KST  
+**커밋**: 검색 한글 입력 문제 및 방갯수 오류 해결
+
+### 🔧 핵심 해결사항
+- **한글 검색 문제**: ✅ IME 입력 중 즉시 검색 방지
+- **방갯수 1.5 오류**: ✅ DB integer 제약으로 정수만 지원
+- **검색 debounce**: ✅ 300ms 지연으로 한글 입력 최적화
+
+### 기술적 구현
+- **IME 처리**: `onCompositionStart/End` 이벤트로 한글 입력 감지
+- **Debounce 로직**: `isComposing` 상태로 한글 입력 중 검색 방지
+- **방갯수 제한**: 1-7개 정수 옵션으로 DB 호환성 확보
+- **사용자 경험**: 한글 타이핑 중 검색 결과 깜빡임 해결
+
+**최종 배포 URL**: https://propertydesk-saas-c9m7vkgqt-daesung75-6440s-projects.vercel.app

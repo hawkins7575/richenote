@@ -21,6 +21,8 @@ const PropertiesPageNew: React.FC = () => {
   const { tenant } = useTenant()
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [isComposing, setIsComposing] = useState(false)
   const [selectedTransactionType, setSelectedTransactionType] = useState('전체')
   const [selectedPropertyType, setSelectedPropertyType] = useState('전체')
   const [selectedStatus, setSelectedStatus] = useState<string>('')
@@ -34,6 +36,17 @@ const PropertiesPageNew: React.FC = () => {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
   const [detailModalProperty, setDetailModalProperty] = useState<Property | null>(null)
 
+  // 검색어 debounce 처리 (한글 IME 입력 중 즉시 검색 방지)
+  useEffect(() => {
+    if (isComposing) return // 한글 입력 중에는 debounce 실행하지 않음
+    
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 300) // 300ms 딜레이
+
+    return () => clearTimeout(timer)
+  }, [searchTerm, isComposing])
+
   // URL 파라미터 확인하여 매물 등록 폼 자동 열기
   useEffect(() => {
     if (searchParams.get('create') === 'true') {
@@ -45,17 +58,17 @@ const PropertiesPageNew: React.FC = () => {
     }
   }, [searchParams, setSearchParams])
 
-  // 필터 객체 생성
+  // 필터 객체 생성 (debounced 검색어 사용)
   const filters = useMemo((): SimplePropertyFilters => {
     const result: SimplePropertyFilters = {}
     
-    if (searchTerm) result.search = searchTerm
+    if (debouncedSearchTerm) result.search = debouncedSearchTerm
     if (selectedTransactionType !== '전체') result.transaction_type = selectedTransactionType
     if (selectedPropertyType !== '전체') result.property_type = selectedPropertyType
     if (selectedStatus) result.status = selectedStatus as any
     
     return result
-  }, [searchTerm, selectedTransactionType, selectedPropertyType, selectedStatus])
+  }, [debouncedSearchTerm, selectedTransactionType, selectedPropertyType, selectedStatus])
 
   const { 
     properties, 
@@ -248,6 +261,8 @@ const PropertiesPageNew: React.FC = () => {
               placeholder="매물명, 주소로 검색하세요..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
               leftIcon={<Search size={18} />}
               className="text-base h-12"
             />
