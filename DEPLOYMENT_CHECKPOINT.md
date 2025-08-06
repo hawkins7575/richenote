@@ -146,4 +146,31 @@ VITE_MOCK_API=false
 - **터치 인터랙션**: touch-manipulation, active 상태 개선
 - **성능 최적화**: overscroll-contain, 렌더링 최적화
 
-**배포 성공**: https://propertydesk-saas-gzrlovi2a-daesung75-6440s-projects.vercel.app
+**배포 성공**: https://propertydesk-saas-9yx5u3c5p-daesung75-6440s-projects.vercel.app
+
+---
+
+## 🔗 v1.2.0 폼-데이터베이스 완전 연동 업데이트
+
+**배포일**: 2025-08-06 12:05:18 KST  
+**커밋**: 2a4a2c9 🔗 매물등록폼-데이터베이스 완전 연동 및 배포 준비
+
+### 핵심 개선사항
+- **데이터 영속성**: 구조화된 description 필드로 모든 폼 데이터 저장
+- **임대인 정보 연동**: [임대인정보] 태그로 임대인명/연락처 저장
+- **상세주소 연동**: [상세주소] 태그로 상세주소 저장  
+- **퇴실예정일 연동**: [퇴실예정] 태그로 퇴실일 저장
+- **공실 상태 처리**: exit_date null 처리로 공실 상태 표현
+- **localStorage 의존성 제거**: 완전한 데이터베이스 기반 저장
+
+### 기술적 구현
+- **propertyService.ts**: 구조화된 데이터 인코딩/파싱 로직 구현
+- **PropertyCard.tsx**: 퇴실일/공실 상태 시각적 표현 개선
+- **데이터 무결성**: 기존 데이터 호환성 유지하며 신규 기능 추가
+
+### 사용자 경험
+- **폼 입력**: 모든 항목이 데이터베이스에 정확히 저장
+- **매물 목록**: 공실/퇴실예정 상태 명확한 시각적 구분
+- **상세보기**: 임대인 정보 포함 모든 데이터 완전 표시
+
+**새 배포 URL**: https://propertydesk-saas-9yx5u3c5p-daesung75-6440s-projects.vercel.app

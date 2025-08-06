@@ -2,7 +2,7 @@
 // 매물 카드 컴포넌트 - 빠른 스캔을 위한 간단한 정보 표시
 // ============================================================================
 
-import React from 'react'
+import React, { memo } from 'react'
 import { Calendar, MapPin, DollarSign } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, extractNeighborhood } from '@/utils/propertyUtils'
@@ -13,7 +13,7 @@ interface PropertyCardProps {
   className?: string
 }
 
-export const PropertyCard: React.FC<PropertyCardProps> = ({ 
+export const PropertyCard: React.FC<PropertyCardProps> = memo(({ 
   property, 
   onClick,
   className = '' 
@@ -100,4 +100,4 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       </div>
     </div>
   )
-}
+})

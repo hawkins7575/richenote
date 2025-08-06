@@ -37,34 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 데모 모드 - 개발자 도구에서만 활성화 (일반 사용자는 사용 불가)
-    const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true' && import.meta.env.DEV
-    
-    console.log('🔍 환경 확인:', { 
-      hostname: window.location.hostname, 
-      isDemoMode,
-      VITE_APP_ENV: import.meta.env.VITE_APP_ENV,
-      DEV: import.meta.env.DEV 
-    })
-    
-    // 데모 모드는 개발자만 사용 (일반적으로 비활성화)
-    if (isDemoMode && false) { // false로 설정하여 데모 모드 완전 비활성화
-      console.log('🎭 데모 모드 - 자동 로그인')
-      const demoUser: AuthUser = {
-        id: '00000000-0000-0000-0000-000000000001',
-        email: 'demo@propertydesk.com',
-        name: '김대성',
-        role: 'owner',
-        tenant_id: '00000000-0000-0000-0000-000000000001',
-        avatar_url: null,
-        created_at: new Date().toISOString(),
-        last_sign_in_at: new Date().toISOString(),
-      }
-      
-      setUser(demoUser)
-      setLoading(false)
-      return
-    }
+    console.log('🔍 인증 초기화 시작')
 
     // 초기 세션 확인 (타임아웃 포함)
     const getSession = async () => {
@@ -111,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               email: session.user.email!,
               name: profile?.name || session.user.user_metadata?.name || '',
               role: profile?.role || 'owner',
-              tenant_id: profile?.tenant_id || null,
+              tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
               avatar_url: profile?.avatar_url || null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
@@ -124,7 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               email: session.user.email!,
               name: session.user.user_metadata?.name || session.user.email!,
               role: 'owner',
-              tenant_id: null,
+              tenant_id: session.user.id,
               avatar_url: null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
@@ -170,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               email: session.user.email!,
               name: profile?.name || session.user.user_metadata?.name || '',
               role: profile?.role || 'owner',
-              tenant_id: profile?.tenant_id || null,
+              tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
               avatar_url: profile?.avatar_url || null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
@@ -183,7 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               email: session.user.email!,
               name: session.user.user_metadata?.name || session.user.email!,
               role: 'owner',
-              tenant_id: null,
+              tenant_id: session.user.id,
               avatar_url: null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
@@ -213,48 +186,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       })
 
-      // 회원가입 성공 시 새 테넌트 생성 및 사용자를 Owner로 설정
+      // 회원가입 성공 시 사용자 ID를 tenant_id로 사용하여 개별 데이터 관리
       if (result.data.user && !result.error) {
         try {
-          // create_tenant_and_owner 함수 호출하여 독립적인 테넌트 생성
-          console.log('🏢 Creating tenant for user:', result.data.user.id)
+          console.log('👤 사용자별 독립 프로필 생성:', result.data.user.id)
           
-          const rpcPromise = supabase.rpc('create_tenant_and_owner', {
-            tenant_name: data.company || `${data.name}의 부동산`,
-            user_name: data.name,
-            user_company: data.company
-          })
-          
-          const rpcTimeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Tenant creation timeout')), 10000)
-          )
-          
-          const { data: tenantData, error: tenantError } = await Promise.race([
-            rpcPromise,
-            rpcTimeoutPromise
-          ]) as any
+          // 사용자 ID를 tenant_id로 사용하여 완전히 독립적인 데이터 관리
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: result.data.user.id,
+              email: data.email,
+              name: data.name,
+              role: 'owner',
+              tenant_id: result.data.user.id, // 사용자 ID = tenant_id로 개별 관리
+            })
 
-          if (tenantError) {
-            console.error('Error creating tenant:', tenantError)
-            // 테넌트 생성 실패 시 기본 프로필만 생성
-            const { error: profileError } = await supabase
-              .from('user_profiles')
-              .insert({
-                id: result.data.user.id,
-                email: data.email,
-                name: data.name,
-                role: 'owner', // 첫 번째 사용자는 Owner
-                tenant_id: null,
-              })
-
-            if (profileError) {
-              console.error('Error creating user profile:', profileError)
-            }
+          if (profileError) {
+            console.error('Error creating user profile:', profileError)
           } else {
-            console.log('✅ 새 테넌트 생성 완료:', tenantData)
+            console.log('✅ 사용자별 독립 프로필 생성 완료')
           }
         } catch (error) {
-          console.error('Error in tenant creation process:', error)
+          console.error('Error in profile creation process:', error)
         }
       }
 

@@ -2,7 +2,7 @@
 // 매물 등록 폼 컴포넌트
 // ============================================================================
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
 import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
@@ -24,6 +24,17 @@ const TRANSACTION_TYPES: TransactionType[] = [
 
 const PROPERTY_STATUS: PropertyStatus[] = [
   '판매중', '예약중', '거래완료', '임시보관', '만료됨'
+]
+
+// 방 개수 옵션을 상수로 추출
+const ROOM_OPTIONS = [
+  { value: '1', label: '1개' },
+  { value: '1.5', label: '1.5개' },
+  { value: '2', label: '2개' },
+  { value: '2.5', label: '2.5개' },
+  { value: '3', label: '3개' },
+  { value: '4', label: '4개' },
+  { value: '5', label: '5개' }
 ]
 
 // 샘플 데이터 제거 - 실제 Supabase 데이터 사용
@@ -68,6 +79,19 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
       }))
     }
   }, [errors])
+
+  // 메모이제이션된 옵션들
+  const propertyTypeOptions = useMemo(() => 
+    PROPERTY_TYPES.map(type => ({ value: type, label: type })), []
+  )
+  
+  const transactionTypeOptions = useMemo(() => 
+    TRANSACTION_TYPES.map(type => ({ value: type, label: type })), []
+  )
+  
+  const statusOptions = useMemo(() => 
+    PROPERTY_STATUS.map(status => ({ value: status, label: status })), []
+  )
 
   // 샘플 데이터 기능 제거
 
@@ -213,14 +237,14 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   label="매물 유형"
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value as PropertyType)}
-                  options={PROPERTY_TYPES.map(type => ({ value: type, label: type }))}
+                  options={propertyTypeOptions}
                 />
                 
                 <Select
                   label="거래 유형"
                   value={formData.transaction_type}
                   onChange={(e) => handleInputChange('transaction_type', e.target.value as TransactionType)}
-                  options={TRANSACTION_TYPES.map(type => ({ value: type, label: type }))}
+                  options={transactionTypeOptions}
                 />
               </div>
             </div>
@@ -290,15 +314,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   value={formData.rooms?.toString() || '1'}
                   onChange={(e) => handleInputChange('rooms', parseFloat(e.target.value) || 1)}
                   error={errors.rooms}
-                  options={[
-                    { value: '1', label: '1개' },
-                    { value: '1.5', label: '1.5개' },
-                    { value: '2', label: '2개' },
-                    { value: '2.5', label: '2.5개' },
-                    { value: '3', label: '3개' },
-                    { value: '4', label: '4개' },
-                    { value: '5', label: '5개' }
-                  ]}
+                  options={ROOM_OPTIONS}
                 />
                 
                 <Input
@@ -445,7 +461,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   label="매물 상태"
                   value={formData.status || '판매중'}
                   onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
-                  options={PROPERTY_STATUS.map(status => ({ value: status, label: status }))}
+                  options={statusOptions}
                 />
               </div>
               
