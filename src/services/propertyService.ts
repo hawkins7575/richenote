@@ -81,23 +81,69 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
 
     // 데이터 변환하여 프론트엔드 타입에 맞춤 (실제 DB 컬럼명 사용)
     let transformedData = (data || []).map((item: any) => {
+      // description에서 구조화된 정보 파싱
+      const parseStructuredDescription = (desc: string | null) => {
+        if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '', is_vacant: false }
+        
+        let cleanDescription = desc
+        let landlord_name, landlord_phone, exit_date, detailed_address
+        let parking = false, elevator = false, is_vacant = false
+        
+        // 임대인 정보 파싱
+        const landlordMatch = desc.match(/\[임대인정보\]\s*([^\n\[]+)/)
+        if (landlordMatch) {
+          const landlordText = landlordMatch[1]
+          const nameMatch = landlordText.match(/임대인:\s*([^|]+)/)
+          const phoneMatch = landlordText.match(/연락처:\s*([^|]+)/)
+          
+          if (nameMatch) landlord_name = nameMatch[1].trim()
+          if (phoneMatch) landlord_phone = phoneMatch[1].trim()
+          
+          cleanDescription = cleanDescription.replace(landlordMatch[0], '').trim()
+        }
+        
+        // 퇴실 예정일 파싱
+        const exitMatch = desc.match(/\[퇴실예정\]\s*([^\n\[]+)/)
+        if (exitMatch) {
+          exit_date = exitMatch[1].trim()
+          cleanDescription = cleanDescription.replace(exitMatch[0], '').trim()
+        }
+        
+        // 거주현황(공실) 파싱
+        const vacantMatch = desc.match(/\[거주현황\]\s*공실/)
+        if (vacantMatch) {
+          is_vacant = true
+          cleanDescription = cleanDescription.replace(vacantMatch[0], '').trim()
+        }
+        
+        // 편의시설 파싱
+        const facilityMatch = desc.match(/\[편의시설\]\s*([^\n\[]+)/)
+        if (facilityMatch) {
+          const facilityText = facilityMatch[1]
+          parking = facilityText.includes('주차가능')
+          elevator = facilityText.includes('엘리베이터')
+          cleanDescription = cleanDescription.replace(facilityMatch[0], '').trim()
+        }
+        
+        // 상세주소 파싱
+        const addressMatch = desc.match(/\[상세주소\]\s*([^\n\[]+)/)
+        if (addressMatch) {
+          detailed_address = addressMatch[1].trim()
+          cleanDescription = cleanDescription.replace(addressMatch[0], '').trim()
+        }
+        
+        // 연속된 줄바꿈 정리
+        cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
+        
+        return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, cleanDescription, is_vacant }
+      }
+      
+      const parsedInfo = parseStructuredDescription(item.description)
+      
       // 로컬 저장소에서 상태 확인, 없으면 기본 상태 '판매중'으로 설정
       const statusKey = `property_status_${item.id}`
       const savedStatus = localStorage.getItem(statusKey)
       const assignedStatus = savedStatus || item.status || '판매중'
-      
-      // 로컬 저장소에서 임대인 정보 확인
-      const landlordKey = `property_landlord_${item.id}`
-      const savedLandlordInfo = localStorage.getItem(landlordKey)
-      let landlordInfo = { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined }
-      
-      if (savedLandlordInfo) {
-        try {
-          landlordInfo = JSON.parse(savedLandlordInfo)
-        } catch (e) {
-          console.warn('임대인 정보 파싱 실패:', e)
-        }
-      }
       
       return {
         id: item.id,
@@ -107,6 +153,7 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
         type: item.property_type,
         transaction_type: item.transaction_type,
         address: item.address,
+        detailed_address: parsedInfo.detailed_address,
         area: item.area_exclusive,
         floor: item.floor_current,
         total_floors: item.floor_total,
@@ -115,20 +162,21 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
         price: item.price ? parseFloat(item.price) : undefined,
         deposit: item.deposit ? parseFloat(item.deposit) : undefined,
         monthly_rent: item.monthly_rent ? parseFloat(item.monthly_rent) : undefined,
-        description: item.description,
-        // 임대인 정보 - 로컬 저장소에서만 가져오기 (DB 컬럼 없음)
-        landlord_name: landlordInfo.landlord_name || undefined,
-        landlord_phone: landlordInfo.landlord_phone || undefined,
-        // 퇴실 날짜 - 로컬 저장소에서만 가져오기 (DB 컬럼 없음)
-        exit_date: landlordInfo.exit_date || undefined,
+        description: parsedInfo.cleanDescription || item.description,
+        // description에서 파싱된 임대인 정보 사용
+        landlord_name: parsedInfo.landlord_name,
+        landlord_phone: parsedInfo.landlord_phone,
+        // description에서 파싱된 퇴실 날짜 사용
+        exit_date: parsedInfo.exit_date,
+        // description에서 파싱된 편의시설 정보 사용
+        parking: parsedInfo.parking,
+        elevator: parsedInfo.elevator,
         images: item.images || [],
         is_featured: false,
         view_count: 0,
         created_at: item.created_at,
         updated_at: item.updated_at,
         status: assignedStatus,
-        parking: false,
-        elevator: false,
         options: [],
         inquiry_count: 0,
         is_urgent: false,
@@ -202,6 +250,45 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
   try {
     console.log('📡 실제 Supabase에 매물 생성 요청 중...')
     // 프론트엔드 데이터를 데이터베이스 스키마에 맞게 변환
+    
+    // 임대인 정보와 기타 정보를 description에 구조화하여 저장
+    let structuredDescription = propertyData.description || ''
+    
+    // 임대인 정보 추가
+    if (propertyData.landlord_name || propertyData.landlord_phone) {
+      const landlordInfo = []
+      if (propertyData.landlord_name) landlordInfo.push(`임대인: ${propertyData.landlord_name}`)
+      if (propertyData.landlord_phone) landlordInfo.push(`연락처: ${propertyData.landlord_phone}`)
+      
+      const landlordSection = `[임대인정보] ${landlordInfo.join(' | ')}`
+      structuredDescription = landlordSection + (structuredDescription ? `\n\n${structuredDescription}` : '')
+    }
+    
+    // 퇴실 예정일 또는 공실 상태 추가
+    if (propertyData.exit_date) {
+      const exitInfo = `[퇴실예정] ${propertyData.exit_date}`
+      structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + exitInfo
+    } else {
+      // exit_date가 없으면 공실로 처리
+      const vacantInfo = `[거주현황] 공실`
+      structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + vacantInfo
+    }
+    
+    // 편의시설 정보 추가
+    const facilities = []
+    if (propertyData.parking) facilities.push('주차가능')
+    if (propertyData.elevator) facilities.push('엘리베이터')
+    if (facilities.length > 0) {
+      const facilityInfo = `[편의시설] ${facilities.join(', ')}`
+      structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + facilityInfo
+    }
+    
+    // 상세 주소 정보 추가
+    if (propertyData.detailed_address) {
+      const addressInfo = `[상세주소] ${propertyData.detailed_address}`
+      structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + addressInfo
+    }
+    
     // 실제 DB에 존재하는 컬럼만 사용
     const dbData = {
       tenant_id: tenantId,
@@ -218,8 +305,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       area_exclusive: propertyData.area || 0, // 기본값 설정
       rooms: propertyData.rooms || 1, // 기본값 설정
       bathrooms: propertyData.bathrooms || 1, // 기본값 설정
-      description: propertyData.description || null
-      // landlord_name, landlord_phone, exit_date 컬럼이 DB에 없어서 제거
+      description: structuredDescription || null
     }
 
     console.log('💾 데이터베이스 삽입 데이터:', dbData)
@@ -245,16 +331,57 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     
     console.log('✅ 매물 생성 성공:', data)
 
-    // 임대인 정보와 퇴실 날짜를 로컬 저장소에 저장 (DB 컬럼이 없으므로)
-    if (propertyData.landlord_name || propertyData.landlord_phone || propertyData.exit_date) {
-      const landlordInfo = {
-        landlord_name: propertyData.landlord_name || undefined,
-        landlord_phone: propertyData.landlord_phone || undefined,
-        exit_date: propertyData.exit_date || undefined
+    // description에서 구조화된 정보 파싱
+    const parseStructuredDescription = (desc: string | null) => {
+      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '' }
+      
+      let cleanDescription = desc
+      let landlord_name, landlord_phone, exit_date, detailed_address
+      let parking = false, elevator = false
+      
+      // 임대인 정보 파싱
+      const landlordMatch = desc.match(/\[임대인정보\]\s*([^\n\[]+)/)
+      if (landlordMatch) {
+        const landlordText = landlordMatch[1]
+        const nameMatch = landlordText.match(/임대인:\s*([^|]+)/)
+        const phoneMatch = landlordText.match(/연락처:\s*([^|]+)/)
+        
+        if (nameMatch) landlord_name = nameMatch[1].trim()
+        if (phoneMatch) landlord_phone = phoneMatch[1].trim()
+        
+        cleanDescription = cleanDescription.replace(landlordMatch[0], '').trim()
       }
-      localStorage.setItem(`property_landlord_${data.id}`, JSON.stringify(landlordInfo))
-      console.log('💾 임대인 정보 로컬 저장소에 저장:', landlordInfo)
+      
+      // 퇴실 예정일 파싱
+      const exitMatch = desc.match(/\[퇴실예정\]\s*([^\n\[]+)/)
+      if (exitMatch) {
+        exit_date = exitMatch[1].trim()
+        cleanDescription = cleanDescription.replace(exitMatch[0], '').trim()
+      }
+      
+      // 편의시설 파싱
+      const facilityMatch = desc.match(/\[편의시설\]\s*([^\n\[]+)/)
+      if (facilityMatch) {
+        const facilityText = facilityMatch[1]
+        parking = facilityText.includes('주차가능')
+        elevator = facilityText.includes('엘리베이터')
+        cleanDescription = cleanDescription.replace(facilityMatch[0], '').trim()
+      }
+      
+      // 상세주소 파싱
+      const addressMatch = desc.match(/\[상세주소\]\s*([^\n\[]+)/)
+      if (addressMatch) {
+        detailed_address = addressMatch[1].trim()
+        cleanDescription = cleanDescription.replace(addressMatch[0], '').trim()
+      }
+      
+      // 연속된 줄바꿈 정리
+      cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
+      
+      return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, cleanDescription }
     }
+
+    const parsedInfo = parseStructuredDescription(data.description)
 
     // 프론트엔드 타입에 맞게 변환 (실제 DB 컬럼명 사용)
     const transformedData = {
@@ -265,6 +392,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       type: data.property_type,
       transaction_type: data.transaction_type,
       address: data.address,
+      detailed_address: parsedInfo.detailed_address,
       area: data.area_exclusive,
       floor: data.floor_current,
       total_floors: data.floor_total,
@@ -273,20 +401,21 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       price: data.price ? parseFloat(data.price) : undefined,
       deposit: data.deposit ? parseFloat(data.deposit) : undefined,
       monthly_rent: data.monthly_rent ? parseFloat(data.monthly_rent) : undefined,
-      description: data.description,
-      // 임대인 정보 - 폼 데이터 사용 (DB에 저장되지 않으므로)
-      landlord_name: propertyData.landlord_name || undefined,
-      landlord_phone: propertyData.landlord_phone || undefined,
-      // 퇴실 날짜 - 폼 데이터 사용 (DB에 저장되지 않으므로)
-      exit_date: propertyData.exit_date || undefined,
+      description: parsedInfo.cleanDescription || data.description,
+      // description에서 파싱된 임대인 정보 사용
+      landlord_name: parsedInfo.landlord_name,
+      landlord_phone: parsedInfo.landlord_phone,
+      // description에서 파싱된 퇴실 날짜 사용
+      exit_date: parsedInfo.exit_date,
+      // description에서 파싱된 편의시설 정보 사용
+      parking: parsedInfo.parking,
+      elevator: parsedInfo.elevator,
       images: [], // 빈 배열로 설정 - DB에 images 컬럼 없음
       is_featured: false,
       view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      status: '판매중' as const,
-      parking: false,
-      elevator: false,
+      status: propertyData.status || '판매중',
       options: [],
       inquiry_count: 0,
       is_urgent: false,
@@ -305,6 +434,66 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
   console.log('🔄 매물 수정 시작:', { propertyId, propertyData, tenantId })
   
   try {
+    // 기존 데이터 조회
+    const { data: existingData } = await supabase
+      .from('properties')
+      .select('description')
+      .eq('id', propertyId)
+      .eq('tenant_id', tenantId)
+      .single()
+
+    // 기존 description에서 정보 파싱
+    const parseExistingInfo = (desc: string | null) => {
+      if (!desc) return { cleanDescription: '' }
+      
+      let cleanDescription = desc
+      
+      // 기존 구조화된 정보들 제거
+      cleanDescription = cleanDescription.replace(/\[임대인정보\][^\n\[]*/, '').trim()
+      cleanDescription = cleanDescription.replace(/\[퇴실예정\][^\n\[]*/, '').trim()
+      cleanDescription = cleanDescription.replace(/\[편의시설\][^\n\[]*/, '').trim()
+      cleanDescription = cleanDescription.replace(/\[상세주소\][^\n\[]*/, '').trim()
+      cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
+      
+      return { cleanDescription }
+    }
+    
+    const existingInfo = parseExistingInfo(existingData?.description)
+    
+    // 새로운 구조화된 description 생성
+    let newStructuredDescription = propertyData.description !== undefined ? propertyData.description : existingInfo.cleanDescription
+    
+    // 임대인 정보 추가
+    if (propertyData.landlord_name || propertyData.landlord_phone) {
+      const landlordInfo = []
+      if (propertyData.landlord_name) landlordInfo.push(`임대인: ${propertyData.landlord_name}`)
+      if (propertyData.landlord_phone) landlordInfo.push(`연락처: ${propertyData.landlord_phone}`)
+      
+      const landlordSection = `[임대인정보] ${landlordInfo.join(' | ')}`
+      newStructuredDescription = landlordSection + (newStructuredDescription ? `\n\n${newStructuredDescription}` : '')
+    }
+    
+    // 퇴실 예정일 추가
+    if (propertyData.exit_date) {
+      const exitInfo = `[퇴실예정] ${propertyData.exit_date}`
+      newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + exitInfo
+    }
+    
+    // 편의시설 정보 추가
+    const facilities = []
+    if (propertyData.parking) facilities.push('주차가능')
+    if (propertyData.elevator) facilities.push('엘리베이터')
+    if (facilities.length > 0) {
+      const facilityInfo = `[편의시설] ${facilities.join(', ')}`
+      newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + facilityInfo
+    }
+    
+    // 상세 주소 정보 추가
+    if (propertyData.detailed_address) {
+      const addressInfo = `[상세주소] ${propertyData.detailed_address}`
+      newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + addressInfo
+    }
+    
     // 프론트엔드 데이터를 데이터베이스 스키마에 맞게 변환
     const dbData: any = {}
     
@@ -321,7 +510,9 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
     if (propertyData.price !== undefined) dbData.price = propertyData.price
     if (propertyData.deposit !== undefined) dbData.deposit = propertyData.deposit
     if (propertyData.monthly_rent !== undefined) dbData.monthly_rent = propertyData.monthly_rent
-    if (propertyData.description !== undefined) dbData.description = propertyData.description
+    
+    // 구조화된 description 저장
+    dbData.description = newStructuredDescription || null
 
     console.log('💾 데이터베이스 업데이트 데이터:', dbData)
 
@@ -340,32 +531,57 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
 
     console.log('✅ 데이터베이스 수정 성공:', data)
 
-    // 임대인 정보와 퇴실 날짜를 로컬 저장소에 업데이트
-    if (propertyData.landlord_name !== undefined || propertyData.landlord_phone !== undefined || propertyData.exit_date !== undefined) {
-      const landlordKey = `property_landlord_${propertyId}`
+    // description에서 구조화된 정보 파싱
+    const parseStructuredDescription = (desc: string | null) => {
+      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '' }
       
-      // 기존 정보 가져오기
-      let existingInfo = {}
-      try {
-        const existing = localStorage.getItem(landlordKey)
-        if (existing) {
-          existingInfo = JSON.parse(existing)
-        }
-      } catch (e) {
-        console.warn('기존 임대인 정보 파싱 실패:', e)
-      }
-
-      // 새 정보로 업데이트
-      const updatedLandlordInfo = {
-        ...existingInfo,
-        ...(propertyData.landlord_name !== undefined && { landlord_name: propertyData.landlord_name }),
-        ...(propertyData.landlord_phone !== undefined && { landlord_phone: propertyData.landlord_phone }),
-        ...(propertyData.exit_date !== undefined && { exit_date: propertyData.exit_date })
+      let cleanDescription = desc
+      let landlord_name, landlord_phone, exit_date, detailed_address
+      let parking = false, elevator = false
+      
+      // 임대인 정보 파싱
+      const landlordMatch = desc.match(/\[임대인정보\]\s*([^\n\[]+)/)
+      if (landlordMatch) {
+        const landlordText = landlordMatch[1]
+        const nameMatch = landlordText.match(/임대인:\s*([^|]+)/)
+        const phoneMatch = landlordText.match(/연락처:\s*([^|]+)/)
+        
+        if (nameMatch) landlord_name = nameMatch[1].trim()
+        if (phoneMatch) landlord_phone = phoneMatch[1].trim()
+        
+        cleanDescription = cleanDescription.replace(landlordMatch[0], '').trim()
       }
       
-      localStorage.setItem(landlordKey, JSON.stringify(updatedLandlordInfo))
-      console.log('💾 임대인 정보 로컬 저장소 업데이트:', updatedLandlordInfo)
+      // 퇴실 예정일 파싱
+      const exitMatch = desc.match(/\[퇴실예정\]\s*([^\n\[]+)/)
+      if (exitMatch) {
+        exit_date = exitMatch[1].trim()
+        cleanDescription = cleanDescription.replace(exitMatch[0], '').trim()
+      }
+      
+      // 편의시설 파싱
+      const facilityMatch = desc.match(/\[편의시설\]\s*([^\n\[]+)/)
+      if (facilityMatch) {
+        const facilityText = facilityMatch[1]
+        parking = facilityText.includes('주차가능')
+        elevator = facilityText.includes('엘리베이터')
+        cleanDescription = cleanDescription.replace(facilityMatch[0], '').trim()
+      }
+      
+      // 상세주소 파싱
+      const addressMatch = desc.match(/\[상세주소\]\s*([^\n\[]+)/)
+      if (addressMatch) {
+        detailed_address = addressMatch[1].trim()
+        cleanDescription = cleanDescription.replace(addressMatch[0], '').trim()
+      }
+      
+      // 연속된 줄바꿈 정리
+      cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
+      
+      return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, cleanDescription }
     }
+
+    const parsedInfo = parseStructuredDescription(data.description)
 
     // 프론트엔드 타입에 맞게 변환하여 반환
     const transformedData = {
@@ -376,6 +592,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       type: data.property_type,
       transaction_type: data.transaction_type,
       address: data.address,
+      detailed_address: parsedInfo.detailed_address,
       area: data.area_exclusive,
       floor: data.floor_current,
       total_floors: data.floor_total,
@@ -384,19 +601,19 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       price: data.price ? parseFloat(data.price) : undefined,
       deposit: data.deposit ? parseFloat(data.deposit) : undefined,
       monthly_rent: data.monthly_rent ? parseFloat(data.monthly_rent) : undefined,
-      description: data.description,
-      // 업데이트된 임대인 정보 포함
-      landlord_name: propertyData.landlord_name || undefined,
-      landlord_phone: propertyData.landlord_phone || undefined,
-      exit_date: propertyData.exit_date || undefined,
+      description: parsedInfo.cleanDescription || data.description,
+      // description에서 파싱된 임대인 정보 사용
+      landlord_name: parsedInfo.landlord_name,
+      landlord_phone: parsedInfo.landlord_phone,
+      exit_date: parsedInfo.exit_date,
+      parking: parsedInfo.parking,
+      elevator: parsedInfo.elevator,
       images: [],
       is_featured: false,
       view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
       status: propertyData.status || '판매중',
-      parking: propertyData.parking || false,
-      elevator: propertyData.elevator || false,
       options: [],
       inquiry_count: 0,
       is_urgent: false,
@@ -428,16 +645,7 @@ export const deleteProperty = async (propertyId: string, tenantId: string) => {
       throw new Error(`데이터베이스 오류: ${error.message}`)
     }
 
-    // 로컬 저장소에서 관련 데이터 삭제
-    const statusKey = `property_status_${propertyId}`
-    const landlordKey = `property_landlord_${propertyId}`
-    
-    localStorage.removeItem(statusKey)
-    localStorage.removeItem(landlordKey)
-    
-    console.log('🧹 로컬 저장소 정리 완료:', { statusKey, landlordKey })
     console.log('✅ 매물 삭제 완료')
-
     return true
   } catch (error) {
     console.error('💥 deleteProperty 전체 에러:', error)
@@ -445,33 +653,136 @@ export const deleteProperty = async (propertyId: string, tenantId: string) => {
   }
 }
 
-// 매물 상태 업데이트 (임시로 로컬 저장소 사용)
+// 매물 상태 업데이트 (description에 상태 정보 저장)
 export const updatePropertyStatus = async (propertyId: string, status: Property['status'], tenantId: string) => {
   try {
     console.log('🔄 매물 상태 업데이트:', { propertyId, status, tenantId })
     
-    // 임시로 로컬 저장소에 상태 저장
-    const statusKey = `property_status_${propertyId}`
-    localStorage.setItem(statusKey, status)
-    
-    // 원본 매물 정보 조회
-    const { data, error } = await supabase
+    // 기존 데이터 조회
+    const { data: existingData, error: fetchError } = await supabase
       .from('properties')
       .select('*')
       .eq('id', propertyId)
       .eq('tenant_id', tenantId)
       .single()
 
+    if (fetchError) {
+      console.error('Error fetching property for status update:', fetchError)
+      throw fetchError
+    }
+
+    // description에 상태 정보 추가/업데이트
+    let updatedDescription = existingData.description || ''
+    
+    // 기존 상태 정보 제거
+    updatedDescription = updatedDescription.replace(/\[상태\][^\n\[]*/, '').trim()
+    
+    // 새 상태 정보 추가
+    const statusInfo = `[상태] ${status}`
+    updatedDescription = statusInfo + (updatedDescription ? `\n\n${updatedDescription}` : '')
+
+    // 상태 정보가 포함된 description 업데이트
+    const { data, error } = await supabase
+      .from('properties')
+      .update({ description: updatedDescription })
+      .eq('id', propertyId)
+      .eq('tenant_id', tenantId)
+      .select('*')
+      .single()
+
     if (error) {
-      console.error('Error fetching property for status update:', error)
+      console.error('Error updating property status:', error)
       throw error
     }
 
-    // 상태가 업데이트된 데이터 반환
+    // description에서 구조화된 정보 파싱하여 반환
+    const parseStructuredDescription = (desc: string | null) => {
+      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '', status: '판매중' }
+      
+      let cleanDescription = desc
+      let landlord_name, landlord_phone, exit_date, detailed_address, parsedStatus = '판매중'
+      let parking = false, elevator = false
+      
+      // 상태 정보 파싱
+      const statusMatch = desc.match(/\[상태\]\s*([^\n\[]+)/)
+      if (statusMatch) {
+        parsedStatus = statusMatch[1].trim()
+        cleanDescription = cleanDescription.replace(statusMatch[0], '').trim()
+      }
+      
+      // 기타 정보들도 파싱 (기존 로직 재사용)
+      const landlordMatch = desc.match(/\[임대인정보\]\s*([^\n\[]+)/)
+      if (landlordMatch) {
+        const landlordText = landlordMatch[1]
+        const nameMatch = landlordText.match(/임대인:\s*([^|]+)/)
+        const phoneMatch = landlordText.match(/연락처:\s*([^|]+)/)
+        
+        if (nameMatch) landlord_name = nameMatch[1].trim()
+        if (phoneMatch) landlord_phone = phoneMatch[1].trim()
+        
+        cleanDescription = cleanDescription.replace(landlordMatch[0], '').trim()
+      }
+      
+      const exitMatch = desc.match(/\[퇴실예정\]\s*([^\n\[]+)/)
+      if (exitMatch) {
+        exit_date = exitMatch[1].trim()
+        cleanDescription = cleanDescription.replace(exitMatch[0], '').trim()
+      }
+      
+      const facilityMatch = desc.match(/\[편의시설\]\s*([^\n\[]+)/)
+      if (facilityMatch) {
+        const facilityText = facilityMatch[1]
+        parking = facilityText.includes('주차가능')
+        elevator = facilityText.includes('엘리베이터')
+        cleanDescription = cleanDescription.replace(facilityMatch[0], '').trim()
+      }
+      
+      const addressMatch = desc.match(/\[상세주소\]\s*([^\n\[]+)/)
+      if (addressMatch) {
+        detailed_address = addressMatch[1].trim()
+        cleanDescription = cleanDescription.replace(addressMatch[0], '').trim()
+      }
+      
+      cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
+      
+      return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, cleanDescription, status: parsedStatus }
+    }
+
+    const parsedInfo = parseStructuredDescription(data.description)
+
     const updatedData = {
-      ...data,
-      status: status,
-      updated_at: new Date().toISOString()
+      id: data.id,
+      tenant_id: data.tenant_id,
+      created_by: data.user_id,
+      title: data.title,
+      type: data.property_type,
+      transaction_type: data.transaction_type,
+      address: data.address,
+      detailed_address: parsedInfo.detailed_address,
+      area: data.area_exclusive,
+      floor: data.floor_current,
+      total_floors: data.floor_total,
+      rooms: data.rooms,
+      bathrooms: data.bathrooms,
+      price: data.price ? parseFloat(data.price) : undefined,
+      deposit: data.deposit ? parseFloat(data.deposit) : undefined,
+      monthly_rent: data.monthly_rent ? parseFloat(data.monthly_rent) : undefined,
+      description: parsedInfo.cleanDescription,
+      landlord_name: parsedInfo.landlord_name,
+      landlord_phone: parsedInfo.landlord_phone,
+      exit_date: parsedInfo.exit_date,
+      parking: parsedInfo.parking,
+      elevator: parsedInfo.elevator,
+      status: parsedInfo.status,
+      updated_at: data.updated_at || new Date().toISOString(),
+      created_at: data.created_at,
+      images: [],
+      is_featured: false,
+      view_count: 0,
+      options: [],
+      inquiry_count: 0,
+      is_urgent: false,
+      is_favorite: false
     }
 
     console.log('✅ 매물 상태 업데이트 완료:', updatedData)

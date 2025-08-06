@@ -55,16 +55,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         <span className="font-bold text-lg">{price}</span>
       </div>
 
-      {/* 퇴실날짜 */}
-      {property.exit_date && (
-        <div className="flex items-center text-gray-500">
+      {/* 거주 현황 - 퇴실날짜 또는 공실 */}
+      {property.exit_date ? (
+        <div className="flex items-center text-orange-600">
           <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
-          <span className="text-sm">
+          <span className="text-sm font-medium">
             퇴실: {new Date(property.exit_date).toLocaleDateString('ko-KR', {
               month: 'long',
               day: 'numeric'
             })}
           </span>
+        </div>
+      ) : (
+        <div className="flex items-center text-green-600">
+          <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
+          <span className="text-sm font-medium">공실</span>
         </div>
       )}
 
