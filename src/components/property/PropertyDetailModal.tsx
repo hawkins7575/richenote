@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React from 'react'
-import { X, MapPin, Calendar, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
+import { X, MapPin, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
 import '@/styles/mobile-modal.css'
