@@ -56,7 +56,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     bathrooms: 1,
     parking: false,
     elevator: false,
-    status: '판매중'
+    status: '거래중'
   })
 
   const [isVacant, setIsVacant] = useState(false)
@@ -195,7 +195,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         bathrooms: 1,
         parking: false,
         elevator: false,
-        status: '판매중'
+        status: '거래중'
       })
       setErrors({})
       setIsVacant(false)
@@ -483,7 +483,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                 
                 <Select
                   label="매물 상태"
-                  value={formData.status || '판매중'}
+                  value={formData.status || '거래중'}
                   onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
                   options={statusOptions}
                 />

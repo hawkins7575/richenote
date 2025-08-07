@@ -6,7 +6,7 @@ export type PropertyType = '아파트' | '오피스텔' | '원룸' | '빌라' | 
 
 export type TransactionType = '매매' | '전세' | '월세' | '단기임대'
 
-export type PropertyStatus = '판매중' | '예약중' | '거래완료' | '임시보관' | '만료됨'
+export type PropertyStatus = '거래중' | '거래완료'
 
 export interface Property {
   id: string

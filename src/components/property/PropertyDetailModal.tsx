@@ -79,8 +79,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   {property.transaction_type}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  property.status === '판매중' ? 'bg-green-100 text-green-800' : 
-                  property.status === '예약중' ? 'bg-yellow-100 text-yellow-800' : 
+                  property.status === '거래중' ? 'bg-green-100 text-green-800' : 
+                  property.status === '거래완료' ? 'bg-gray-100 text-gray-800' : 
                   'bg-gray-100 text-gray-800'
                 }`}>
                   {property.status}
@@ -112,8 +112,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     {property.transaction_type}
                   </span>
                   <span className={`px-3 py-1.5 rounded-full font-medium text-sm ${
-                    property.status === '판매중' ? 'bg-green-100 text-green-800' : 
-                    property.status === '예약중' ? 'bg-yellow-100 text-yellow-800' : 
+                    property.status === '거래중' ? 'bg-green-100 text-green-800' : 
+                    property.status === '거래완료' ? 'bg-gray-100 text-gray-800' : 
                     'bg-gray-100 text-gray-800'
                   }`}>
                     {property.status}

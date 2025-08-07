@@ -33,22 +33,19 @@ export const FACILITY_KEYWORDS = {
 
 // 매물 상태 옵션 (통일된 정의)
 export const PROPERTY_STATUS_OPTIONS = [
-  '판매중', '예약중', '거래완료', '임시보관', '만료됨'
+  '거래중', '거래완료'
 ] as const
 
 // 필터용 상태 옵션 (모든 상태 + 전체 옵션)
 export const FILTER_STATUS_OPTIONS = [
   { value: '', label: '모든 상태' },
-  { value: '판매중', label: '판매중' },
-  { value: '예약중', label: '예약중' },
-  { value: '거래완료', label: '거래완료' },
-  { value: '임시보관', label: '임시보관' },
-  { value: '만료됨', label: '만료됨' }
+  { value: '거래중', label: '거래중' },
+  { value: '거래완료', label: '거래완료' }
 ] as const
 
 // 기본값
 export const DEFAULT_VALUES = {
-  PROPERTY_STATUS: '판매중',
+  PROPERTY_STATUS: '거래중',
   FLOOR: 1,
   TOTAL_FLOORS: 1,
   AREA: 0,
