@@ -14,6 +14,7 @@ import { useProperties } from '@/hooks/useProperties'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatPrice } from '@/utils/propertyUtils'
+import { FILTER_STATUS_OPTIONS } from '@/constants/propertyConstants'
 import type { SimplePropertyFilters, Property, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 const PropertiesPageNew: React.FC = () => {
@@ -96,12 +97,7 @@ const PropertiesPageNew: React.FC = () => {
     { value: '빌라', label: '빌라' },
   ]
 
-  const statusOptions = [
-    { value: '', label: '모든 상태' },
-    { value: '판매중', label: '판매중' },
-    { value: '예약중', label: '예약중' },
-    { value: '거래완료', label: '거래완료' },
-  ]
+  // 공통 상수에서 가져온 필터 옵션 사용
 
 
 
@@ -289,7 +285,7 @@ const PropertiesPageNew: React.FC = () => {
 
               {/* 상태 필터 */}
               <Select
-                options={statusOptions}
+                options={[...FILTER_STATUS_OPTIONS]}
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="w-full sm:w-24 text-sm"
@@ -486,7 +482,10 @@ const PropertyList: React.FC<PropertyListProps> = ({
                   <div className="mt-1">
                     <Badge size="sm" variant={
                       property.status === '판매중' ? 'success' : 
-                      property.status === '예약중' ? 'warning' : 'default'
+                      property.status === '예약중' ? 'warning' : 
+                      property.status === '거래완료' ? 'default' :
+                      property.status === '임시보관' ? 'secondary' :
+                      property.status === '만료됨' ? 'danger' : 'default'
                     }>
                       {property.status}
                     </Badge>
@@ -576,7 +575,10 @@ const PropertyList: React.FC<PropertyListProps> = ({
                     </Badge>
                     <Badge size="sm" variant={
                       property.status === '판매중' ? 'success' : 
-                      property.status === '예약중' ? 'warning' : 'default'
+                      property.status === '예약중' ? 'warning' : 
+                      property.status === '거래완료' ? 'default' :
+                      property.status === '임시보관' ? 'secondary' :
+                      property.status === '만료됨' ? 'danger' : 'default'
                     }>
                       {property.status}
                     </Badge>

@@ -86,13 +86,17 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
             inline-block w-2 h-2 rounded-full mr-2
             ${property.status === '판매중' ? 'bg-green-400' : 
               property.status === '예약중' ? 'bg-yellow-400' : 
-              'bg-gray-400'}
+              property.status === '거래완료' ? 'bg-gray-400' :
+              property.status === '임시보관' ? 'bg-blue-400' :
+              property.status === '만료됨' ? 'bg-red-400' : 'bg-gray-400'}
           `} />
           <span className={`
             text-xs font-medium
             ${property.status === '판매중' ? 'text-green-600' : 
               property.status === '예약중' ? 'text-yellow-600' : 
-              'text-gray-600'}
+              property.status === '거래완료' ? 'text-gray-600' :
+              property.status === '임시보관' ? 'text-blue-600' :
+              property.status === '만료됨' ? 'text-red-600' : 'text-gray-600'}
           `}>
             {property.status}
           </span>

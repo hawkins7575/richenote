@@ -6,6 +6,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
 import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
+import { PROPERTY_STATUS_OPTIONS } from '@/constants/propertyConstants'
 
 interface PropertyCreateFormProps {
   isOpen: boolean
@@ -22,9 +23,7 @@ const TRANSACTION_TYPES: TransactionType[] = [
   '매매', '전세', '월세', '단기임대'
 ]
 
-const PROPERTY_STATUS: PropertyStatus[] = [
-  '판매중', '예약중', '거래완료', '임시보관', '만료됨'
-]
+// 공통 상수에서 가져온 상태 옵션 사용
 
 // 방 개수 옵션 (정수만 지원 - DB integer 컬럼)
 const ROOM_OPTIONS = [
@@ -95,7 +94,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   )
   
   const statusOptions = useMemo(() => 
-    PROPERTY_STATUS.map(status => ({ value: status, label: status })), []
+    PROPERTY_STATUS_OPTIONS.map(status => ({ value: status, label: status })), []
   )
 
   // 샘플 데이터 기능 제거
