@@ -54,6 +54,8 @@ export const TeamManagement: React.FC = () => {
   const [memberMenuOpen, setMemberMenuOpen] = useState<string | null>(null)
   const [showInviteLinkModal, setShowInviteLinkModal] = useState(false)
   const [inviteLinkData, setInviteLinkData] = useState<any>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [memberToDelete, setMemberToDelete] = useState<{ id: string, name: string } | null>(null)
 
   // 현재 사용자의 역할 확인
   const currentUserRole = members.find(m => m.id === user?.id)?.role
@@ -163,16 +165,51 @@ export const TeamManagement: React.FC = () => {
     }
   }
 
-  const handleRemoveMember = async (memberId: string, memberName: string) => {
-    if (!confirm(`${memberName}님을 팀에서 제거하시겠습니까?`)) return
+  const handleRemoveMemberClick = (memberId: string, memberName: string) => {
+    // 추가 안전 검사
+    const memberToRemove = members.find(m => m.id === memberId)
+    
+    if (!memberToRemove) {
+      alert('삭제할 팀원을 찾을 수 없습니다.')
+      return
+    }
+
+    // Owner는 삭제할 수 없음
+    if (memberToRemove.role === 'owner') {
+      alert('Owner는 팀에서 제거할 수 없습니다.')
+      return
+    }
+
+    // 자기 자신은 삭제할 수 없음
+    if (memberId === user?.id) {
+      alert('자신을 팀에서 제거할 수 없습니다.')
+      return
+    }
+
+    // 권한 확인
+    if (currentUserRole !== 'owner' && currentUserRole !== 'admin') {
+      alert('팀원을 제거할 권한이 없습니다.')
+      return
+    }
+
+    // 삭제 확인 모달 표시
+    setMemberToDelete({ id: memberId, name: memberName })
+    setShowDeleteConfirm(true)
+  }
+
+  const handleConfirmRemoveMember = async () => {
+    if (!memberToDelete) return
 
     try {
       setActionLoading(true)
-      await teamService.removeMember(user!.id, memberId)
-      alert('팀원이 제거되었습니다.')
+      await teamService.removeMember(user!.id, memberToDelete.id)
+      alert(`✅ ${memberToDelete.name}님이 팀에서 제거되었습니다.`)
       loadTeamData()
+      setShowDeleteConfirm(false)
+      setMemberToDelete(null)
     } catch (error: any) {
-      alert(error.message || '팀원 제거에 실패했습니다.')
+      console.error('팀원 제거 실패:', error)
+      alert(`❌ 팀원 제거에 실패했습니다.\n\n오류: ${error.message || '알 수 없는 오류'}`)
     } finally {
       setActionLoading(false)
     }
@@ -334,15 +371,27 @@ export const TeamManagement: React.FC = () => {
                     <Edit className="w-4 h-4" />
                   </button>
                   
-                  {/* 삭제 버튼 */}
-                  {canManageTeam && member.role !== 'owner' && member.id !== user?.id && (
+                  {/* 삭제 버튼 - 더 명확한 조건으로 표시 */}
+                  {(currentUserRole === 'owner' || currentUserRole === 'admin') && 
+                   member.role !== 'owner' && 
+                   member.id !== user?.id ? (
                     <button
-                      onClick={() => handleRemoveMember(member.id, member.name)}
+                      onClick={() => handleRemoveMemberClick(member.id, member.name)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="팀에서 제거"
+                      disabled={actionLoading}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                  ) : (
+                    /* 삭제 조건이 맞지 않을 때 - 개발 환경에서만 정보 표시 */
+                    import.meta.env.DEV && (
+                      <div className="text-xs text-gray-400 p-2" title="삭제 불가 사유">
+                        {currentUserRole !== 'owner' && currentUserRole !== 'admin' && '권한없음'}
+                        {member.role === 'owner' && 'Owner'}
+                        {member.id === user?.id && '본인'}
+                      </div>
+                    )
                   )}
                   
                   {/* 더보기 메뉴 (필요시) */}
@@ -656,6 +705,99 @@ export const TeamManagement: React.FC = () => {
           }}
           inviteData={inviteLinkData}
         />
+      )}
+
+      {/* 팀원 삭제 확인 모달 */}
+      {showDeleteConfirm && memberToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-md mx-4">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">팀원 제거 확인</h2>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false)
+                    setMemberToDelete(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="px-6 py-4">
+              <div className="mb-4">
+                <div className="flex items-center space-x-3 p-4 bg-red-50 rounded-lg mb-4">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-red-900">{memberToDelete.name}</h3>
+                    <p className="text-sm text-red-700">제거할 팀원</p>
+                  </div>
+                </div>
+                
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <span className="text-yellow-400 text-lg">⚠️</span>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-800">
+                        <strong>주의사항:</strong>
+                      </p>
+                      <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside space-y-1">
+                        <li>제거된 팀원은 더 이상 이 팀의 데이터에 접근할 수 없습니다.</li>
+                        <li>이 작업은 되돌릴 수 없습니다.</li>
+                        <li>필요시 나중에 다시 초대할 수 있습니다.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 text-center">
+                  <strong>{memberToDelete.name}님</strong>을 정말로 팀에서 제거하시겠습니까?
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false)
+                  setMemberToDelete(null)
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={actionLoading}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleConfirmRemoveMember}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              >
+                {actionLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>제거중...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>팀에서 제거</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
