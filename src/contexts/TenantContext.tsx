@@ -2,11 +2,10 @@
 // 테넌트 컨텍스트 (React Context + Zustand 통합)
 // ============================================================================
 
-import React, { createContext, useContext, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useTenantStore } from '@/stores/tenantStore'
 import { supabase } from '@/services/supabase'
-import type { TenantContextType } from '@/types/tenant'
+import type { TenantContextType, TenantStats } from '@/types/tenant'
 
 const TenantContext = createContext<TenantContextType | null>(null)
 
@@ -16,18 +15,129 @@ interface TenantProviderProps {
 
 export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
   const { user } = useAuth() // 인증된 사용자 정보 가져오기
-  const {
-    tenant,
-    isLoading,
-    error,
-    switchTenant,
-    updateTenant,
-    getTenantStats,
-    hasFeature,
-    canCreateProperty,
-    canInviteUser,
-    isWithinLimits,
-  } = useTenantStore()
+  
+  // Local state management instead of Zustand
+  const [tenant, setTenant] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Tenant management functions
+  const switchTenant = async (tenantId: string) => {
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('tenants')
+        .select('*')
+        .eq('id', tenantId)
+        .single()
+      
+      if (error) throw error
+      setTenant(data)
+      setError(null)
+    } catch (err) {
+      console.error('Failed to switch tenant:', err)
+      setError('테넌트 전환에 실패했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const updateTenant = async (updates: any) => {
+    if (!tenant) return
+    
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('tenants')
+        .update(updates)
+        .eq('id', tenant.id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      setTenant(data)
+      setError(null)
+    } catch (err) {
+      console.error('Failed to update tenant:', err)
+      setError('테넌트 업데이트에 실패했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getTenantStats = async (): Promise<TenantStats> => {
+    if (!tenant) {
+      // Return default stats if no tenant
+      return {
+        total_properties: 0,
+        active_properties: 0,
+        total_users: 0,
+        active_users: 0,
+        storage_used_mb: 0,
+        api_calls_this_month: 0,
+        created_this_month: 0,
+      }
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('id, status, created_at')
+        .eq('tenant_id', tenant.id)
+      
+      if (error) throw error
+      
+      const stats: TenantStats = {
+        total_properties: data.length,
+        active_properties: data.filter(p => p.status === '판매중').length,
+        total_users: 1, // Simplified - would need actual user count
+        active_users: 1, // Simplified - would need actual active user count
+        storage_used_mb: 0, // Simplified - would need actual storage calculation
+        api_calls_this_month: 0, // Simplified - would need actual API call tracking
+        created_this_month: data.filter(p => {
+          const created = new Date(p.created_at || Date.now())
+          const now = new Date()
+          return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear()
+        }).length,
+      }
+      
+      return stats
+    } catch (err) {
+      console.error('Failed to get tenant stats:', err)
+      // Return default stats on error
+      return {
+        total_properties: 0,
+        active_properties: 0,
+        total_users: 0,
+        active_users: 0,
+        storage_used_mb: 0,
+        api_calls_this_month: 0,
+        created_this_month: 0,
+      }
+    }
+  }
+
+  const hasFeature = (feature: string) => {
+    return tenant?.limits?.features_enabled?.includes(feature) || false
+  }
+
+  const canCreateProperty = () => {
+    if (!tenant?.limits) return true
+    // Simplified - would need actual property count check
+    return true
+  }
+
+  const canInviteUser = () => {
+    if (!tenant?.limits) return true
+    // Simplified - would need actual user count check
+    return true
+  }
+
+  const isWithinLimits = (_resource: string) => {
+    if (!tenant?.limits) return true
+    // Simplified - would need actual resource usage check
+    return true
+  }
 
   // 페이지 로드 시 URL에서 테넌트 감지 또는 자동 테넌트 설정
   useEffect(() => {
@@ -37,6 +147,7 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
       
       // 사용자별 개별 테넌트를 실제 DB에 생성/조회
       const initializeTenant = async () => {
+        setIsLoading(true)
         try {
           // 1. 기존 테넌트 조회
           const { data: existingTenant } = await supabase
@@ -46,13 +157,11 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
             .single()
           
           if (existingTenant) {
-            // 기존 테넌트가 있으면 스토어에 설정
-            useTenantStore.setState({ 
-              tenant: existingTenant,
-              isLoading: false,
-              error: null 
-            })
+            // 기존 테넌트가 있으면 상태에 설정
+            setTenant(existingTenant)
+            setError(null)
             console.log('✅ 기존 테넌트 조회 완료:', existingTenant.name)
+            setIsLoading(false)
             return
           }
         } catch (error) {
@@ -83,7 +192,7 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
             throw error
           }
           
-          // 생성된 테넌트를 스토어에 설정 (추가 속성 포함)
+          // 생성된 테넌트를 상태에 설정 (추가 속성 포함)
           const fullTenant = {
             ...newTenant,
             branding: {
@@ -114,20 +223,16 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
             },
           }
           
-          useTenantStore.setState({ 
-            tenant: fullTenant,
-            isLoading: false,
-            error: null 
-          })
+          setTenant(fullTenant)
+          setError(null)
           
           console.log('✅ 새 테넌트 생성 완료:', newTenant.name, 'User ID:', user.id)
         } catch (error) {
           console.error('❌ 테넌트 초기화 실패:', error)
-          useTenantStore.setState({ 
-            tenant: null,
-            isLoading: false,
-            error: '테넌트 초기화에 실패했습니다.' 
-          })
+          setTenant(null)
+          setError('테넌트 초기화에 실패했습니다.')
+        } finally {
+          setIsLoading(false)
         }
       }
       

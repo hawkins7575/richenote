@@ -259,7 +259,7 @@ export const calculateYearlyDiscount = (plan: SubscriptionPlan) => {
   return monthlyPrice - yearlyPrice
 }
 
-export const formatPrice = (price: number, currency = 'KRW') => {
+export const formatPlanPrice = (price: number, currency = 'KRW') => {
   if (price === 0) return '맞춤 견적'
   
   return new Intl.NumberFormat('ko-KR', {

@@ -140,9 +140,45 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
     total_floors: item.floor_total,
     rooms: item.rooms,
     bathrooms: item.bathrooms,
-    price: item.price ? parseFloat(String(item.price)) : undefined,
-    deposit: item.deposit ? parseFloat(String(item.deposit)) : undefined,
-    monthly_rent: item.monthly_rent ? parseFloat(String(item.monthly_rent)) : undefined,
+    price: item.price ? (() => {
+      const parsed = parseFloat(String(item.price))
+      if (item.title?.includes('한솔')) {
+        console.log('🔍 한솔 아파트 price 변환:', {
+          title: item.title,
+          originalPrice: item.price,
+          originalType: typeof item.price,
+          parsedPrice: parsed,
+          parsedType: typeof parsed
+        })
+      }
+      return parsed
+    })() : undefined,
+    deposit: item.deposit ? (() => {
+      const parsed = parseFloat(String(item.deposit))
+      if (item.title?.includes('한솔')) {
+        console.log('🔍 한솔 아파트 deposit 변환:', {
+          title: item.title,
+          originalDeposit: item.deposit,
+          originalType: typeof item.deposit,
+          parsedDeposit: parsed,
+          parsedType: typeof parsed
+        })
+      }
+      return parsed
+    })() : undefined,
+    monthly_rent: item.monthly_rent ? (() => {
+      const parsed = parseFloat(String(item.monthly_rent))
+      if (item.title?.includes('한솔')) {
+        console.log('🔍 한솔 아파트 monthly_rent 변환:', {
+          title: item.title,
+          originalMonthlyRent: item.monthly_rent,
+          originalType: typeof item.monthly_rent,
+          parsedMonthlyRent: parsed,
+          parsedType: typeof parsed
+        })
+      }
+      return parsed
+    })() : undefined,
     description: parsedInfo.cleanDescription || item.description || '',
     landlord_name: parsedInfo.landlord_name,
     landlord_phone: parsedInfo.landlord_phone,
