@@ -4,6 +4,30 @@
 
 import { supabase } from './supabase'
 
+// 이메일 전송 인터페이스
+interface EmailInvitationData {
+  invitationToken: string
+  recipientEmail: string
+  inviterName: string
+  teamName: string
+  role: string
+  message?: string
+}
+
+// 초대 이메일 전송 함수
+const sendInvitationEmail = async (data: EmailInvitationData) => {
+  const { data: result, error } = await supabase.functions.invoke('send-team-invitation', {
+    body: data
+  })
+
+  if (error) {
+    console.error('이메일 전송 오류:', error)
+    throw error
+  }
+
+  return result
+}
+
 export interface TeamMember {
   id: string
   tenant_id: string
@@ -147,10 +171,15 @@ export const getTeamInvitations = async (userId: string) => {
 // 이메일로 팀원 초대
 export const inviteTeamMember = async (userId: string, invitationData: CreateInvitationData) => {
   try {
-    // 사용자의 tenant_id와 권한 확인
+    // 사용자의 tenant_id와 권한 확인 (팀 정보 포함)
     const { data: userProfile, error: userError } = await supabase
       .from('user_profiles')
-      .select('tenant_id, role, name')
+      .select(`
+        tenant_id, 
+        role, 
+        name,
+        tenant:tenant_id(name)
+      `)
       .eq('id', userId)
       .single()
 
@@ -200,13 +229,28 @@ export const inviteTeamMember = async (userId: string, invitationData: CreateInv
 
     if (inviteError) throw inviteError
 
+    // 이메일 전송
+    try {
+      await sendInvitationEmail({
+        invitationToken: invitation.invitation_token,
+        recipientEmail: invitationData.email,
+        inviterName: userProfile.name,
+        teamName: (userProfile as any).tenant?.name || '팀',
+        role: invitationData.role,
+        message: invitationData.message
+      })
+    } catch (emailError) {
+      console.warn('이메일 전송 실패:', emailError)
+      // 이메일 전송 실패해도 초대는 생성되도록 함
+    }
+
     // 활동 로그 기록
     await supabase
       .from('team_activity_logs')
       .insert({
         tenant_id: userProfile.tenant_id,
         user_id: userId,
-        action: 'invited',
+        action: 'invitation_sent',
         details: {
           invited_email: invitationData.email,
           role: invitationData.role,
@@ -214,7 +258,10 @@ export const inviteTeamMember = async (userId: string, invitationData: CreateInv
         }
       })
 
-    return invitation
+    return {
+      ...invitation,
+      inviteUrl: `${typeof window !== 'undefined' ? window.location.origin : 'https://summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app'}/team/invite?token=${invitation.invitation_token}`
+    }
   } catch (error) {
     console.error('팀원 초대 실패:', error)
     throw error

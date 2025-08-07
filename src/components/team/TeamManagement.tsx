@@ -24,6 +24,7 @@ import type { TeamMember, TeamInvitation, UserSearchResult } from '@/types/team'
 import { ROLE_LABELS, STATUS_LABELS, INVITATION_STATUS_LABELS } from '@/types/team'
 import { MemberEditModal } from './MemberEditModal'
 import { TeamActivityLog } from './TeamActivityLog'
+import { InviteLinkModal } from './InviteLinkModal'
 
 export const TeamManagement: React.FC = () => {
   const { user } = useAuth()
@@ -51,6 +52,8 @@ export const TeamManagement: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showActivityLog, setShowActivityLog] = useState(false)
   const [memberMenuOpen, setMemberMenuOpen] = useState<string | null>(null)
+  const [showInviteLinkModal, setShowInviteLinkModal] = useState(false)
+  const [inviteLinkData, setInviteLinkData] = useState<any>(null)
 
   // 현재 사용자의 역할 확인
   const currentUserRole = members.find(m => m.id === user?.id)?.role
@@ -98,13 +101,20 @@ export const TeamManagement: React.FC = () => {
 
     try {
       setActionLoading(true)
-      await teamService.inviteTeamMember(user!.id, {
+      const result = await teamService.inviteTeamMember(user!.id, {
         email: inviteEmail,
         role: inviteRole,
         message: inviteMessage
       })
       
-      alert('초대를 발송했습니다.')
+      // 초대 링크 모달 표시
+      setInviteLinkData({
+        email: inviteEmail,
+        inviteUrl: (result as any).inviteUrl,
+        role: inviteRole,
+        teamName: '리체 매물장' // 실제 팀 이름으로 변경 가능
+      })
+      setShowInviteLinkModal(true)
       setShowInviteModal(false)
       resetInviteForm()
       loadTeamData()
@@ -600,6 +610,18 @@ export const TeamManagement: React.FC = () => {
         isOpen={showActivityLog}
         onClose={() => setShowActivityLog(false)}
       />
+
+      {/* 초대 링크 모달 */}
+      {inviteLinkData && (
+        <InviteLinkModal
+          isOpen={showInviteLinkModal}
+          onClose={() => {
+            setShowInviteLinkModal(false)
+            setInviteLinkData(null)
+          }}
+          inviteData={inviteLinkData}
+        />
+      )}
     </div>
   )
 }
