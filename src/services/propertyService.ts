@@ -14,6 +14,8 @@ import { ERROR_MESSAGES, DEFAULT_VALUES } from '@/constants/propertyConstants'
 export const getProperties = async (userId: string, filters?: SimplePropertyFilters) => {
   try {
     console.log('🔍 getProperties 시작 - userId:', userId)
+    // 개발 환경에서 필터 로깅
+    if (import.meta.env.DEV) console.log('Service getProperties 필터:', filters)
     
     // 사용자의 올바른 tenant_id 조회 (자동 복구 로직 포함)
     let { data: userProfile, error: userError } = await supabase
@@ -112,6 +114,11 @@ export const getProperties = async (userId: string, filters?: SimplePropertyFilt
     let transformedData = (data || []).map((item: PropertyDbRow) => {
       const parsedInfo = parseStructuredDescription(item.description || null)
       
+      // 개발 환경에서 매매가 데이터 확인
+      if (import.meta.env.DEV && item.transaction_type === '매매') {
+        console.log('Service DB 원본:', { title: item.title, price: item.price, type: typeof item.price })
+      }
+      
       // 로컬 저장소에서 상태 확인 (호환성 유지)
       const statusKey = `property_status_${item.id}`
       const savedStatus = localStorage.getItem(statusKey)
@@ -119,6 +126,11 @@ export const getProperties = async (userId: string, filters?: SimplePropertyFilt
       
       const property = transformDbRowToProperty(item, parsedInfo)
       property.status = assignedStatus as any
+      
+      // 개발 환경에서 변환 후 데이터 확인
+      if (import.meta.env.DEV && property.transaction_type === '매매') {
+        console.log('Service 변환 후:', { title: property.title, price: property.price, type: typeof property.price })
+      }
       
       return property
     })
@@ -259,6 +271,11 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       description: structuredDescription || null
     }
 
+    // 개발 환경에서 DB 저장 데이터 확인
+    if (import.meta.env.DEV && dbData.transaction_type === '매매') {
+      console.log('Service DB 저장:', { title: dbData.title, price: dbData.price, type: typeof dbData.price })
+    }
+
     
     const { data, error } = await supabase
       .from('properties')
@@ -274,12 +291,22 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       console.error('❌ 에러 힌트:', error.hint)
       throw new Error(`${ERROR_MESSAGES.DATABASE_ERROR}: ${error.message}`)
     }
+
+    // 개발 환경에서 DB 저장 결과 확인
+    if (import.meta.env.DEV && data.transaction_type === '매매') {
+      console.log('Service DB 결과:', { title: data.title, price: data.price, type: typeof data.price })
+    }
     
 
     const parsedInfo = parseStructuredDescription(data.description)
     const transformedData = transformDbRowToProperty(data as PropertyDbRow, parsedInfo)
     transformedData.status = propertyData.status as any || DEFAULT_VALUES.PROPERTY_STATUS as any
     transformedData.updated_at = data.updated_at
+
+    // 개발 환경에서 최종 결과 확인
+    if (import.meta.env.DEV && transformedData.transaction_type === '매매') {
+      console.log('Service 최종 결과:', { title: transformedData.title, price: transformedData.price, type: typeof transformedData.price })
+    }
 
     return transformedData
   } catch (error) {

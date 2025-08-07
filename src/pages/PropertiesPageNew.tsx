@@ -127,6 +127,10 @@ const PropertiesPageNew: React.FC = () => {
   const handleCreateProperty = async (data: CreatePropertyData) => {
     console.log('🏠 PropertiesPageNew.handleCreateProperty 시작')
     console.log('📊 받은 데이터:', data)
+    // 개발 환경에서만 데이터 확인
+    if (import.meta.env.DEV && data.transaction_type === '매매') {
+      console.log('Page 매매가 데이터:', { price: data.price, type: typeof data.price })
+    }
     console.log('👤 현재 사용자:', { user: user?.id, tenant: tenant?.id })
     
     try {
@@ -136,6 +140,10 @@ const PropertiesPageNew: React.FC = () => {
       console.log('📞 createProperty 훅 호출 중...')
       const result = await createProperty(data)
       console.log('✅ createProperty 성공:', result)
+      // 저장 후 결과 확인
+      if (import.meta.env.DEV && result.transaction_type === '매매') {
+        console.log('Page 저장 결과:', { id: result.id, price: result.price })
+      }
       
       console.log('🔄 매물 목록 새로고침...')
       // 폼이 닫히고 목록이 자동으로 새로고침됩니다

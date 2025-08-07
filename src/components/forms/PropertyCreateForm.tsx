@@ -166,6 +166,10 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     
     try {
       console.log('📡 onSubmit 함수 호출 중...')
+      // 매매가 데이터 확인 (개발 환경에서만)
+      if (import.meta.env.DEV && formData.transaction_type === '매매') {
+        console.log('Form 매매가 데이터:', { price: formData.price, type: typeof formData.price })
+      }
       await onSubmit(formData)
       console.log('✅ 매물 등록 성공!')
       

@@ -142,40 +142,25 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
     bathrooms: item.bathrooms,
     price: item.price ? (() => {
       const parsed = parseFloat(String(item.price))
-      if (item.title?.includes('한솔')) {
-        console.log('🔍 한솔 아파트 price 변환:', {
-          title: item.title,
-          originalPrice: item.price,
-          originalType: typeof item.price,
-          parsedPrice: parsed,
-          parsedType: typeof parsed
-        })
+      // 개발 환경에서 가격 변환 추적
+      if (import.meta.env.DEV && parsed && parsed >= 10000) {
+        console.log('Price 변환:', { title: item.title, original: item.price, parsed })
       }
       return parsed
     })() : undefined,
     deposit: item.deposit ? (() => {
       const parsed = parseFloat(String(item.deposit))
-      if (item.title?.includes('한솔')) {
-        console.log('🔍 한솔 아파트 deposit 변환:', {
-          title: item.title,
-          originalDeposit: item.deposit,
-          originalType: typeof item.deposit,
-          parsedDeposit: parsed,
-          parsedType: typeof parsed
-        })
+      // 개발 환경에서 보증금 변환 추적
+      if (import.meta.env.DEV && parsed && parsed >= 1000) {
+        console.log('Deposit 변환:', { title: item.title, original: item.deposit, parsed })
       }
       return parsed
     })() : undefined,
     monthly_rent: item.monthly_rent ? (() => {
       const parsed = parseFloat(String(item.monthly_rent))
-      if (item.title?.includes('한솔')) {
-        console.log('🔍 한솔 아파트 monthly_rent 변환:', {
-          title: item.title,
-          originalMonthlyRent: item.monthly_rent,
-          originalType: typeof item.monthly_rent,
-          parsedMonthlyRent: parsed,
-          parsedType: typeof parsed
-        })
+      // 개발 환경에서 월세 변환 추적
+      if (import.meta.env.DEV && parsed && parsed >= 10) {
+        console.log('Monthly rent 변환:', { title: item.title, original: item.monthly_rent, parsed })
       }
       return parsed
     })() : undefined,
