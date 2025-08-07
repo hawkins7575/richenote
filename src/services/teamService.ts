@@ -41,6 +41,13 @@ export interface AddExistingMemberData {
   role: 'admin' | 'member' | 'viewer'
 }
 
+export interface UpdateMemberData {
+  name?: string
+  email?: string
+  phone?: string
+  company?: string
+}
+
 // 팀 멤버 목록 조회
 export const getTeamMembers = async (userId: string) => {
   try {
@@ -483,6 +490,168 @@ export const searchUsers = async (query: string, currentUserId: string) => {
     return users || []
   } catch (error) {
     console.error('사용자 검색 실패:', error)
+    throw error
+  }
+}
+
+// 팀원 정보 업데이트
+export const updateMemberInfo = async (userId: string, memberId: string, updateData: UpdateMemberData) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner 또는 admin만 다른 멤버 정보 수정 가능, 본인은 언제나 가능)
+    if (userId !== memberId && userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('팀원 정보를 수정할 권한이 없습니다.')
+    }
+
+    // 멤버 정보 업데이트
+    const { data: updatedMember, error: updateError } = await supabase
+      .from('user_profiles')
+      .update(updateData)
+      .eq('id', memberId)
+      .eq('tenant_id', userProfile.tenant_id)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+
+    // 활동 로그 기록 (본인이 아닌 경우에만)
+    if (userId !== memberId) {
+      await supabase
+        .from('team_activity_logs')
+        .insert({
+          tenant_id: userProfile.tenant_id,
+          user_id: userId,
+          action: 'member_info_updated',
+          details: {
+            target_user_id: memberId,
+            updated_fields: Object.keys(updateData)
+          }
+        })
+    }
+
+    return updatedMember
+  } catch (error) {
+    console.error('멤버 정보 업데이트 실패:', error)
+    throw error
+  }
+}
+
+// 팀원 상태 변경 (활성/비활성/정지)
+export const updateMemberStatus = async (userId: string, memberId: string, newStatus: TeamMember['status']) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner 또는 admin만 상태 변경 가능)
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('팀원 상태를 변경할 권한이 없습니다.')
+    }
+
+    // 자기 자신의 상태는 변경할 수 없음
+    if (userId === memberId) {
+      throw new Error('자신의 상태는 변경할 수 없습니다.')
+    }
+
+    // 멤버 상태 업데이트
+    const { data: updatedMember, error: updateError } = await supabase
+      .from('user_profiles')
+      .update({ status: newStatus })
+      .eq('id', memberId)
+      .eq('tenant_id', userProfile.tenant_id)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+
+    // 활동 로그 기록
+    await supabase
+      .from('team_activity_logs')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        user_id: userId,
+        action: 'member_status_changed',
+        details: {
+          target_user_id: memberId,
+          new_status: newStatus
+        }
+      })
+
+    return updatedMember
+  } catch (error) {
+    console.error('멤버 상태 변경 실패:', error)
+    throw error
+  }
+}
+
+// 팀 활동 로그 조회
+export const getTeamActivityLogs = async (userId: string, limit: number = 50) => {
+  try {
+    // 사용자의 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner 또는 admin만 활동 로그 조회 가능)
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('활동 로그를 조회할 권한이 없습니다.')
+    }
+
+    // 활동 로그 조회
+    const { data: logs, error } = await supabase
+      .from('team_activity_logs')
+      .select(`
+        id,
+        action,
+        details,
+        created_at,
+        user_id
+      `)
+      .eq('tenant_id', userProfile.tenant_id)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+
+    // 사용자 이름들을 별도로 가져오기
+    if (logs && logs.length > 0) {
+      const userIds = [...new Set(logs.map(log => log.user_id))]
+      const { data: users } = await supabase
+        .from('user_profiles')
+        .select('id, name')
+        .in('id', userIds)
+      
+      const userMap = users?.reduce((acc, user) => {
+        acc[user.id] = user.name
+        return acc
+      }, {} as Record<string, string>) || {}
+
+      return logs.map(log => ({
+        ...log,
+        user_name: userMap[log.user_id] || '알 수 없는 사용자'
+      }))
+    }
+
+    return []
+  } catch (error) {
+    console.error('팀 활동 로그 조회 실패:', error)
     throw error
   }
 }

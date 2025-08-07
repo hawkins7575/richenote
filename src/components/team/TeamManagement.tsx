@@ -13,12 +13,17 @@ import {
   User,
   Eye,
   Trash2,
-  X
+  X,
+  Edit,
+  Activity,
+  MoreVertical
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import * as teamService from '@/services/teamService'
 import type { TeamMember, TeamInvitation, UserSearchResult } from '@/types/team'
 import { ROLE_LABELS, STATUS_LABELS, INVITATION_STATUS_LABELS } from '@/types/team'
+import { MemberEditModal } from './MemberEditModal'
+import { TeamActivityLog } from './TeamActivityLog'
 
 export const TeamManagement: React.FC = () => {
   const { user } = useAuth()
@@ -40,6 +45,12 @@ export const TeamManagement: React.FC = () => {
   const [memberRole, setMemberRole] = useState<'admin' | 'member' | 'viewer'>('member')
 
   const [actionLoading, setActionLoading] = useState(false)
+  
+  // 새로운 모달 상태
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showActivityLog, setShowActivityLog] = useState(false)
+  const [memberMenuOpen, setMemberMenuOpen] = useState<string | null>(null)
 
   // 현재 사용자의 역할 확인
   const currentUserRole = members.find(m => m.id === user?.id)?.role
@@ -49,6 +60,17 @@ export const TeamManagement: React.FC = () => {
       loadTeamData()
     }
   }, [user?.id])
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setMemberMenuOpen(null)
+    }
+    
+    if (memberMenuOpen) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [memberMenuOpen])
 
   const loadTeamData = async () => {
     try {
@@ -174,6 +196,27 @@ export const TeamManagement: React.FC = () => {
     setMemberRole('member')
   }
 
+  const handleEditMember = (member: TeamMember) => {
+    setSelectedMember(member)
+    setShowEditModal(true)
+    setMemberMenuOpen(null)
+  }
+
+  const handleMemberInfoUpdate = async (memberId: string, updateData: any) => {
+    await teamService.updateMemberInfo(user!.id, memberId, updateData)
+    loadTeamData()
+  }
+
+  const handleMemberRoleChange = async (memberId: string, newRole: TeamMember['role']) => {
+    await teamService.updateMemberRole(user!.id, memberId, newRole)
+    loadTeamData()
+  }
+
+  const handleMemberStatusChange = async (memberId: string, newStatus: TeamMember['status']) => {
+    await teamService.updateMemberStatus(user!.id, memberId, newStatus)
+    loadTeamData()
+  }
+
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'owner': return <Crown className="w-4 h-4 text-yellow-500" />
@@ -213,13 +256,22 @@ export const TeamManagement: React.FC = () => {
             </div>
             
             {canManageTeam && (
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>팀원 초대</span>
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setShowActivityLog(true)}
+                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>활동 로그</span>
+                </button>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>팀원 초대</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -263,15 +315,43 @@ export const TeamManagement: React.FC = () => {
                     {STATUS_LABELS[member.status]}
                   </span>
                   
-                  {canManageTeam && member.role !== 'owner' && member.id !== user?.id && (
+                  {/* 멤버 메뉴 */}
+                  <div className="relative">
                     <button
-                      onClick={() => handleRemoveMember(member.id, member.name)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="팀에서 제거"
+                      onClick={() => setMemberMenuOpen(memberMenuOpen === member.id ? null : member.id)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="멤버 관리"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <MoreVertical className="w-4 h-4" />
                     </button>
-                  )}
+                    
+                    {memberMenuOpen === member.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleEditMember(member)}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                          >
+                            <Edit className="w-4 h-4" />
+                            <span>정보 수정</span>
+                          </button>
+                          
+                          {canManageTeam && member.role !== 'owner' && member.id !== user?.id && (
+                            <>
+                              <div className="border-t border-gray-100"></div>
+                              <button
+                                onClick={() => handleRemoveMember(member.id, member.name)}
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span>팀에서 제거</span>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -497,6 +577,29 @@ export const TeamManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 멤버 편집 모달 */}
+      {selectedMember && (
+        <MemberEditModal
+          member={selectedMember}
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false)
+            setSelectedMember(null)
+          }}
+          onUpdate={handleMemberInfoUpdate}
+          onRoleChange={handleMemberRoleChange}
+          onStatusChange={handleMemberStatusChange}
+          currentUserRole={currentUserRole || 'viewer'}
+          canEdit={canManageTeam || selectedMember.id === user?.id}
+        />
+      )}
+
+      {/* 팀 활동 로그 */}
+      <TeamActivityLog
+        isOpen={showActivityLog}
+        onClose={() => setShowActivityLog(false)}
+      />
     </div>
   )
 }
