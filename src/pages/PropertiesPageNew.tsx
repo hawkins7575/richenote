@@ -13,6 +13,7 @@ import { PropertyDetailModal } from '@/components/property/PropertyDetailModal'
 import { useProperties } from '@/hooks/useProperties'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { formatPrice } from '@/utils/propertyUtils'
 import type { SimplePropertyFilters, Property, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 const PropertiesPageNew: React.FC = () => {
@@ -102,16 +103,6 @@ const PropertiesPageNew: React.FC = () => {
     { value: '거래완료', label: '거래완료' },
   ]
 
-  const formatPrice = (property: Property) => {
-    if (property.transaction_type === '매매' && property.price) {
-      return `${(property.price/10000).toFixed(0)}억 ${(property.price%10000/1000).toFixed(0)}천만원`
-    } else if (property.transaction_type === '전세' && property.deposit) {
-      return `${(property.deposit/10000).toFixed(0)}억 ${(property.deposit%10000/1000).toFixed(0)}천만원`
-    } else if (property.transaction_type === '월세' && property.deposit && property.monthly_rent) {
-      return `${property.deposit.toLocaleString()}/${property.monthly_rent}만원`
-    }
-    return '가격 정보 없음'
-  }
 
 
   const handleDeleteProperty = async () => {
@@ -363,7 +354,6 @@ const PropertiesPageNew: React.FC = () => {
         <PropertyList
           properties={properties}
           onView={(property) => setDetailModalProperty(property)}
-          formatPrice={formatPrice}
         />
       )}
 
@@ -445,13 +435,11 @@ const PropertiesPageNew: React.FC = () => {
 interface PropertyListProps {
   properties: Property[]
   onView: (property: Property) => void
-  formatPrice: (property: Property) => string
 }
 
 const PropertyList: React.FC<PropertyListProps> = ({ 
   properties, 
-  onView,
-  formatPrice 
+  onView
 }) => {
   return (
     <Card>
