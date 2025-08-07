@@ -29,17 +29,14 @@ export const extractNeighborhood = (address: string): string => {
 export const formatPrice = (property: Property): string => {
   const { transaction_type, price, deposit, monthly_rent, title } = property
   
-  // 한솔 아파트 디버깅
-  if (title?.includes('한솔')) {
-    console.log('🔍 한솔 아파트 가격 포맷팅:', {
+  // 매매가 디버깅 (모든 매물)
+  if (transaction_type === '매매') {
+    console.log('🔍 매매가 가격 포맷팅:', {
       title,
       transaction_type,
       price,
-      deposit,
-      monthly_rent,
       priceType: typeof price,
-      depositType: typeof deposit,
-      monthlyRentType: typeof monthly_rent
+      result: price ? `${formatMoney(price)}` : '가격 협의'
     })
   }
   
@@ -67,13 +64,15 @@ export const formatPrice = (property: Property): string => {
  * 금액을 억/만원 단위로 포맷팅
  */
 export const formatMoney = (amount: number): string => {
-  // 한솔 아파트 관련 디버깅 (amount로만 판단)
-  if (amount === 35000 || amount === 21000 || amount === 65) {
-    console.log('💰 formatMoney 디버깅:', {
+  // 매매가 관련 디버깅 (고액 매매가 추적)
+  if (amount >= 10000) {
+    console.log('💰 formatMoney 매매가 디버깅:', {
       amount,
       type: typeof amount,
-      formatted: amount >= 10000 ? 
-        `${Math.floor(amount / 10000)}억${amount % 10000 !== 0 ? ` ${(amount % 10000).toLocaleString()}만원` : ''}` :
+      eok: Math.floor(amount / 10000),
+      man: amount % 10000,
+      결과: amount >= 10000 ? 
+        (amount % 10000 === 0 ? `${Math.floor(amount / 10000)}억` : `${Math.floor(amount / 10000)}억 ${(amount % 10000).toLocaleString()}만원`) :
         `${amount.toLocaleString()}만원`
     })
   }

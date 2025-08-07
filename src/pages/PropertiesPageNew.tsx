@@ -448,9 +448,9 @@ const PropertyList: React.FC<PropertyListProps> = ({
         <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-700">
           <div className="col-span-1">거래유형</div>
           <div className="col-span-3">매물정보</div>
-          <div className="col-span-2">가격정보</div>
+          <div className="col-span-3">가격정보</div>
           <div className="col-span-2">임대인정보</div>
-          <div className="col-span-2">퇴실예정일</div>
+          <div className="col-span-1">퇴실예정일</div>
           <div className="col-span-2">추가정보</div>
         </div>
       </div>
@@ -499,8 +499,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
                 </div>
 
                 {/* 가격정보 */}
-                <div className="col-span-2">
-                  <div className="font-bold text-gray-900 text-sm">
+                <div className="col-span-3">
+                  <div className="font-bold text-gray-900 text-sm break-words">
                     {formatPrice(property)}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
@@ -523,7 +523,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
                 </div>
 
                 {/* 퇴실예정일 */}
-                <div className="col-span-2">
+                <div className="col-span-1">
                   {property.exit_date ? (
                     <div className="text-xs">
                       <div className="font-medium text-gray-700">
