@@ -11,12 +11,31 @@
     <title>리체 매물장 - 부동산 매물관리 시스템</title>
     <meta name="description" content="리체 부동산 전용 매물관리 플랫폼" />
     
-    <!-- 카카오톡 메타 태그 -->
+    <!-- Open Graph 메타 태그 (카카오톡, 페이스북 등) -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="리체 매물장 - 부동산 매물관리" />
     <meta property="og:description" content="리체 부동산 전용 매물관리 플랫폼" />
-    <meta property="og:image" content="/icon-512.svg" />
-    <meta property="og:url" content="https://propertydesk-saas-ncio1y8tv-daesung75-6440s-projects.vercel.app" />
+    <meta property="og:image" content="https://summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app/icon-512.svg" />
+    <meta property="og:url" content="https://summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app" />
+    <meta property="og:site_name" content="리체 매물장" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card 메타 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="리체 매물장 - 부동산 매물관리" />
+    <meta name="twitter:description" content="리체 부동산 전용 매물관리 플랫폼" />
+    <meta name="twitter:image" content="https://summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app/icon-512.svg" />
+    
+    <!-- 카카오톡 특화 메타 태그 -->
+    <meta property="kakao:card" content="summary" />
+    <meta property="kakao:title" content="리체 매물장 - 부동산 매물관리" />
+    <meta property="kakao:description" content="리체 부동산 전용 매물관리 플랫폼" />
+    <meta property="kakao:image" content="https://summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app/icon-512.svg" />
+    
+    <!-- 링크 캐시 방지 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     
     <!-- 모바일 최적화 -->
     <meta name="format-detection" content="telephone=no" />
@@ -75,24 +94,47 @@
       (function() {
         var userAgent = navigator.userAgent || navigator.vendor || window.opera;
         var isKakaoTalk = /KAKAOTALK/i.test(userAgent);
+        var isLine = /Line/i.test(userAgent);
+        var isInAppBrowser = isKakaoTalk || isLine;
         var currentUrl = window.location.href;
         
         console.log('🔍 User Agent:', userAgent);
         console.log('📱 KakaoTalk 감지:', isKakaoTalk);
+        console.log('📱 Line 감지:', isLine);
+        console.log('📱 인앱 브라우저:', isInAppBrowser);
         
-        if (isKakaoTalk) {
-          console.log('🟡 카카오톡 인앱 브라우저에서 접속됨');
+        // URL이 올바른 도메인인지 확인
+        var correctDomain = 'summi3-2mk8sy7pu-daesung75-6440s-projects.vercel.app';
+        var isCorrectDomain = window.location.hostname === correctDomain;
+        
+        console.log('🌐 현재 도메인:', window.location.hostname);
+        console.log('✅ 올바른 도메인:', isCorrectDomain);
+        
+        // 잘못된 도메인에서 접속한 경우 올바른 도메인으로 리다이렉트
+        if (!isCorrectDomain && window.location.hostname.includes('vercel.app')) {
+          console.log('🔄 올바른 도메인으로 리다이렉트');
+          var correctUrl = 'https://' + correctDomain + window.location.pathname + window.location.search;
+          window.location.replace(correctUrl);
+          return;
+        }
+        
+        if (isInAppBrowser) {
+          var browserName = isKakaoTalk ? '카카오톡' : '라인';
+          console.log('🟡 ' + browserName + ' 인앱 브라우저에서 접속됨');
           
-          // 카카오톡 인앱 브라우저에서 외부 브라우저로 안내
-          var openInBrowser = confirm('이 앱은 외부 브라우저에서 더 잘 작동합니다.\n외부 브라우저로 여시겠습니까?');
-          
-          if (openInBrowser) {
-            // 카카오톡에서 외부 브라우저로 열기 시도
-            window.open(currentUrl, '_blank');
-          } else {
-            // 사용자가 거부한 경우에도 일단 앱 로딩 시도
-            console.log('✅ 카카오톡 인앱 브라우저에서 계속 진행');
-          }
+          // 3초 후에 외부 브라우저 안내 (너무 즉시 뜨면 사용자 경험이 안좋음)
+          setTimeout(function() {
+            var openInBrowser = confirm('이 앱은 외부 브라우저(Safari, Chrome)에서 더 잘 작동합니다.\n외부 브라우저로 여시겠습니까?');
+            
+            if (openInBrowser) {
+              // 외부 브라우저로 열기 시도
+              if (isKakaoTalk) {
+                window.open('https://www.google.com/url?q=' + encodeURIComponent(currentUrl), '_blank');
+              } else {
+                window.open(currentUrl, '_blank');
+              }
+            }
+          }, 3000);
         } else {
           console.log('✅ 일반 브라우저에서 접속됨');
         }
