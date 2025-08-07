@@ -36,6 +36,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- 카카오톡 크롤러 강제 새로고침 -->
+    <meta property="og:updated_time" content="2024-12-19T12:00:00Z" />
+    <meta name="last-modified" content="2024-12-19T12:00:00Z" />
     
     <!-- 모바일 최적화 -->
     <meta name="format-detection" content="telephone=no" />
@@ -113,6 +118,27 @@
         // 잘못된 도메인에서 접속한 경우 올바른 도메인으로 리다이렉트
         if (!isCorrectDomain && window.location.hostname.includes('vercel.app')) {
           console.log('🔄 올바른 도메인으로 리다이렉트');
+          var correctUrl = 'https://' + correctDomain + window.location.pathname + window.location.search;
+          console.log('🔄 리다이렉트 대상:', correctUrl);
+          
+          // 즉시 리다이렉트 (history.replace로 뒤로가기 버튼 문제 방지)
+          window.location.replace(correctUrl);
+          return;
+        }
+        
+        // 카카오톡에서 잘못된 URL로 접속한 경우를 위한 추가 체크
+        var wrongPatterns = [
+          'propertydesk-saas',
+          'richey-property',
+          'property-manager'
+        ];
+        
+        var hasWrongPattern = wrongPatterns.some(function(pattern) {
+          return window.location.hostname.includes(pattern);
+        });
+        
+        if (hasWrongPattern) {
+          console.log('🔄 잘못된 패턴 감지, 올바른 도메인으로 리다이렉트');
           var correctUrl = 'https://' + correctDomain + window.location.pathname + window.location.search;
           window.location.replace(correctUrl);
           return;

@@ -1,0 +1,12 @@
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache  
+  Expires: 0
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+
+# Open Graph and Social Media Headers
+/*
+  # Force refresh of social media crawlers
+  og:updated_time: {{ timestamp }}
