@@ -45,6 +45,18 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
   if (statusMatch) {
     parsedStatus = statusMatch[1].trim()
     cleanDescription = cleanDescription.replace(statusMatch[0], '').trim()
+    // 개발 환경에서 상태 파싱 확인
+    if (import.meta.env.DEV) {
+      console.log('📄 상태 파싱 성공:', { 
+        원본: statusMatch[0], 
+        파싱된상태: parsedStatus 
+      })
+    }
+  } else {
+    // 상태 정보가 없는 경우 기본값 사용
+    if (import.meta.env.DEV) {
+      console.log('📄 상태 정보 없음 - 기본값 사용:', DEFAULT_VALUES.PROPERTY_STATUS)
+    }
   }
 
   // 임대인 정보 파싱

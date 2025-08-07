@@ -119,13 +119,18 @@ export const getProperties = async (userId: string, filters?: SimplePropertyFilt
         console.log('Service DB 원본:', { title: item.title, price: item.price, type: typeof item.price })
       }
       
-      // 로컬 저장소에서 상태 확인 (호환성 유지)
-      const statusKey = `property_status_${item.id}`
-      const savedStatus = localStorage.getItem(statusKey)
-      const assignedStatus = savedStatus || parsedInfo.status || DEFAULT_VALUES.PROPERTY_STATUS
-      
+      // 구조화된 description에서 파싱된 상태 사용 (로컬 저장소 제거)
       const property = transformDbRowToProperty(item, parsedInfo)
-      property.status = assignedStatus as any
+      
+      // 개발 환경에서 상태 파싱 결과 확인
+      if (import.meta.env.DEV) {
+        console.log('🔍 상태 파싱 결과:', { 
+          title: item.title,
+          rawDescription: item.description, 
+          parsedStatus: parsedInfo.status,
+          finalStatus: property.status 
+        })
+      }
       
       // 개발 환경에서 변환 후 데이터 확인
       if (import.meta.env.DEV && property.transaction_type === '매매') {
@@ -250,6 +255,12 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     if (propertyData.detailed_address) {
       const addressInfo = `[상세주소] ${propertyData.detailed_address}`
       structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + addressInfo
+    }
+    
+    // 매물 상태 정보 추가
+    if (propertyData.status) {
+      const statusInfo = `[상태] ${propertyData.status}`
+      structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + statusInfo
     }
     
     // 실제 DB에 존재하는 컬럼만 사용 - 올바른 tenant_id 사용

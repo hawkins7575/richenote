@@ -66,6 +66,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInputChange = useCallback((field: keyof CreatePropertyData, value: any) => {
+    // 개발 환경에서 상태 변경 디버깅
+    if (import.meta.env.DEV && field === 'status') {
+      console.log('매물 상태 변경:', { 이전값: formData.status, 새값: value })
+    }
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -78,7 +83,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         [field]: undefined
       }))
     }
-  }, [errors])
+  }, [errors, formData.status])
 
   // 메모이제이션된 옵션들
   const propertyTypeOptions = useMemo(() => 
@@ -166,9 +171,13 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     
     try {
       console.log('📡 onSubmit 함수 호출 중...')
-      // 매매가 데이터 확인 (개발 환경에서만)
-      if (import.meta.env.DEV && formData.transaction_type === '매매') {
-        console.log('Form 매매가 데이터:', { price: formData.price, type: typeof formData.price })
+      // 매매가 및 상태 데이터 확인 (개발 환경에서만)
+      if (import.meta.env.DEV) {
+        console.log('Form 제출 데이터:', { 
+          status: formData.status, 
+          transaction_type: formData.transaction_type,
+          price: formData.price 
+        })
       }
       await onSubmit(formData)
       console.log('✅ 매물 등록 성공!')
