@@ -481,11 +481,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
                   </Badge>
                   <div className="mt-1">
                     <Badge size="sm" variant={
-                      property.status === '판매중' ? 'success' : 
-                      property.status === '예약중' ? 'warning' : 
-                      property.status === '거래완료' ? 'default' :
-                      property.status === '임시보관' ? 'secondary' :
-                      property.status === '만료됨' ? 'danger' : 'default'
+                      property.status === '거래중' ? 'success' : 
+                      property.status === '거래완료' ? 'default' : 'default'
                     }>
                       {property.status}
                     </Badge>
@@ -574,11 +571,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
                       {property.transaction_type}
                     </Badge>
                     <Badge size="sm" variant={
-                      property.status === '판매중' ? 'success' : 
-                      property.status === '예약중' ? 'warning' : 
-                      property.status === '거래완료' ? 'default' :
-                      property.status === '임시보관' ? 'secondary' :
-                      property.status === '만료됨' ? 'danger' : 'default'
+                      property.status === '거래중' ? 'success' : 
+                      property.status === '거래완료' ? 'default' : 'default'
                     }>
                       {property.status}
                     </Badge>

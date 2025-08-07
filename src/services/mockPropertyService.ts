@@ -13,7 +13,7 @@ let mockProperties: Property[] = [
     title: '강남구 신사동 럭셔리 아파트',
     type: '아파트',
     transaction_type: '매매',
-    status: '판매중',
+    status: '거래중',
     price: 350000,
     deposit: undefined,
     monthly_rent: undefined,
@@ -80,7 +80,7 @@ let mockProperties: Property[] = [
     title: '경기도 성남시 분당구 정자동',
     type: '아파트',
     transaction_type: '전세',
-    status: '예약중',
+    status: '거래중',
     price: undefined,
     deposit: 210000,
     monthly_rent: undefined,
@@ -128,7 +128,7 @@ let mockProperties: Property[] = [
     title: '홍대 신축 오피스텔',
     type: '오피스텔',
     transaction_type: '월세',
-    status: '판매중',
+    status: '거래중',
     price: undefined,
     deposit: 10000,
     monthly_rent: 65,
@@ -231,7 +231,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     title: propertyData.title,
     type: propertyData.type,
     transaction_type: propertyData.transaction_type,
-    status: propertyData.status || '판매중',
+    status: propertyData.status || '거래중',
     price: propertyData.price,
     deposit: propertyData.deposit,
     monthly_rent: propertyData.monthly_rent,
@@ -347,8 +347,8 @@ export const getPropertyStats = async (tenantId: string) => {
   
   const stats = {
     total: properties.length,
-    active: properties.filter(p => p.status === '판매중').length,
-    reserved: properties.filter(p => p.status === '예약중').length,
+    active: properties.filter(p => p.status === '거래중').length,
+    reserved: 0,
     sold: properties.filter(p => p.status === '거래완료').length,
     this_month: properties.filter(p => {
       const created = new Date(p.created_at)
