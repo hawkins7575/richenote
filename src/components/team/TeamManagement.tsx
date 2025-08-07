@@ -325,12 +325,32 @@ export const TeamManagement: React.FC = () => {
                     {STATUS_LABELS[member.status]}
                   </span>
                   
-                  {/* 멤버 메뉴 */}
+                  {/* 수정 버튼 */}
+                  <button
+                    onClick={() => handleEditMember(member)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="정보 수정"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  
+                  {/* 삭제 버튼 */}
+                  {canManageTeam && member.role !== 'owner' && member.id !== user?.id && (
+                    <button
+                      onClick={() => handleRemoveMember(member.id, member.name)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="팀에서 제거"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  
+                  {/* 더보기 메뉴 (필요시) */}
                   <div className="relative">
                     <button
                       onClick={() => setMemberMenuOpen(memberMenuOpen === member.id ? null : member.id)}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                      title="멤버 관리"
+                      title="추가 옵션"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
@@ -339,25 +359,16 @@ export const TeamManagement: React.FC = () => {
                       <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                         <div className="py-1">
                           <button
-                            onClick={() => handleEditMember(member)}
+                            onClick={() => {
+                              // 추가 기능이 필요한 경우 여기에 구현
+                              setMemberMenuOpen(null)
+                              alert('추가 기능은 준비 중입니다.')
+                            }}
                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                           >
-                            <Edit className="w-4 h-4" />
-                            <span>정보 수정</span>
+                            <MoreVertical className="w-4 h-4" />
+                            <span>추가 옵션</span>
                           </button>
-                          
-                          {canManageTeam && member.role !== 'owner' && member.id !== user?.id && (
-                            <>
-                              <div className="border-t border-gray-100"></div>
-                              <button
-                                onClick={() => handleRemoveMember(member.id, member.name)}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                <span>팀에서 제거</span>
-                              </button>
-                            </>
-                          )}
                         </div>
                       </div>
                     )}
@@ -443,29 +454,43 @@ export const TeamManagement: React.FC = () => {
             <div className="px-6 py-4 space-y-4">
               {/* 초대 방식 선택 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">초대 방식</label>
-                <div className="flex space-x-4">
-                  <label className="flex items-center">
+                <label className="block text-sm font-medium text-gray-700 mb-3">초대 방식 선택</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                    inviteType === 'email' 
+                      ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}>
                     <input
                       type="radio"
                       name="inviteType"
                       value="email"
                       checked={inviteType === 'email'}
                       onChange={(e) => setInviteType(e.target.value as 'email')}
-                      className="mr-2"
+                      className="mr-3"
                     />
-                    이메일 초대
+                    <div>
+                      <div className="font-medium">📧 이메일 초대</div>
+                      <div className="text-xs text-gray-600">새로운 사용자를 초대</div>
+                    </div>
                   </label>
-                  <label className="flex items-center">
+                  <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                    inviteType === 'existing' 
+                      ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}>
                     <input
                       type="radio"
                       name="inviteType"
                       value="existing"
                       checked={inviteType === 'existing'}
                       onChange={(e) => setInviteType(e.target.value as 'existing')}
-                      className="mr-2"
+                      className="mr-3"
                     />
-                    기존 회원 추가
+                    <div>
+                      <div className="font-medium">👥 기존 회원 추가</div>
+                      <div className="text-xs text-gray-600">이미 가입한 회원 검색</div>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -511,6 +536,16 @@ export const TeamManagement: React.FC = () => {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">회원 검색</label>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                      <div className="flex items-start space-x-2">
+                        <div className="text-blue-600 mt-0.5">💡</div>
+                        <div className="text-sm text-blue-800">
+                          <p className="font-medium">검색 방법:</p>
+                          <p>• 이름 또는 이메일을 2글자 이상 입력하세요</p>
+                          <p>• 검색 결과에서 원하는 회원을 클릭하세요</p>
+                        </div>
+                      </div>
+                    </div>
                     <div className="relative">
                       <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                       <input
@@ -520,7 +555,7 @@ export const TeamManagement: React.FC = () => {
                           setSearchQuery(e.target.value)
                           handleSearchUsers(e.target.value)
                         }}
-                        placeholder="이름 또는 이메일로 검색"
+                        placeholder="이름 또는 이메일로 검색 (2글자 이상 입력)"
                         className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
