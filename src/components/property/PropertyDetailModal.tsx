@@ -133,7 +133,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
         {/* 콘텐츠 - 모바일 최적화 */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 pb-safe">
+          <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 pb-safe pb-20">
             
             {/* 모바일: 세로 스택 레이아웃 */}
             <div className="lg:hidden space-y-3">
@@ -447,7 +447,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* 액션 버튼 섹션 - 모바일 최적화 */}
         <div className="border-t border-gray-200 bg-white">
           {/* 모바일: 세로 스택 레이아웃 */}
-          <div className="lg:hidden p-3 sm:p-4 pb-safe space-y-3 mb-4 sm:mb-6">
+          <div className="lg:hidden p-3 sm:p-4 pb-safe space-y-3 mb-20">
             
             {/* 액션 버튼들 */}
             <div className="grid grid-cols-3 gap-3">

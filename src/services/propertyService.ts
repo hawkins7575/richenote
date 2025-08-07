@@ -311,7 +311,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
 
     const parsedInfo = parseStructuredDescription(data.description)
     const transformedData = transformDbRowToProperty(data as PropertyDbRow, parsedInfo)
-    transformedData.status = propertyData.status as any || DEFAULT_VALUES.PROPERTY_STATUS as any
+    transformedData.status = parsedInfo.status || propertyData.status as any || DEFAULT_VALUES.PROPERTY_STATUS as any
     transformedData.updated_at = data.updated_at
 
     // 개발 환경에서 최종 결과 확인
@@ -366,6 +366,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       cleanDescription = cleanDescription.replace(/\[퇴실예정\][^\n\[]*/, '').trim()
       cleanDescription = cleanDescription.replace(/\[편의시설\][^\n\[]*/, '').trim()
       cleanDescription = cleanDescription.replace(/\[상세주소\][^\n\[]*/, '').trim()
+      cleanDescription = cleanDescription.replace(/\[상태\][^\n\[]*/, '').trim()
       cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
       
       return { cleanDescription }
@@ -407,6 +408,21 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + addressInfo
     }
     
+    // 매물 상태 정보 추가
+    if (propertyData.status) {
+      const statusInfo = `[상태] ${propertyData.status}`
+      newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + statusInfo
+      
+      // 개발 환경에서 상태 저장 확인
+      if (import.meta.env.DEV) {
+        console.log('🔄 매물 수정 - 상태 저장:', { 
+          매물ID: propertyId,
+          상태: propertyData.status,
+          구조화된설명: newStructuredDescription 
+        })
+      }
+    }
+    
     // 프론트엔드 데이터를 데이터베이스 스키마에 맞게 변환
     const dbData: any = {}
     
@@ -444,10 +460,10 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
 
     // description에서 구조화된 정보 파싱
     const parseStructuredDescription = (desc: string | null) => {
-      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '' }
+      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, status: undefined, cleanDescription: '' }
       
       let cleanDescription = desc
-      let landlord_name, landlord_phone, exit_date, detailed_address
+      let landlord_name, landlord_phone, exit_date, detailed_address, status
       let parking = false, elevator = false
       
       // 임대인 정보 파싱
@@ -486,10 +502,17 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
         cleanDescription = cleanDescription.replace(addressMatch[0], '').trim()
       }
       
+      // 상태 정보 파싱
+      const statusMatch = desc.match(/\[상태\]\s*([^\n\[]+)/)
+      if (statusMatch) {
+        status = statusMatch[1].trim()
+        cleanDescription = cleanDescription.replace(statusMatch[0], '').trim()
+      }
+      
       // 연속된 줄바꿈 정리
       cleanDescription = cleanDescription.replace(/\n\s*\n/g, '\n').trim()
       
-      return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, cleanDescription }
+      return { landlord_name, landlord_phone, exit_date, detailed_address, parking, elevator, status, cleanDescription }
     }
 
     const parsedInfo = parseStructuredDescription(data.description)
@@ -524,7 +547,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      status: propertyData.status || '판매중',
+      status: parsedInfo.status || propertyData.status || '판매중',
       options: [],
       inquiry_count: 0,
       is_urgent: false,

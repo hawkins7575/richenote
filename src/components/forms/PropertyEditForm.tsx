@@ -6,6 +6,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
 import type { Property, PropertyType, TransactionType, PropertyStatus, UpdatePropertyData } from '@/types'
+import { PROPERTY_STATUS_OPTIONS } from '@/constants/propertyConstants'
 
 interface PropertyEditFormProps {
   isOpen: boolean
@@ -23,9 +24,7 @@ const TRANSACTION_TYPES: TransactionType[] = [
   '매매', '전세', '월세', '단기임대'
 ]
 
-const PROPERTY_STATUS: PropertyStatus[] = [
-  '판매중', '예약중', '거래완료', '임시보관', '만료됨'
-]
+// 공통 상수에서 가져온 상태 옵션 사용
 
 export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
   isOpen,
@@ -68,6 +67,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
   }, [property, isOpen])
 
   const handleInputChange = useCallback((field: keyof UpdatePropertyData, value: any) => {
+    // 개발 환경에서 상태 변경 디버깅
+    if (import.meta.env.DEV && field === 'status') {
+      console.log('🔄 수정폼 매물 상태 변경:', { 
+        이전값: formData.status, 
+        새값: value,
+        매물제목: property.title 
+      })
+    }
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -80,7 +88,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         [field]: undefined
       }))
     }
-  }, [errors])
+  }, [errors, formData.status, property.title])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof UpdatePropertyData, string>> = {}
@@ -139,6 +147,16 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
     e.preventDefault()
     
     if (!validateForm() || isSubmitting) return
+
+    // 개발 환경에서 수정 데이터 확인
+    if (import.meta.env.DEV) {
+      console.log('🔄 매물 수정 제출:', { 
+        매물ID: property.id,
+        제목: formData.title,
+        상태: formData.status,
+        전체데이터: formData 
+      })
+    }
 
     setIsSubmitting(true)
     try {
@@ -402,7 +420,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   label="매물 상태"
                   value={formData.status || '판매중'}
                   onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
-                  options={PROPERTY_STATUS.map(status => ({ value: status, label: status }))}
+                  options={PROPERTY_STATUS_OPTIONS.map(status => ({ value: status, label: status }))}
                 />
               </div>
               
