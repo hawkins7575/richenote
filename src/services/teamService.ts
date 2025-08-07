@@ -1,0 +1,488 @@
+// ============================================================================
+// 팀 관리 서비스 - Supabase 통합
+// ============================================================================
+
+import { supabase } from './supabase'
+
+export interface TeamMember {
+  id: string
+  tenant_id: string
+  name: string
+  email?: string
+  phone?: string
+  role: 'owner' | 'admin' | 'member' | 'viewer'
+  status: 'active' | 'inactive' | 'suspended'
+  joined_at: string
+  invited_by?: string
+  company?: string
+}
+
+export interface TeamInvitation {
+  id: string
+  tenant_id: string
+  inviter_id: string
+  email: string
+  role: 'owner' | 'admin' | 'member' | 'viewer'
+  status: 'pending' | 'accepted' | 'declined' | 'expired'
+  invitation_token: string
+  expires_at: string
+  created_at: string
+  inviter_name?: string
+}
+
+export interface CreateInvitationData {
+  email: string
+  role: 'admin' | 'member' | 'viewer'
+  message?: string
+}
+
+export interface AddExistingMemberData {
+  user_id: string
+  role: 'admin' | 'member' | 'viewer'
+}
+
+// 팀 멤버 목록 조회
+export const getTeamMembers = async (userId: string) => {
+  try {
+    // 사용자의 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 팀 멤버들 조회 (이메일 포함)
+    const { data: members, error } = await supabase
+      .from('user_profiles')
+      .select(`
+        id,
+        tenant_id,
+        name,
+        email,
+        phone,
+        role,
+        status,
+        joined_at,
+        invited_by,
+        company
+      `)
+      .eq('tenant_id', userProfile.tenant_id)
+      .order('joined_at', { ascending: false })
+
+    if (error) throw error
+
+    return members || []
+  } catch (error) {
+    console.error('팀 멤버 조회 실패:', error)
+    throw error
+  }
+}
+
+// 팀 초대 목록 조회
+export const getTeamInvitations = async (userId: string) => {
+  try {
+    // 사용자의 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 팀 초대들 조회
+    const { data: invitations, error } = await supabase
+      .from('team_invitations')
+      .select(`
+        id,
+        tenant_id,
+        inviter_id,
+        email,
+        role,
+        status,
+        invitation_token,
+        expires_at,
+        created_at
+      `)
+      .eq('tenant_id', userProfile.tenant_id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    // 초대자 이름들을 별도로 가져오기
+    if (invitations && invitations.length > 0) {
+      const inviterIds = [...new Set(invitations.map(inv => inv.inviter_id))]
+      const { data: inviters } = await supabase
+        .from('user_profiles')
+        .select('id, name')
+        .in('id', inviterIds)
+      
+      const inviterMap = inviters?.reduce((acc, inviter) => {
+        acc[inviter.id] = inviter.name
+        return acc
+      }, {} as Record<string, string>) || {}
+
+      return invitations.map(inv => ({
+        ...inv,
+        inviter_name: inviterMap[inv.inviter_id] || '알 수 없는 사용자'
+      }))
+    }
+
+    return []
+  } catch (error) {
+    console.error('팀 초대 조회 실패:', error)
+    throw error
+  }
+}
+
+// 이메일로 팀원 초대
+export const inviteTeamMember = async (userId: string, invitationData: CreateInvitationData) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role, name')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner 또는 admin만 초대 가능)
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('팀원을 초대할 권한이 없습니다.')
+    }
+
+    // 이미 팀의 멤버인지 확인
+    const { data: existingMember } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('tenant_id', userProfile.tenant_id)
+      .eq('email', invitationData.email)
+      .single()
+
+    if (existingMember) {
+      throw new Error('이미 팀에 속한 회원입니다.')
+    }
+
+    // 이미 초대된 이메일인지 확인
+    const { data: existingInvitation } = await supabase
+      .from('team_invitations')
+      .select('id, status')
+      .eq('tenant_id', userProfile.tenant_id)
+      .eq('email', invitationData.email)
+      .eq('status', 'pending')
+      .single()
+
+    if (existingInvitation) {
+      throw new Error('이미 초대된 이메일입니다.')
+    }
+
+    // 새 초대 생성
+    const { data: invitation, error: inviteError } = await supabase
+      .from('team_invitations')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        inviter_id: userId,
+        email: invitationData.email,
+        role: invitationData.role,
+      })
+      .select()
+      .single()
+
+    if (inviteError) throw inviteError
+
+    // 활동 로그 기록
+    await supabase
+      .from('team_activity_logs')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        user_id: userId,
+        action: 'invited',
+        details: {
+          invited_email: invitationData.email,
+          role: invitationData.role,
+          message: invitationData.message
+        }
+      })
+
+    return invitation
+  } catch (error) {
+    console.error('팀원 초대 실패:', error)
+    throw error
+  }
+}
+
+// 기존 회원을 팀에 추가
+export const addExistingMember = async (userId: string, memberData: AddExistingMemberData) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('팀원을 추가할 권한이 없습니다.')
+    }
+
+    // 추가하려는 사용자가 존재하는지 확인
+    const { data: targetUser, error: targetError } = await supabase
+      .from('user_profiles')
+      .select('id, name, email, tenant_id')
+      .eq('id', memberData.user_id)
+      .single()
+
+    if (targetError) {
+      throw new Error('존재하지 않는 사용자입니다.')
+    }
+
+    // 이미 팀의 멤버인지 확인
+    if (targetUser.tenant_id === userProfile.tenant_id) {
+      throw new Error('이미 팀에 속한 회원입니다.')
+    }
+
+    // 다른 팀에 속해있는지 확인 (한 번에 하나의 팀만 가능)
+    if (targetUser.tenant_id) {
+      throw new Error('이미 다른 팀에 속한 회원입니다.')
+    }
+
+    // 팀에 추가
+    const { data: updatedMember, error: updateError } = await supabase
+      .from('user_profiles')
+      .update({
+        tenant_id: userProfile.tenant_id,
+        role: memberData.role,
+        invited_by: userId,
+        joined_at: new Date().toISOString()
+      })
+      .eq('id', memberData.user_id)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+
+    // 활동 로그 기록
+    await supabase
+      .from('team_activity_logs')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        user_id: userId,
+        action: 'member_added',
+        details: {
+          added_user_id: memberData.user_id,
+          added_user_name: targetUser.name,
+          role: memberData.role
+        }
+      })
+
+    return updatedMember
+  } catch (error) {
+    console.error('팀원 추가 실패:', error)
+    throw error
+  }
+}
+
+// 팀원 역할 변경
+export const updateMemberRole = async (userId: string, memberId: string, newRole: TeamMember['role']) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner만 역할 변경 가능, 또는 admin이 member/viewer 변경 가능)
+    if (userProfile.role !== 'owner' && 
+        !(userProfile.role === 'admin' && ['member', 'viewer'].includes(newRole))) {
+      throw new Error('역할을 변경할 권한이 없습니다.')
+    }
+
+    // 자기 자신의 역할은 변경할 수 없음
+    if (userId === memberId) {
+      throw new Error('자신의 역할은 변경할 수 없습니다.')
+    }
+
+    // 멤버 역할 업데이트
+    const { data: updatedMember, error: updateError } = await supabase
+      .from('user_profiles')
+      .update({ role: newRole })
+      .eq('id', memberId)
+      .eq('tenant_id', userProfile.tenant_id)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+
+    // 활동 로그 기록
+    await supabase
+      .from('team_activity_logs')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        user_id: userId,
+        action: 'role_changed',
+        details: {
+          target_user_id: memberId,
+          new_role: newRole
+        }
+      })
+
+    return updatedMember
+  } catch (error) {
+    console.error('멤버 역할 변경 실패:', error)
+    throw error
+  }
+}
+
+// 팀에서 멤버 제거
+export const removeMember = async (userId: string, memberId: string) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인 (owner 또는 admin만 제거 가능)
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('팀원을 제거할 권한이 없습니다.')
+    }
+
+    // 자기 자신은 제거할 수 없음
+    if (userId === memberId) {
+      throw new Error('자신을 팀에서 제거할 수 없습니다.')
+    }
+
+    // 제거할 멤버 정보 조회
+    const { data: memberToRemove, error: memberError } = await supabase
+      .from('user_profiles')
+      .select('name, role')
+      .eq('id', memberId)
+      .eq('tenant_id', userProfile.tenant_id)
+      .single()
+
+    if (memberError) {
+      throw new Error('팀에서 해당 멤버를 찾을 수 없습니다.')
+    }
+
+    // owner는 제거할 수 없음
+    if (memberToRemove.role === 'owner') {
+      throw new Error('팀 소유자는 제거할 수 없습니다.')
+    }
+
+    // 새 개인 테넌트 생성
+    const { data: newTenant, error: tenantError } = await supabase
+      .from('tenants')
+      .insert({
+        name: `${memberToRemove.name}의 부동산`
+      })
+      .select()
+      .single()
+
+    if (tenantError) throw tenantError
+
+    // 멤버를 새 테넌트로 이동
+    const { error: updateError } = await supabase
+      .from('user_profiles')
+      .update({
+        tenant_id: newTenant.id,
+        role: 'owner',
+        invited_by: null
+      })
+      .eq('id', memberId)
+
+    if (updateError) throw updateError
+
+    // 활동 로그 기록
+    await supabase
+      .from('team_activity_logs')
+      .insert({
+        tenant_id: userProfile.tenant_id,
+        user_id: userId,
+        action: 'member_removed',
+        details: {
+          removed_user_id: memberId,
+          removed_user_name: memberToRemove.name
+        }
+      })
+
+    return true
+  } catch (error) {
+    console.error('팀원 제거 실패:', error)
+    throw error
+  }
+}
+
+// 초대 취소
+export const cancelInvitation = async (userId: string, invitationId: string) => {
+  try {
+    // 사용자의 tenant_id와 권한 확인
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id, role')
+      .eq('id', userId)
+      .single()
+
+    if (userError) throw userError
+
+    // 권한 확인
+    if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+      throw new Error('초대를 취소할 권한이 없습니다.')
+    }
+
+    // 초대 삭제
+    const { error } = await supabase
+      .from('team_invitations')
+      .delete()
+      .eq('id', invitationId)
+      .eq('tenant_id', userProfile.tenant_id)
+
+    if (error) throw error
+
+    return true
+  } catch (error) {
+    console.error('초대 취소 실패:', error)
+    throw error
+  }
+}
+
+// 사용자 검색 (기존 회원 추가용)
+export const searchUsers = async (query: string, currentUserId: string) => {
+  try {
+    // 현재 사용자의 tenant_id 조회
+    const { data: userProfile, error: userError } = await supabase
+      .from('user_profiles')
+      .select('tenant_id')
+      .eq('id', currentUserId)
+      .single()
+
+    if (userError) throw userError
+
+    // 이메일 또는 이름으로 검색 (현재 팀에 속하지 않은 사용자만)
+    const { data: users, error } = await supabase
+      .from('user_profiles')
+      .select('id, name, email, company')
+      .or(`name.ilike.%${query}%,email.ilike.%${query}%`)
+      .or(`tenant_id.is.null,tenant_id.neq.${userProfile.tenant_id}`)
+      .neq('id', currentUserId)
+      .limit(10)
+
+    if (error) throw error
+
+    return users || []
+  } catch (error) {
+    console.error('사용자 검색 실패:', error)
+    throw error
+  }
+}
