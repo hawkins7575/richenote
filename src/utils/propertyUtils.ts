@@ -104,16 +104,10 @@ export const formatArea = (area: number): string => {
  */
 export const getStatusColor = (status: string): string => {
   switch (status) {
-    case '판매중':
+    case '거래중':
       return 'text-green-600'
-    case '예약중':
-      return 'text-yellow-600'
     case '거래완료':
-      return 'text-blue-600'
-    case '임시보관':
       return 'text-gray-600'
-    case '만료됨':
-      return 'text-red-600'
     default:
       return 'text-gray-600'
   }
@@ -124,16 +118,10 @@ export const getStatusColor = (status: string): string => {
  */
 export const getStatusBgColor = (status: string): string => {
   switch (status) {
-    case '판매중':
+    case '거래중':
       return 'bg-green-100'
-    case '예약중':
-      return 'bg-yellow-100'
     case '거래완료':
-      return 'bg-blue-100'
-    case '임시보관':
       return 'bg-gray-100'
-    case '만료됨':
-      return 'bg-red-100'
     default:
       return 'bg-gray-100'
   }

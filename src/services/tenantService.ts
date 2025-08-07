@@ -150,7 +150,7 @@ export class TenantService {
           date_format: 'YYYY-MM-DD',
           currency: 'KRW',
           language: 'ko',
-          default_property_status: '판매중',
+          default_property_status: '거래중',
           require_exit_date: true,
           require_landlord_info: true,
           email_notifications: true,

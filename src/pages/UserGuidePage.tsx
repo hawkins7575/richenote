@@ -209,7 +209,7 @@ const UserGuidePage: React.FC = () => {
                     <ul className="ml-4 space-y-1">
                       <li>• 거래유형: 매매, 전세, 월세</li>
                       <li>• 매물유형: 아파트, 오피스텔, 원룸, 빌라</li>
-                      <li>• 상태: 판매중, 예약중, 거래완료</li>
+                      <li>• 상태: 거래중, 거래완료</li>
                     </ul>
                   </div>
                 </div>

@@ -66,15 +66,12 @@ Badge.displayName = 'Badge'
 
 // 매물 상태 뱃지 (MVP 호환)
 export const PropertyStatusBadge: React.FC<{
-  status: '판매중' | '예약중' | '거래완료' | '임시보관' | '만료됨'
+  status: '거래중' | '거래완료'
   className?: string
 }> = ({ status, className }) => {
   const variantMap = {
-    '판매중': 'available',
-    '예약중': 'reserved', 
+    '거래중': 'available',
     '거래완료': 'sold',
-    '임시보관': 'secondary',
-    '만료됨': 'danger',
   } as const
 
   return (

@@ -547,7 +547,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      status: parsedInfo.status || propertyData.status || '판매중',
+      status: parsedInfo.status || propertyData.status || '거래중',
       options: [],
       inquiry_count: 0,
       is_urgent: false,
@@ -660,10 +660,10 @@ export const updatePropertyStatus = async (propertyId: string, status: Property[
 
     // description에서 구조화된 정보 파싱하여 반환
     const parseStructuredDescription = (desc: string | null) => {
-      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '', status: '판매중' }
+      if (!desc) return { landlord_name: undefined, landlord_phone: undefined, exit_date: undefined, detailed_address: undefined, parking: false, elevator: false, cleanDescription: '', status: '거래중' }
       
       let cleanDescription = desc
-      let landlord_name, landlord_phone, exit_date, detailed_address, parsedStatus = '판매중'
+      let landlord_name, landlord_phone, exit_date, detailed_address, parsedStatus = '거래중'
       let parking = false, elevator = false
       
       // 상태 정보 파싱
