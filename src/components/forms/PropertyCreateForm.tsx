@@ -215,43 +215,43 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* 개선된 헤더 */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
+        {/* 모바일 최적화된 헤더 */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Home className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg flex-shrink-0">
+                <Home className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">새 매물 등록</h2>
-                <p className="text-blue-100 text-sm">매물 정보를 입력해주세요</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg sm:text-xl font-bold text-white truncate">새 매물 등록</h2>
+                <p className="text-blue-100 text-xs sm:text-sm hidden sm:block">매물 정보를 입력해주세요</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-white/20 p-2 h-10 w-10 rounded-lg"
+              className="text-white hover:bg-white/20 active:scale-95 p-2 h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex-shrink-0 ml-2"
             >
-              <X size={20} />
+              <X size={18} className="sm:w-5 sm:h-5" />
             </Button>
           </div>
         </div>
         
-        <div className="max-h-[85vh] overflow-y-auto">
-          <form onSubmit={handleSubmit} className="p-4">
-            <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-3 sm:p-4">
+            <div className="space-y-3 sm:space-y-4">
               
               {/* 기본 정보 섹션 */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 sm:p-4 border border-blue-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-blue-600 rounded-md">
                     <Settings className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">기본 정보</h3>
-                    <p className="text-xs text-gray-600">매물의 기본적인 정보를 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">기본 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">매물의 기본적인 정보를 입력해주세요</p>
                   </div>
                 </div>
                 
@@ -264,17 +264,17 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       error={errors.title}
                       placeholder="예: 강남구 신사동 럭셔리 아파트"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3">
                     <Select
                       label="매물 유형"
                       value={formData.type}
                       onChange={(e) => handleInputChange('type', e.target.value as PropertyType)}
                       options={propertyTypeOptions}
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                     
                     <Select
@@ -282,7 +282,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       value={formData.transaction_type}
                       onChange={(e) => handleInputChange('transaction_type', e.target.value as TransactionType)}
                       options={transactionTypeOptions}
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                     
                     <Select
@@ -290,21 +290,21 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       value={formData.status}
                       onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
                       options={statusOptions}
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 위치 정보 섹션 */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 sm:p-4 border border-green-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-green-600 rounded-md">
                     <MapPin className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">위치 정보</h3>
-                    <p className="text-xs text-gray-600">매물의 정확한 위치를 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">위치 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">매물의 정확한 위치를 입력해주세요</p>
                   </div>
                 </div>
                 
@@ -317,7 +317,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       error={errors.address}
                       placeholder="예: 서울시 강남구 신사동 123-45"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                   
@@ -327,27 +327,27 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       value={formData.detailed_address || ''}
                       onChange={(e) => handleInputChange('detailed_address', e.target.value)}
                       placeholder="예: 123동 456호"
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 매물 정보 섹션 */}
-              <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-3 sm:p-4 border border-purple-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-purple-600 rounded-md">
                     <Home className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">매물 정보</h3>
-                    <p className="text-xs text-gray-600">매물의 상세 정보를 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">매물 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">매물의 상세 정보를 입력해주세요</p>
                   </div>
                 </div>
                 
                 <div className="space-y-4">
                   {/* 면적 및 구조 */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 md:grid-cols-3 sm:gap-3">
                     <Input
                       label="면적 (m²)"
                       type="number"
@@ -358,7 +358,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       min="0"
                       step="0.1"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                     
                     <Input
@@ -369,7 +369,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       error={errors.floor}
                       placeholder="15"
                       min="1"
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                     
                     <Input
@@ -380,19 +380,19 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       error={errors.total_floors}
                       placeholder="25"
                       min="1"
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12 sm:col-span-2 md:col-span-1"
                     />
                   </div>
 
                   {/* 방 구성 */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
                     <Select
                       label="방 개수"
                       value={formData.rooms?.toString() || '1'}
                       onChange={(e) => handleInputChange('rooms', parseInt(e.target.value) || 1)}
                       error={errors.rooms}
                       options={ROOM_OPTIONS}
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                     
                     <Input
@@ -403,30 +403,30 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       error={errors.bathrooms}
                       placeholder="2"
                       min="1"
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                   
                   {/* 편의시설 */}
                   <div className="bg-white/60 rounded-lg p-3 border border-purple-200">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">편의시설</h4>
-                    <div className="flex flex-wrap gap-3">
-                      <label className="flex items-center space-x-2 bg-white rounded-md px-3 py-2 border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2">편의시설</h4>
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+                      <label className="flex items-center space-x-2 bg-white rounded-md px-2 sm:px-3 py-2 border border-gray-200 hover:border-purple-300 active:scale-95 transition-all cursor-pointer">
                         <input
                           type="checkbox"
                           checked={formData.parking}
                           onChange={(e) => handleInputChange('parking', e.target.checked)}
-                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-3 h-3"
+                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-4 h-4 sm:w-3 sm:h-3"
                         />
                         <span className="text-xs font-medium text-gray-700">🚗 주차</span>
                       </label>
                       
-                      <label className="flex items-center space-x-2 bg-white rounded-md px-3 py-2 border border-gray-200 hover:border-purple-300 transition-colors cursor-pointer">
+                      <label className="flex items-center space-x-2 bg-white rounded-md px-2 sm:px-3 py-2 border border-gray-200 hover:border-purple-300 active:scale-95 transition-all cursor-pointer">
                         <input
                           type="checkbox"
                           checked={formData.elevator}
                           onChange={(e) => handleInputChange('elevator', e.target.checked)}
-                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-3 h-3"
+                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-4 h-4 sm:w-3 sm:h-3"
                         />
                         <span className="text-xs font-medium text-gray-700">🏢 엘리베이터</span>
                       </label>
@@ -436,18 +436,18 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
               </div>
 
               {/* 가격 정보 섹션 */}
-              <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-4 border border-orange-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 sm:p-4 border border-orange-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-orange-600 rounded-md">
                     <DollarSign className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">가격 정보</h3>
-                    <p className="text-xs text-gray-600">거래 유형에 맞는 가격을 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">가격 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">거래 유형에 맞는 가격을 입력해주세요</p>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-3 sm:gap-3">
                   {formData.transaction_type === '매매' && (
                     <Input
                       label="매매가 (만원)"
@@ -458,7 +458,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       placeholder="35000"
                       min="0"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   )}
                   
@@ -472,7 +472,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       placeholder="21000"
                       min="0"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   )}
                   
@@ -486,31 +486,31 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       placeholder="65"
                       min="0"
                       required
-                      className="text-base"
+                      className="text-sm sm:text-base h-11 sm:h-12"
                     />
                   )}
                 </div>
               </div>
 
               {/* 임대인 정보 섹션 */}
-              <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg p-4 border border-rose-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg p-3 sm:p-4 border border-rose-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-rose-600 rounded-md">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">임대인 정보</h3>
-                    <p className="text-xs text-gray-600">임대인의 연락처 정보를 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">임대인 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">임대인의 연락처 정보를 입력해주세요</p>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
                   <Input
                     label="임대인 이름"
                     value={formData.landlord_name || ''}
                     onChange={(e) => handleInputChange('landlord_name', e.target.value)}
                     placeholder="홍길동"
-                    className="text-base"
+                    className="text-sm sm:text-base h-11 sm:h-12"
                   />
                   
                   <Input
@@ -518,25 +518,25 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                     value={formData.landlord_phone || ''}
                     onChange={(e) => handleInputChange('landlord_phone', e.target.value)}
                     placeholder="010-1234-5678"
-                    className="text-base"
+                    className="text-sm sm:text-base h-11 sm:h-12"
                   />
                 </div>
               </div>
 
               {/* 기타 정보 섹션 */}
-              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-4 border border-gray-100">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-3 sm:p-4 border border-gray-100">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
                   <div className="p-1.5 bg-gray-600 rounded-md">
                     <FileText className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">기타 정보</h3>
-                    <p className="text-xs text-gray-600">추가적인 매물 정보를 입력해주세요</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">기타 정보</h3>
+                    <p className="text-xs text-gray-600 hidden sm:block">추가적인 매물 정보를 입력해주세요</p>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     매물 설명
                   </label>
                   <textarea
@@ -544,19 +544,19 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="매물에 대한 상세한 설명을 입력해주세요&#10;예: 남향, 풀옵션, 교통 편리, 학군 좋음 등"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-sm resize-none transition-colors"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-xs sm:text-sm resize-none transition-colors"
                   />
                 </div>
               </div>
 
-              {/* 폼 액션 버튼 */}
-              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 mt-4">
+              {/* 모바일 최적화된 폼 액션 버튼 */}
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end space-y-reverse space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 mt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
                   disabled={loading}
-                  className="px-6 py-2 text-base"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-2 text-sm sm:text-base active:scale-95"
                 >
                   취소
                 </Button>
@@ -565,7 +565,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   variant="primary"
                   loading={loading}
                   leftIcon={<Save size={16} />}
-                  className="px-6 py-2 text-base bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-2 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 active:scale-95"
                 >
                   매물 등록
                 </Button>

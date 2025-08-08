@@ -252,86 +252,85 @@ const PropertiesPageNew: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 개선된 페이지 헤더 */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="flex-1">
-            <div className="flex items-center space-x-3 mb-2">
+      {/* 모바일 최적화된 페이지 헤더 */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-blue-100">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            {/* 헤더 정보 */}
+            <div className="flex items-center space-x-3 flex-1">
               <div className="p-2 bg-blue-600 rounded-xl">
-                <Settings className="w-6 h-6 text-white" />
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">매물 관리</h1>
-                <p className="text-sm text-blue-700 font-medium">{tenant?.name}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">매물 관리</h1>
+                <p className="text-xs sm:text-sm text-blue-700 font-medium truncate">{tenant?.name}</p>
               </div>
             </div>
             
-            {/* 통계 정보 */}
-            <div className="flex items-center space-x-6 mt-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                <span className="text-sm text-gray-600">총</span>
-                <span className="text-lg font-bold text-blue-600">{properties.length}</span>
-                <span className="text-sm text-gray-600">개의 매물</span>
-              </div>
-              
-              {tenant?.limits.max_properties && (
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                  <span className="text-sm text-gray-500">제한</span>
-                  <span className="text-sm font-medium text-gray-700">{tenant.limits.max_properties}개</span>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* 등록 버튼 */}
-          <div className="flex items-center space-x-3">
+            {/* 모바일 등록 버튼 - 간소화 */}
             <button 
               onClick={() => setCreateFormOpen(true)}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg active:scale-95 sm:hover:scale-105"
             >
-              <Plus size={20} className="mr-2" />
-              <span className="font-medium">새 매물 등록</span>
+              <Plus size={18} className="sm:mr-2" />
+              <span className="hidden sm:inline font-medium">새 매물 등록</span>
             </button>
+          </div>
+          
+          {/* 모바일 최적화된 통계 정보 */}
+          <div className="flex items-center justify-between sm:justify-start sm:space-x-6 bg-white/60 rounded-lg p-3 sm:bg-transparent sm:p-0">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+              <span className="text-xs sm:text-sm text-gray-600">총</span>
+              <span className="text-base sm:text-lg font-bold text-blue-600">{properties.length}</span>
+              <span className="text-xs sm:text-sm text-gray-600">개</span>
+            </div>
+            
+            {tenant?.limits.max_properties && (
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="text-xs sm:text-sm text-gray-500">제한</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">{tenant.limits.max_properties}개</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 개선된 검색 및 필터 영역 */}
+      {/* 모바일 최적화된 검색 및 필터 영역 */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div className="p-6">
-          {/* 섹션 헤더 */}
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Search className="w-5 h-5 text-gray-600" />
+        <div className="p-4 sm:p-6">
+          {/* 모바일 최적화된 섹션 헤더 */}
+          <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+            <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">검색 및 필터</h2>
-              <p className="text-sm text-gray-500">원하는 매물을 빠르게 찾아보세요</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">검색 및 필터</h2>
+              <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">원하는 매물을 빠르게 찾아보세요</p>
             </div>
           </div>
           
-          <div className="space-y-6">
-            {/* 검색바 */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* 모바일 최적화된 검색바 */}
             <div className="relative">
               <Input
-                placeholder={getSearchPlaceholder()}
+                placeholder="매물명, 주소로 검색..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onCompositionStart={() => setIsComposing(true)}
                 onCompositionEnd={() => setIsComposing(false)}
-                leftIcon={<Search size={20} />}
-                className="text-base h-14 text-gray-700 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                leftIcon={<Search size={18} />}
+                className="text-sm sm:text-base h-12 sm:h-14 text-gray-700 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               />
               
-              {/* 활성 필터 표시 */}
+              {/* 활성 필터 표시 - 모바일 최적화 */}
               {getActiveFilters().length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 flex flex-wrap gap-2 z-10">
+                <div className="absolute top-full left-0 right-0 mt-2 flex flex-wrap gap-1 sm:gap-2 z-10">
                   {getActiveFilters().map((filter, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 text-sm rounded-lg font-medium"
+                      className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1.5 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-md sm:rounded-lg font-medium"
                     >
                       {filter}
                     </span>
@@ -340,84 +339,85 @@ const PropertiesPageNew: React.FC = () => {
               )}
             </div>
 
-            {/* 개선된 필터 영역 */}
+            {/* 모바일 최적화된 필터 영역 */}
             <div className="space-y-4">
-              {/* 필터 드롭다운들 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 필터 드롭다운들 - 모바일에서 세로 배치 */}
+              <div className="space-y-3 sm:space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-4">
                 {/* 거래유형 필터 */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">거래유형</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">거래유형</label>
                   <Select
                     options={transactionTypeOptions}
                     value={selectedTransactionType}
                     onChange={(e) => setSelectedTransactionType(e.target.value)}
-                    className="w-full h-12 text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
 
                 {/* 매물유형 필터 */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">매물유형</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">매물유형</label>
                   <Select
                     options={propertyTypeOptions}
                     value={selectedPropertyType}
                     onChange={(e) => setSelectedPropertyType(e.target.value)}
-                    className="w-full h-12 text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
 
                 {/* 매물상태 필터 */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">매물상태</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">매물상태</label>
                   <Select
                     options={propertyStatusOptions}
                     value={selectedPropertyStatus}
                     onChange={(e) => setSelectedPropertyStatus(e.target.value)}
-                    className="w-full h-12 text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
               </div>
 
-              {/* 하단 액션 영역 */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                {/* 뷰 모드 토글 */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700">보기:</span>
+              {/* 모바일 최적화된 하단 액션 영역 */}
+              <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 pt-4 border-t border-gray-100">
+                {/* 뷰 모드 토글 - 모바일 최적화 */}
+                <div className="flex items-center justify-center sm:justify-start">
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 mr-3 sm:mr-2">보기:</span>
                   <div className="flex items-center bg-gray-100 rounded-xl p-1">
                     <button
                       onClick={() => setViewMode('card')}
-                      className={`flex items-center justify-center px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
+                      className={`flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium ${
                         viewMode === 'card' 
                           ? 'bg-white text-blue-600 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-800'
+                          : 'text-gray-600 hover:text-gray-800 active:scale-95'
                       }`}
                     >
-                      <Grid size={16} className="mr-2" />
+                      <Grid size={14} className="mr-1 sm:mr-2" />
                       카드형
                     </button>
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`flex items-center justify-center px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
+                      className={`flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium ${
                         viewMode === 'list' 
                           ? 'bg-white text-blue-600 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-800'
+                          : 'text-gray-600 hover:text-gray-800 active:scale-95'
                       }`}
                     >
-                      <AlignLeft size={16} className="mr-2" />
+                      <AlignLeft size={14} className="mr-1 sm:mr-2" />
                       리스트형
                     </button>
                   </div>
                 </div>
 
-                {/* 초기화 버튼 */}
+                {/* 초기화 버튼 - 모바일 최적화 */}
                 <Button 
                   variant="outline"
                   onClick={resetFilters}
-                  size="lg"
-                  leftIcon={<Settings size={16} />}
-                  className="text-sm font-medium px-5 py-2.5 bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300 rounded-lg transition-all duration-200"
+                  size="sm"
+                  leftIcon={<Settings size={14} />}
+                  className="text-xs sm:text-sm font-medium px-4 py-2.5 bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300 active:scale-95 rounded-lg transition-all duration-200 w-full sm:w-auto"
                 >
-                  필터 초기화
+                  <span className="sm:hidden">초기화</span>
+                  <span className="hidden sm:inline">필터 초기화</span>
                 </Button>
               </div>
             </div>
