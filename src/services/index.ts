@@ -15,7 +15,6 @@ export const {
   createProperty,
   updateProperty,
   deleteProperty,
-  // updatePropertyStatus, // 매물 상태 업데이트 기능 삭제
   getPropertyStats,
   togglePropertyFavorite
 } = propertyService

@@ -6,6 +6,7 @@ import React, { createContext, useContext, useEffect, useState, useMemo } from '
 import { Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '@/services/supabase'
 import type { AuthUser, SignUpData, SignInData } from '@/types'
+import { logger } from '@/utils/logger'
 
 interface AuthContextType {
   user: AuthUser | null
@@ -37,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log('🔍 인증 초기화 시작')
+    logger.info('🔍 인증 초기화 시작')
 
     // 초기 세션 확인 (타임아웃 포함)
     const getSession = async () => {
@@ -55,7 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ]) as any
         
         if (error) {
-          console.error('Error getting session:', error)
+          logger.error('Error getting session:', error)
           setLoading(false)
           return
         }
@@ -90,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               last_sign_in_at: session.user.last_sign_in_at || null,
             })
           } catch (profileError) {
-            console.error('Error fetching profile:', profileError)
+            logger.error('Error fetching profile:', profileError)
             // 프로필 가져오기 실패 시 기본 사용자 정보만 설정
             setUser({
               id: session.user.id,
@@ -105,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error in getSession:', error)
+        logger.error('Error in getSession:', error)
       } finally {
         setLoading(false)
       }
@@ -116,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // 인증 상태 변경 리스너 (타임아웃 포함)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔐 Auth state changed:', event, session?.user?.id, session?.user?.email)
+        logger.info('🔐 Auth state changed:', event, session?.user?.id, session?.user?.email)
         
         setSession(session)
         
@@ -149,7 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               last_sign_in_at: session.user.last_sign_in_at || null,
             })
           } catch (profileError) {
-            console.error('Error fetching profile in auth state change:', profileError)
+            logger.error('Error fetching profile in auth state change:', profileError)
             // 프로필 가져오기 실패 시 기본 사용자 정보만 설정
             setUser({
               id: session.user.id,
@@ -189,7 +190,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // 회원가입 성공 시 사용자 ID를 tenant_id로 사용하여 개별 데이터 관리
       if (result.data.user && !result.error) {
         try {
-          console.log('👤 사용자별 독립 프로필 생성:', result.data.user.id)
+          logger.info('👤 사용자별 독립 프로필 생성:', result.data.user.id)
           
           // 사용자 ID를 tenant_id로 사용하여 완전히 독립적인 데이터 관리
           const { error: profileError } = await supabase
@@ -203,18 +204,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             })
 
           if (profileError) {
-            console.error('Error creating user profile:', profileError)
+            logger.error('Error creating user profile:', profileError)
           } else {
-            console.log('✅ 사용자별 독립 프로필 생성 완료')
+            logger.info('✅ 사용자별 독립 프로필 생성 완료')
           }
         } catch (error) {
-          console.error('Error in profile creation process:', error)
+          logger.error('Error in profile creation process:', error)
         }
       }
 
       return result
     } catch (error) {
-      console.error('Sign up error:', error)
+      logger.error('Sign up error:', error)
       return { user: null, error: error as AuthError }
     }
   }
@@ -227,7 +228,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
       return result
     } catch (error) {
-      console.error('Sign in error:', error)
+      logger.error('Sign in error:', error)
       return { user: null, error: error as AuthError }
     }
   }
@@ -239,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setSession(null)
       return result
     } catch (error) {
-      console.error('Sign out error:', error)
+      logger.error('Sign out error:', error)
       return { error: error as AuthError }
     }
   }
@@ -251,7 +252,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
       return result
     } catch (error) {
-      console.error('Reset password error:', error)
+      logger.error('Reset password error:', error)
       return { error: error as AuthError }
     }
   }

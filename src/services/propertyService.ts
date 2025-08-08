@@ -7,15 +7,16 @@ import type { SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } fr
 import type { PropertyDbRow } from '@/types/propertyService'
 import { parseStructuredDescription, transformDbRowToProperty } from '@/utils/propertyParsing'
 import { ERROR_MESSAGES, DEFAULT_VALUES } from '@/constants/propertyConstants'
+import { logger } from '@/utils/logger'
 
 // 실제 Supabase 서비스 사용
 
 // 매물 조회 (사용자별 개별 관리) - 자동 복구 로직 포함
 export const getProperties = async (userId: string, filters?: SimplePropertyFilters) => {
   try {
-    console.log('🔍 getProperties 시작 - userId:', userId)
+    logger.info('🔍 getProperties 시작 - userId:', userId)
     // 개발 환경에서 필터 로깅
-    if (import.meta.env.DEV) console.log('Service getProperties 필터:', filters)
+    logger.debug('Service getProperties 필터:', filters)
     
     // 사용자의 올바른 tenant_id 조회 (자동 복구 로직 포함)
     let { data: userProfile, error: userError } = await supabase
@@ -26,7 +27,7 @@ export const getProperties = async (userId: string, filters?: SimplePropertyFilt
 
     // user_profile이 없는 경우 자동 생성
     if (userError || !userProfile) {
-      console.log('⚠️ user_profile 누락 감지 - 자동 복구 시작')
+      logger.warn('⚠️ user_profile 누락 감지 - 자동 복구 시작')
       
       // 사용자 이메일 조회
       const { data: authUser } = await supabase.auth.getUser()

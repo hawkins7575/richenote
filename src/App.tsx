@@ -59,7 +59,6 @@ function App() {
 
 // 테넌트별 라우팅 처리
 const TenantRoutes: React.FC = () => {
-  // TODO: 테넌트 슬러그 기반 라우팅 로직
   return (
     <Routes>
       <Route path="/" element={<DashboardPage />} />

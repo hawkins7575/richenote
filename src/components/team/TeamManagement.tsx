@@ -75,6 +75,8 @@ export const TeamManagement: React.FC = () => {
       document.addEventListener('click', handleClickOutside)
       return () => document.removeEventListener('click', handleClickOutside)
     }
+    
+    return undefined
   }, [memberMenuOpen])
 
   const loadTeamData = async () => {

@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { Property } from '@/types/property'
+import { logger } from '@/utils/logger'
 
 /**
  * 주소에서 동(네이버후드) 추출
@@ -31,7 +32,7 @@ export const formatPrice = (property: Property): string => {
   
   // 매매가 디버깅 (모든 매물)
   if (transaction_type === '매매') {
-    console.log('🔍 매매가 가격 포맷팅:', {
+    logger.debug('🔍 매매가 가격 포맷팅:', {
       title,
       transaction_type,
       price,
@@ -66,7 +67,7 @@ export const formatPrice = (property: Property): string => {
 export const formatMoney = (amount: number): string => {
   // 매매가 관련 디버깅 (고액 매매가 추적)
   if (amount >= 10000) {
-    console.log('💰 formatMoney 매매가 디버깅:', {
+    logger.debug('💰 formatMoney 매매가 디버깅:', {
       amount,
       type: typeof amount,
       eok: Math.floor(amount / 10000),

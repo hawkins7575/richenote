@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type { Property, SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } from '@/types'
+import { logger } from '@/utils/logger'
 
 // 메모리 기반 데이터 저장소
 let mockProperties: Property[] = [
@@ -183,7 +184,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 // 매물 조회 (테넌트별)
 export const getProperties = async (tenantId: string, filters?: SimplePropertyFilters): Promise<Property[]> => {
-  console.log('🏠 Mock Service: getProperties 호출됨', { tenantId, filters })
+  logger.debug('🏠 Mock Service: getProperties 호출됨', { tenantId, filters })
   await delay(300) // API 호출 시뮬레이션
   
   let results = mockProperties.filter(p => p.tenant_id === tenantId)

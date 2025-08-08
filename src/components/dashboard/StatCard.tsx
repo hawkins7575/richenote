@@ -2,7 +2,7 @@
 // 통계 카드 컴포넌트
 // ============================================================================
 
-import React from 'react'
+import React, { memo } from 'react'
 import { LucideIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
 
@@ -15,7 +15,7 @@ interface StatCardProps {
   loading?: boolean
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
+export const StatCard: React.FC<StatCardProps> = memo(({
   title,
   value,
   change,
@@ -52,4 +52,4 @@ export const StatCard: React.FC<StatCardProps> = ({
       </CardContent>
     </Card>
   )
-}
+})

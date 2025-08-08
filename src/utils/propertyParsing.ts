@@ -5,6 +5,7 @@
 import { DESCRIPTION_PATTERNS, FACILITY_KEYWORDS } from '@/constants/propertyConstants'
 import type { ParsedPropertyInfo, PropertyDbRow } from '@/types/propertyService'
 import type { Property } from '@/types'
+import { logger } from '@/utils/logger'
 
 // 캐시 메모리 (성능 최적화)
 const parseCache = new Map<string, ParsedPropertyInfo>()
@@ -140,7 +141,7 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
       const parsed = parseFloat(String(item.price))
       // 개발 환경에서 가격 변환 추적
       if (import.meta.env.DEV && parsed && parsed >= 10000) {
-        console.log('Price 변환:', { title: item.title, original: item.price, parsed })
+        logger.debug('Price 변환:', { title: item.title, original: item.price, parsed })
       }
       return parsed
     })() : undefined,
@@ -148,7 +149,7 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
       const parsed = parseFloat(String(item.deposit))
       // 개발 환경에서 보증금 변환 추적
       if (import.meta.env.DEV && parsed && parsed >= 1000) {
-        console.log('Deposit 변환:', { title: item.title, original: item.deposit, parsed })
+        logger.debug('Deposit 변환:', { title: item.title, original: item.deposit, parsed })
       }
       return parsed
     })() : undefined,
@@ -156,7 +157,7 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
       const parsed = parseFloat(String(item.monthly_rent))
       // 개발 환경에서 월세 변환 추적
       if (import.meta.env.DEV && parsed && parsed >= 10) {
-        console.log('Monthly rent 변환:', { title: item.title, original: item.monthly_rent, parsed })
+        logger.debug('Monthly rent 변환:', { title: item.title, original: item.monthly_rent, parsed })
       }
       return parsed
     })() : undefined,

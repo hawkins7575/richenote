@@ -4,6 +4,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import { logger } from '@/utils/logger'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -65,7 +66,7 @@ export const createTenantChannel = (tenantId: string, table: string) => {
         filter: `tenant_id=eq.${tenantId}`,
       },
       (payload) => {
-        console.log('실시간 데이터 변경:', payload)
+        logger.info('실시간 데이터 변경:', payload)
       }
     )
 }
