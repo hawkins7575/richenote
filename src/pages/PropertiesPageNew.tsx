@@ -315,7 +315,7 @@ const PropertiesPageNew: React.FC = () => {
             {/* 모바일 최적화된 검색바 */}
             <div className="relative">
               <Input
-                placeholder="매물명, 주소로 검색..."
+                placeholder={getSearchPlaceholder()}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onCompositionStart={() => setIsComposing(true)}
