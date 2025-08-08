@@ -4,7 +4,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { X, Save, Home, MapPin, DollarSign, User, FileText, Settings } from 'lucide-react'
-import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
+import { Button, Input, Select, Modal } from '@/components/ui'
 import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
 
 interface PropertyCreateFormProps {
