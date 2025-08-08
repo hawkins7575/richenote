@@ -13,7 +13,7 @@ let mockProperties: Property[] = [
     title: '강남구 신사동 럭셔리 아파트',
     type: '아파트',
     transaction_type: '매매',
-    status: '거래중',
+    // 매물 상태 관련 코드 완전 삭제
     price: 350000,
     deposit: undefined,
     monthly_rent: undefined,
@@ -80,7 +80,7 @@ let mockProperties: Property[] = [
     title: '경기도 성남시 분당구 정자동',
     type: '아파트',
     transaction_type: '전세',
-    status: '거래중',
+    // 매물 상태 관련 코드 완전 삭제
     price: undefined,
     deposit: 210000,
     monthly_rent: undefined,
@@ -128,7 +128,7 @@ let mockProperties: Property[] = [
     title: '홍대 신축 오피스텔',
     type: '오피스텔',
     transaction_type: '월세',
-    status: '거래중',
+    // 매물 상태 관련 코드 완전 삭제
     price: undefined,
     deposit: 10000,
     monthly_rent: 65,
@@ -203,9 +203,7 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
     if (filters.property_type && filters.property_type !== '전체') {
       results = results.filter(p => p.type === filters.property_type)
     }
-    if (filters.status) {
-      results = results.filter(p => p.status === filters.status)
-    }
+    // 매물 상태 필터 로직 완전 삭제
   }
   
   return results
@@ -231,7 +229,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     title: propertyData.title,
     type: propertyData.type,
     transaction_type: propertyData.transaction_type,
-    status: propertyData.status || '거래중',
+    // 매물 상태 관련 코드 완전 삭제
     price: propertyData.price,
     deposit: propertyData.deposit,
     monthly_rent: propertyData.monthly_rent,
@@ -323,21 +321,7 @@ export const deleteProperty = async (propertyId: string, tenantId: string): Prom
   return true
 }
 
-// 매물 상태 업데이트
-export const updatePropertyStatus = async (propertyId: string, status: Property['status'], tenantId: string): Promise<Property | null> => {
-  await delay(200)
-  
-  const index = mockProperties.findIndex(p => p.id === propertyId && p.tenant_id === tenantId)
-  if (index === -1) return null
-  
-  mockProperties[index] = {
-    ...mockProperties[index],
-    status,
-    updated_at: new Date().toISOString()
-  }
-  
-  return mockProperties[index]
-}
+// 매물 상태 업데이트 함수 완전 삭제
 
 // 매물 통계 조회
 export const getPropertyStats = async (tenantId: string) => {
@@ -347,9 +331,9 @@ export const getPropertyStats = async (tenantId: string) => {
   
   const stats = {
     total: properties.length,
-    active: properties.filter(p => p.status === '거래중').length,
+    active: properties.length, // 매물 상태 제거로 전체를 active로 처리
     reserved: 0,
-    sold: properties.filter(p => p.status === '거래완료').length,
+    sold: 0, // 매물 상태 제거로 sold는 0으로 고정
     this_month: properties.filter(p => {
       const created = new Date(p.created_at)
       const now = new Date()

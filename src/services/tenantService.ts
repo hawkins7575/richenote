@@ -73,7 +73,7 @@ export class TenantService {
         users!inner(id, role, status)
       `)
       .eq('users.id', userId)
-      .eq('users.status', 'active')
+      .eq('users', 'active')
 
     if (error) {
       throw handleSupabaseError(error)

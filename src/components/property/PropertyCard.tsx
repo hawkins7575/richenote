@@ -81,20 +81,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
           <span className="text-xs text-gray-500">{property.transaction_type}</span>
         </div>
         
-        <div className="flex items-center">
-          <span className={`
-            inline-block w-2 h-2 rounded-full mr-2
-            ${property.status === '거래중' ? 'bg-green-400' : 
-              property.status === '거래완료' ? 'bg-gray-400' : 'bg-gray-400'}
-          `} />
-          <span className={`
-            text-xs font-medium
-            ${property.status === '거래중' ? 'text-green-600' : 
-              property.status === '거래완료' ? 'text-gray-600' : 'text-gray-600'}
-          `}>
-            {property.status}
-          </span>
-        </div>
+        {/* 매물 상태 관련 코드 완전 삭제 */}
       </div>
     </div>
   )

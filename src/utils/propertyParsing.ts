@@ -2,7 +2,7 @@
 // 매물 데이터 파싱 유틸리티
 // ============================================================================
 
-import { DESCRIPTION_PATTERNS, FACILITY_KEYWORDS, DEFAULT_VALUES } from '@/constants/propertyConstants'
+import { DESCRIPTION_PATTERNS, FACILITY_KEYWORDS } from '@/constants/propertyConstants'
 import type { ParsedPropertyInfo, PropertyDbRow } from '@/types/propertyService'
 import type { Property } from '@/types'
 
@@ -22,6 +22,7 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
       cleanDescription: '',
       is_vacant: false,
       // 매물 상태 관련 코드 완전 삭제
+      // status: '거래중' // 임시 기본값
     }
   }
 

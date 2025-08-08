@@ -140,7 +140,7 @@ const DashboardPage: React.FC = () => {
       type: '아파트',
       transactionType: '매매',
       price: '35억',
-      status: '거래중',
+      // 매물 상태 필드 삭제됨
       createdAt: '2시간 전',
     },
     {
@@ -149,7 +149,7 @@ const DashboardPage: React.FC = () => {
       type: '아파트', 
       transactionType: '전세',
       price: '2억 1천만원',
-      status: '거래중',
+      // 매물 상태 필드 삭제됨
       createdAt: '5시간 전',
     },
     {
@@ -158,7 +158,7 @@ const DashboardPage: React.FC = () => {
       type: '오피스텔',
       transactionType: '월세',
       price: '1000/65만원',
-      status: '거래중',
+      // 매물 상태 필드 삭제됨
       createdAt: '1일 전',
     },
   ]
@@ -256,9 +256,9 @@ const DashboardPage: React.FC = () => {
                     <span className="text-xs text-gray-500">{property.transactionType}</span>
                   </div>
                   <div className="flex items-center">
-                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${property.status === '거래중' ? 'bg-green-400' : 'bg-yellow-400'}`} />
-                    <span className={`text-xs font-medium ${property.status === '거래중' ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {property.status}
+                    <span className="inline-block w-2 h-2 rounded-full mr-2 bg-blue-400" />
+                    <span className="text-xs font-medium text-blue-600">
+                      등록됨
                     </span>
                   </div>
                 </div>

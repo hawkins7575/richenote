@@ -12,7 +12,7 @@ export interface ParsedPropertyInfo {
   elevator: boolean
   cleanDescription: string
   is_vacant?: boolean
-  status: string
+  // 매물 상태 관련 코드 완전 삭제
 }
 
 // 데이터베이스 raw 데이터 타입

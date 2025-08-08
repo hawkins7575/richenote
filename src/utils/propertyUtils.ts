@@ -186,7 +186,7 @@ export const getPropertyCardData = (property: Property) => {
     neighborhood: extractNeighborhood(property.address),
     price: formatPrice(property),
     exitDate: property.exit_date,
-    status: property.status,
+    status: /* status removed */ "거래중",
     type: property.type,
     transactionType: property.transaction_type,
     isUrgent: property.is_urgent,

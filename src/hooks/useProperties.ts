@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { getProperties, getPropertyStats, createProperty, updateProperty, deleteProperty, updatePropertyStatus } from '@/services'
+import { getProperties, getPropertyStats, createProperty, updateProperty, deleteProperty } from '@/services'
 import type { Property, SimplePropertyFilters, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 export const useProperties = (filters?: SimplePropertyFilters) => {
@@ -102,22 +102,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
     }
   }, [user?.id])
 
-  const updateStatus = useCallback(async (propertyId: string, status: Property['status']) => {
-    if (!user?.id) {
-      throw new Error('사용자 정보가 없습니다.')
-    }
-
-    try {
-      const updatedProperty = await updatePropertyStatus(propertyId, status, user.id)
-      setProperties(prev => 
-        prev.map(p => p.id === propertyId ? updatedProperty : p).filter((p): p is Property => p !== null)
-      )
-      return updatedProperty
-    } catch (err) {
-      console.error('Error updating property status:', err)
-      throw new Error('매물 상태 변경 중 오류가 발생했습니다.')
-    }
-  }, [user?.id])
+  // 매물 상태 업데이트 기능 삭제됨
 
   return {
     properties,
@@ -127,7 +112,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
     createProperty: createNewProperty,
     updateProperty: updateExistingProperty,
     deleteProperty: deleteExistingProperty,
-    updatePropertyStatus: updateStatus,
+    // updatePropertyStatus: 매물 상태 업데이트 기능 삭제됨
   }
 }
 

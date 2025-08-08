@@ -89,7 +89,7 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
       
       const stats: TenantStats = {
         total_properties: data.length,
-        active_properties: data.filter(p => p.status === '거래중').length,
+        active_properties: data.length, // 모든 매물을 활성으로 처리 (상태 삭제)
         total_users: 1, // Simplified - would need actual user count
         active_users: 1, // Simplified - would need actual active user count
         storage_used_mb: 0, // Simplified - would need actual storage calculation
@@ -212,7 +212,7 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
               date_format: 'YYYY-MM-DD',
               currency: 'KRW',
               language: 'ko',
-              default_property_status: '거래중',
+              // default_property_status: 매물 상태 필드 삭제됨
               require_exit_date: true,
               require_landlord_info: true,
               email_notifications: true,
