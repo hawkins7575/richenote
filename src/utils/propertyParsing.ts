@@ -4,7 +4,7 @@
 
 import { DESCRIPTION_PATTERNS, FACILITY_KEYWORDS } from '@/constants/propertyConstants'
 import type { ParsedPropertyInfo, PropertyDbRow } from '@/types/propertyService'
-import type { Property } from '@/types'
+import type { Property, PropertyStatus } from '@/types'
 import { logger } from '@/utils/logger'
 
 // 캐시 메모리 (성능 최적화)
@@ -130,6 +130,7 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
     title: item.title,
     type: item.property_type as any,
     transaction_type: item.transaction_type as any,
+    status: (item.status as PropertyStatus) || '거래중', // DB 값 우선, 기본값은 '거래중'
     address: item.address,
     detailed_address: parsedInfo.detailed_address,
     area: item.area_exclusive,

@@ -6,6 +6,7 @@ import React, { memo } from 'react'
 import { Calendar, MapPin, DollarSign } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, extractNeighborhood } from '@/utils/propertyUtils'
+import { PropertyStatusBadge } from '@/components/ui/Badge'
 
 interface PropertyCardProps {
   property: Property
@@ -81,7 +82,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
           <span className="text-xs text-gray-500">{property.transaction_type}</span>
         </div>
         
-        {/* 매물 상태 관련 코드 완전 삭제 */}
+        {/* 매물 상태 배지 */}
+        <div className="flex items-center space-x-2">
+          <PropertyStatusBadge status={property.status} />
+        </div>
       </div>
     </div>
   )

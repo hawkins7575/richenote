@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
-import type { Property, PropertyType, TransactionType, UpdatePropertyData } from '@/types'
+import type { Property, PropertyType, TransactionType, PropertyStatus, UpdatePropertyData } from '@/types'
 
 interface PropertyEditFormProps {
   isOpen: boolean
@@ -23,7 +23,9 @@ const TRANSACTION_TYPES: TransactionType[] = [
   '매매', '전세', '월세', '단기임대'
 ]
 
-// 공통 상수에서 가져온 상태 옵션 사용
+const PROPERTY_STATUS: PropertyStatus[] = [
+  '거래중', '거래완료'
+]
 
 export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
   isOpen,
@@ -43,6 +45,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         title: property.title,
         type: property.type,
         transaction_type: property.transaction_type,
+        status: property.status,
         address: property.address,
         detailed_address: property.detailed_address || '',
         area: property.area,
@@ -65,8 +68,6 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
   }, [property, isOpen])
 
   const handleInputChange = useCallback((field: keyof UpdatePropertyData, value: any) => {
-    // 매물 상태 관련 코드 완전 삭제
-    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -212,6 +213,14 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   value={formData.transaction_type || ''}
                   onChange={(e) => handleInputChange('transaction_type', e.target.value as TransactionType)}
                   options={TRANSACTION_TYPES.map(type => ({ value: type, label: type }))}
+                  required
+                />
+                
+                <Select
+                  label="매물 상태"
+                  value={formData.status || ''}
+                  onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
+                  options={PROPERTY_STATUS.map(status => ({ value: status, label: status }))}
                   required
                 />
               </div>

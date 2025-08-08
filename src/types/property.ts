@@ -6,8 +6,7 @@ export type PropertyType = '아파트' | '오피스텔' | '원룸' | '빌라' | 
 
 export type TransactionType = '매매' | '전세' | '월세' | '단기임대'
 
-// 매물 상태 관련 코드 완전 삭제
-// export type PropertyStatus = '거래중' | '거래완료'
+export type PropertyStatus = '거래중' | '거래완료'
 
 export interface Property {
   id: string
@@ -19,7 +18,7 @@ export interface Property {
   title: string
   type: PropertyType
   transaction_type: TransactionType
-  // 매물 상태 관련 코드 완전 삭제
+  status: PropertyStatus
   
   // 가격 정보
   price?: number // 매매가 (만원)
@@ -261,7 +260,7 @@ export interface PropertyActivity {
   id: string
   property_id: string
   user_id: string
-  action: 'created' | 'updated' | 'viewed' | 'inquired' | 'status_changed' | 'deleted'
+  action: 'created' | 'updated' | 'viewed' | 'inquired' | 'deleted'
   details?: Record<string, any>
   created_at: string
 }
@@ -271,13 +270,14 @@ export interface SimplePropertyFilters {
   search?: string
   transaction_type?: string
   property_type?: string
-  // 매물 상태 관련 코드 완전 삭제
+  property_status?: string
 }
 
 export interface CreatePropertyData {
   title: string
   type: PropertyType
   transaction_type: TransactionType
+  status: PropertyStatus
   address: string
   detailed_address?: string
   area: number
@@ -302,7 +302,7 @@ export interface UpdatePropertyData {
   title?: string
   type?: PropertyType
   transaction_type?: TransactionType
-  // 매물 상태 관련 코드 완전 삭제
+  status?: PropertyStatus
   address?: string
   detailed_address?: string
   area?: number

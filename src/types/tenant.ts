@@ -64,7 +64,6 @@ export interface TenantSettings {
   language: string
   
   // 매물 관련 설정
-  default_property_status: string
   auto_archive_days?: number
   require_exit_date: boolean
   require_landlord_info: boolean

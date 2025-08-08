@@ -100,6 +100,10 @@ export const getProperties = async (userId: string, filters?: SimplePropertyFilt
       if (filters.property_type && filters.property_type !== '전체') {
         query = query.eq('property_type', filters.property_type)
       }
+      
+      if (filters.property_status && filters.property_status !== '전체') {
+        query = query.eq('status', filters.property_status)
+      }
     }
 
     const { data, error } = await query
@@ -256,8 +260,8 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     }
     
     // 매물 상태 정보 추가
-    if (propertyData) {
-      const statusInfo = `[상태] ${propertyData}`
+    if (propertyData.status) {
+      const statusInfo = `[상태] ${propertyData.status}`
       structuredDescription = (structuredDescription ? `${structuredDescription}\n\n` : '') + statusInfo
     }
     
@@ -269,6 +273,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
       address: propertyData.address || '',
       property_type: propertyData.type,
       transaction_type: propertyData.transaction_type,
+      status: propertyData.status || '거래중',
       price: propertyData.price || null,
       deposit: propertyData.deposit || null,
       monthly_rent: propertyData.monthly_rent || null,
@@ -407,15 +412,15 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
     }
     
     // 매물 상태 정보 추가
-    if (propertyData) {
-      const statusInfo = `[상태] ${propertyData}`
+    if (propertyData.status) {
+      const statusInfo = `[상태] ${propertyData.status}`
       newStructuredDescription = (newStructuredDescription ? `${newStructuredDescription}\n\n` : '') + statusInfo
       
       // 개발 환경에서 상태 저장 확인
       if (import.meta.env.DEV) {
         console.log('🔄 매물 수정 - 상태 저장:', { 
           매물ID: propertyId,
-          상태: propertyData,
+          상태: propertyData.status,
           구조화된설명: newStructuredDescription 
         })
       }
@@ -428,6 +433,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
     if (propertyData.title !== undefined) dbData.title = propertyData.title
     if (propertyData.type !== undefined) dbData.property_type = propertyData.type
     if (propertyData.transaction_type !== undefined) dbData.transaction_type = propertyData.transaction_type
+    if (propertyData.status !== undefined) dbData.status = propertyData.status
     if (propertyData.address !== undefined) dbData.address = propertyData.address
     if (propertyData.area !== undefined) dbData.area_exclusive = propertyData.area
     if (propertyData.floor !== undefined) dbData.floor_current = propertyData.floor
@@ -545,7 +551,7 @@ export const updateProperty = async (propertyId: string, propertyData: UpdatePro
       view_count: 0,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      status: parsedInfo || propertyData || '거래중',
+      status: data.status || propertyData.status || '거래중',
       options: [],
       inquiry_count: 0,
       is_urgent: false,

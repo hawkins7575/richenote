@@ -6,6 +6,7 @@ import React from 'react'
 import { X, MapPin, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
+import { PropertyStatusBadge } from '@/components/ui/Badge'
 import '@/styles/mobile-modal.css'
 
 interface PropertyDetailModalProps {
@@ -78,7 +79,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                   {property.transaction_type}
                 </span>
-                {/* 매물 상태 배지 완전 삭제 */}
+                {/* 매물 상태 배지 */}
+                <PropertyStatusBadge status={property.status} />
               </div>
             </div>
           </div>
@@ -105,7 +107,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   <span className="px-3 py-1.5 bg-green-100 text-green-800 rounded-full font-medium text-sm">
                     {property.transaction_type}
                   </span>
-                  {/* 매물 상태 배지 완전 삭제 */}
+                  {/* 매물 상태 배지 */}
+                  <PropertyStatusBadge status={property.status} />
                 </div>
               </div>
             </div>

@@ -23,6 +23,7 @@ export interface PropertyDbRow {
   title: string
   property_type: string
   transaction_type: string
+  status?: string
   address: string
   area_exclusive: number
   floor_current: number
@@ -35,7 +36,6 @@ export interface PropertyDbRow {
   description?: string
   created_at: string
   updated_at: string
-  status?: string
 }
 
 // API 결과 타입

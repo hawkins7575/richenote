@@ -14,7 +14,7 @@ let mockProperties: Property[] = [
     title: '강남구 신사동 럭셔리 아파트',
     type: '아파트',
     transaction_type: '매매',
-    // 매물 상태 관련 코드 완전 삭제
+    status: '거래중',
     price: 350000,
     deposit: undefined,
     monthly_rent: undefined,
@@ -81,7 +81,7 @@ let mockProperties: Property[] = [
     title: '경기도 성남시 분당구 정자동',
     type: '아파트',
     transaction_type: '전세',
-    // 매물 상태 관련 코드 완전 삭제
+    status: '거래중',
     price: undefined,
     deposit: 210000,
     monthly_rent: undefined,
@@ -129,7 +129,7 @@ let mockProperties: Property[] = [
     title: '홍대 신축 오피스텔',
     type: '오피스텔',
     transaction_type: '월세',
-    // 매물 상태 관련 코드 완전 삭제
+    status: '거래완료',
     price: undefined,
     deposit: 10000,
     monthly_rent: 65,
@@ -204,7 +204,9 @@ export const getProperties = async (tenantId: string, filters?: SimplePropertyFi
     if (filters.property_type && filters.property_type !== '전체') {
       results = results.filter(p => p.type === filters.property_type)
     }
-    // 매물 상태 필터 로직 완전 삭제
+    if (filters.property_status && filters.property_status !== '전체') {
+      results = results.filter(p => p.status === filters.property_status)
+    }
   }
   
   return results
@@ -230,7 +232,7 @@ export const createProperty = async (propertyData: CreatePropertyData, tenantId:
     title: propertyData.title,
     type: propertyData.type,
     transaction_type: propertyData.transaction_type,
-    // 매물 상태 관련 코드 완전 삭제
+    status: propertyData.status,
     price: propertyData.price,
     deposit: propertyData.deposit,
     monthly_rent: propertyData.monthly_rent,

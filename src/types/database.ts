@@ -201,7 +201,7 @@ export interface Database {
           title: string
           type: '아파트' | '오피스텔' | '원룸' | '빌라' | '단독주택' | '상가' | '사무실' | '기타'
           transaction_type: '매매' | '전세' | '월세' | '단기임대'
-          status?: '거래중' | '거래완료'
+          status: '거래중' | '거래완료'
           price?: number | null
           deposit?: number | null
           monthly_rent?: number | null
