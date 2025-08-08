@@ -27,64 +27,84 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
       className={`
         bg-white rounded-xl border border-gray-200 hover:border-blue-300 
         hover:shadow-md transition-all duration-200 cursor-pointer
-        p-4 space-y-3 group
+        p-3 sm:p-4 space-y-3 group active:scale-[0.98] touch-target
         ${className}
       `}
       onClick={() => onClick?.(property)}
     >
-      {/* 매물명 */}
-      <div className="flex items-start justify-between">
-        <h3 className="font-semibold text-gray-900 text-lg line-clamp-1 group-hover:text-blue-600 transition-colors">
+      {/* 모바일 최적화된 헤더 - 매물명과 급매 태그 */}
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
           {property.title}
         </h3>
         {property.is_urgent && (
-          <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0">
+          <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium flex-shrink-0">
             급매
           </span>
         )}
       </div>
 
-      {/* 간단한 주소 (동 단위) */}
+      {/* 모바일 최적화된 주소 표시 */}
       <div className="flex items-center text-gray-600">
-        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-        <span className="text-sm truncate">{neighborhood}</span>
+        <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-400" />
+        <span className="text-sm sm:text-base truncate">{neighborhood}</span>
       </div>
 
-      {/* 가격 */}
+      {/* 모바일 최적화된 가격 표시 */}
       <div className="flex items-center text-gray-900">
-        <DollarSign className="w-4 h-4 mr-1 text-green-600 flex-shrink-0" />
-        <span className="font-bold text-lg">{price}</span>
+        <DollarSign className="w-4 h-4 mr-2 text-blue-600 flex-shrink-0" />
+        <span className="font-bold text-lg sm:text-xl text-blue-600">{price}</span>
       </div>
 
-      {/* 거주 현황 - 퇴실날짜 또는 공실 */}
+      {/* 모바일 최적화된 거주 현황 */}
       {property.exit_date ? (
         <div className="flex items-center text-orange-600">
-          <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
+          <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-sm font-medium">
             퇴실: {new Date(property.exit_date).toLocaleDateString('ko-KR', {
-              month: 'long',
+              month: 'short',
               day: 'numeric'
             })}
           </span>
         </div>
       ) : (
         <div className="flex items-center text-green-600">
-          <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
+          <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-sm font-medium">공실</span>
         </div>
       )}
 
-      {/* 하단 구분선 및 상태 */}
-      <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="text-xs text-gray-500">{property.type}</span>
-          <span className="text-gray-300">•</span>
-          <span className="text-xs text-gray-500">{property.transaction_type}</span>
+      {/* 모바일 최적화된 하단 정보 */}
+      <div className="border-t border-gray-100 pt-3">
+        {/* 첫 번째 줄: 매물 유형과 거래 유형 */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
+            <span>{property.type}</span>
+            <span className="text-gray-300">•</span>
+            <span>{property.transaction_type}</span>
+          </div>
+          <PropertyStatusBadge status={property.status} />
         </div>
         
-        {/* 매물 상태 배지 */}
-        <div className="flex items-center space-x-2">
-          <PropertyStatusBadge status={property.status} />
+        {/* 두 번째 줄: 상세 정보 (모바일에서 더 많은 정보 표시) */}
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center space-x-3">
+            <span>{property.area}m² ({Math.floor(property.area/3.3)}평)</span>
+            <span>{property.rooms}룸</span>
+            {property.floor && (
+              <span>{property.floor}층</span>
+            )}
+          </div>
+          
+          {/* 편의시설 아이콘 - 모바일 친화적 */}
+          <div className="flex items-center space-x-2">
+            {property.parking && (
+              <span className="text-green-600" title="주차 가능">🚗</span>
+            )}
+            {property.elevator && (
+              <span className="text-blue-600" title="엘리베이터">🏢</span>
+            )}
+          </div>
         </div>
       </div>
     </div>

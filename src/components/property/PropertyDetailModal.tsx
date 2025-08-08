@@ -46,10 +46,15 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50 touch-manipulation">
-      <div className="bg-white rounded-lg w-full max-w-7xl max-h-[95vh] h-[95vh] overflow-hidden flex flex-col shadow-2xl">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 touch-manipulation">
+      <div className="bg-white rounded-t-2xl sm:rounded-lg w-full max-w-7xl max-h-[95vh] h-[95vh] sm:h-auto overflow-hidden flex flex-col shadow-2xl">
         {/* 헤더 - 모바일 최적화 */}
         <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          {/* 모바일 스와이프 인디케이터 */}
+          <div className="lg:hidden flex justify-center pt-2 pb-1">
+            <div className="w-10 h-1 bg-gray-300 rounded-full"></div>
+          </div>
+          
           {/* 모바일: 세로 배치 */}
           <div className="lg:hidden p-3 sm:p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -124,7 +129,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
         {/* 콘텐츠 - 모바일 최적화 */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 pb-safe pb-20">
+          <div className="p-4 sm:p-4 space-y-4 sm:space-y-4 pb-safe pb-24">
             
             {/* 모바일: 세로 스택 레이아웃 */}
             <div className="lg:hidden space-y-3">
@@ -436,35 +441,36 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         </div>
 
         {/* 액션 버튼 섹션 - 모바일 최적화 */}
-        <div className="border-t border-gray-200 bg-white">
+        <div className="border-t border-gray-200 bg-white lg:bg-gray-50">
           {/* 모바일: 세로 스택 레이아웃 */}
-          <div className="lg:hidden p-3 sm:p-4 pb-safe space-y-3 mb-20">
+          <div className="lg:hidden p-4 pb-safe-4 space-y-3">
             
-            {/* 액션 버튼들 */}
+            {/* 액션 버튼들 - 모바일 터치 최적화 */}
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={onClose}
-                className="py-4 px-4 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-all duration-200 border border-gray-300 hover:border-gray-400 min-h-[48px] flex items-center justify-center"
+                className="py-4 px-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 rounded-xl transition-all duration-200 border border-gray-300 hover:border-gray-400 min-h-[52px] flex flex-col items-center justify-center touch-target"
                 aria-label="모달 닫기"
               >
+                <X className="w-4 h-4 mb-1" />
                 닫기
               </button>
               
               <button
                 onClick={handleEditClick}
-                className="py-4 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 font-medium text-base min-h-[48px] flex items-center justify-center"
+                className="py-4 px-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 active:scale-95 transition-all duration-200 font-medium text-sm min-h-[52px] flex flex-col items-center justify-center touch-target shadow-lg"
                 aria-label="매물 정보 수정"
               >
-                <Edit className="w-4 h-4 mr-2" />
+                <Edit className="w-4 h-4 mb-1" />
                 수정
               </button>
               
               <button
                 onClick={handleDeleteClick}
-                className="py-4 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-200 font-medium text-base min-h-[48px] flex items-center justify-center"
+                className="py-4 px-3 bg-red-600 text-white rounded-xl hover:bg-red-700 active:bg-red-800 active:scale-95 transition-all duration-200 font-medium text-sm min-h-[52px] flex flex-col items-center justify-center touch-target shadow-lg"
                 aria-label="매물 삭제"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4 mb-1" />
                 삭제
               </button>
             </div>
