@@ -31,21 +31,10 @@ export const FACILITY_KEYWORDS = {
   ELEVATOR: '엘리베이터'
 } as const
 
-// 매물 상태 옵션 (통일된 정의)
-export const PROPERTY_STATUS_OPTIONS = [
-  '거래중', '거래완료'
-] as const
-
-// 필터용 상태 옵션 (모든 상태 + 전체 옵션)
-export const FILTER_STATUS_OPTIONS = [
-  { value: '', label: '모든 상태' },
-  { value: '거래중', label: '거래중' },
-  { value: '거래완료', label: '거래완료' }
-] as const
+// 매물 상태 관련 코드 완전 삭제
 
 // 기본값
 export const DEFAULT_VALUES = {
-  PROPERTY_STATUS: '거래중',
   FLOOR: 1,
   TOTAL_FLOORS: 1,
   AREA: 0,

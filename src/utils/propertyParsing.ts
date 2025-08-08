@@ -21,7 +21,7 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
       elevator: false,
       cleanDescription: '',
       is_vacant: false,
-      status: DEFAULT_VALUES.PROPERTY_STATUS
+      // 매물 상태 관련 코드 완전 삭제
     }
   }
 
@@ -35,29 +35,12 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
   let landlord_phone: string | undefined
   let exit_date: string | undefined
   let detailed_address: string | undefined
-  let parsedStatus: string = DEFAULT_VALUES.PROPERTY_STATUS
+  // 매물 상태 관련 코드 완전 삭제
   let parking = false
   let elevator = false
   let is_vacant = false
 
-  // 상태 정보 파싱
-  const statusMatch = desc.match(DESCRIPTION_PATTERNS.STATUS)
-  if (statusMatch) {
-    parsedStatus = statusMatch[1].trim()
-    cleanDescription = cleanDescription.replace(statusMatch[0], '').trim()
-    // 개발 환경에서 상태 파싱 확인
-    if (import.meta.env.DEV) {
-      console.log('📄 상태 파싱 성공:', { 
-        원본: statusMatch[0], 
-        파싱된상태: parsedStatus 
-      })
-    }
-  } else {
-    // 상태 정보가 없는 경우 기본값 사용
-    if (import.meta.env.DEV) {
-      console.log('📄 상태 정보 없음 - 기본값 사용:', DEFAULT_VALUES.PROPERTY_STATUS)
-    }
-  }
+  // 상태 정보 파싱 로직 완전 삭제
 
   // 임대인 정보 파싱
   const landlordMatch = desc.match(DESCRIPTION_PATTERNS.LANDLORD)
@@ -118,7 +101,7 @@ export const parseStructuredDescription = (desc: string | null): ParsedPropertyI
     elevator,
     cleanDescription,
     is_vacant,
-    status: parsedStatus
+    // 매물 상태 관련 코드 완전 삭제
   }
 
   // 결과 캐싱 (메모리 제한)
@@ -187,7 +170,7 @@ export const transformDbRowToProperty = (item: PropertyDbRow, parsedInfo: Parsed
     view_count: 0,
     created_at: item.created_at,
     updated_at: item.updated_at,
-    status: parsedInfo.status as any || DEFAULT_VALUES.PROPERTY_STATUS as any,
+    // 매물 상태 관련 코드 완전 삭제
     options: [],
     inquiry_count: 0,
     is_urgent: false,

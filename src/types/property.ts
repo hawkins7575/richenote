@@ -6,7 +6,8 @@ export type PropertyType = '아파트' | '오피스텔' | '원룸' | '빌라' | 
 
 export type TransactionType = '매매' | '전세' | '월세' | '단기임대'
 
-export type PropertyStatus = '거래중' | '거래완료'
+// 매물 상태 관련 코드 완전 삭제
+// export type PropertyStatus = '거래중' | '거래완료'
 
 export interface Property {
   id: string
@@ -18,7 +19,7 @@ export interface Property {
   title: string
   type: PropertyType
   transaction_type: TransactionType
-  status: PropertyStatus
+  // 매물 상태 관련 코드 완전 삭제
   
   // 가격 정보
   price?: number // 매매가 (만원)
@@ -131,7 +132,7 @@ export interface PropertyFilters {
   // 기본 필터
   transaction_types?: TransactionType[]
   property_types?: PropertyType[]
-  status?: PropertyStatus[]
+  // 매물 상태 관련 코드 완전 삭제
   
   // 가격 범위
   price_min?: number
@@ -214,7 +215,7 @@ export interface UpdatePropertyRequest {
   title?: string
   type?: PropertyType
   transaction_type?: TransactionType
-  status?: PropertyStatus
+  // 매물 상태 관련 코드 완전 삭제
   price?: number
   deposit?: number
   monthly_rent?: number
@@ -245,7 +246,7 @@ export interface UpdatePropertyRequest {
 // 매물 통계
 export interface PropertyStats {
   total: number
-  by_status: Record<PropertyStatus, number>
+  // 매물 상태 관련 코드 완전 삭제
   by_type: Record<PropertyType, number>
   by_transaction_type: Record<TransactionType, number>
   average_price: number
@@ -270,7 +271,7 @@ export interface SimplePropertyFilters {
   search?: string
   transaction_type?: string
   property_type?: string
-  status?: PropertyStatus | string // 빈 문자열도 허용
+  // 매물 상태 관련 코드 완전 삭제
 }
 
 export interface CreatePropertyData {
@@ -294,14 +295,14 @@ export interface CreatePropertyData {
   exit_date?: string
   description?: string
   images?: string[]
-  status?: PropertyStatus
+  // 매물 상태 관련 코드 완전 삭제
 }
 
 export interface UpdatePropertyData {
   title?: string
   type?: PropertyType
   transaction_type?: TransactionType
-  status?: PropertyStatus
+  // 매물 상태 관련 코드 완전 삭제
   address?: string
   detailed_address?: string
   area?: number

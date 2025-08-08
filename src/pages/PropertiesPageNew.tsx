@@ -14,7 +14,6 @@ import { useProperties } from '@/hooks/useProperties'
 import { useTenant } from '@/contexts/TenantContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatPrice } from '@/utils/propertyUtils'
-import { FILTER_STATUS_OPTIONS } from '@/constants/propertyConstants'
 import type { SimplePropertyFilters, Property, CreatePropertyData, UpdatePropertyData } from '@/types'
 
 const PropertiesPageNew: React.FC = () => {
@@ -27,7 +26,6 @@ const PropertiesPageNew: React.FC = () => {
   const [isComposing, setIsComposing] = useState(false)
   const [selectedTransactionType, setSelectedTransactionType] = useState('전체')
   const [selectedPropertyType, setSelectedPropertyType] = useState('전체')
-  const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card')
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
@@ -67,10 +65,9 @@ const PropertiesPageNew: React.FC = () => {
     if (debouncedSearchTerm) result.search = debouncedSearchTerm
     if (selectedTransactionType !== '전체') result.transaction_type = selectedTransactionType
     if (selectedPropertyType !== '전체') result.property_type = selectedPropertyType
-    if (selectedStatus) result.status = selectedStatus as any
     
     return result
-  }, [debouncedSearchTerm, selectedTransactionType, selectedPropertyType, selectedStatus])
+  }, [debouncedSearchTerm, selectedTransactionType, selectedPropertyType])
 
   const { 
     properties, 
@@ -117,7 +114,7 @@ const PropertiesPageNew: React.FC = () => {
     setSearchTerm('')
     setSelectedTransactionType('전체')
     setSelectedPropertyType('전체')
-    setSelectedStatus('')
+    // 매물 상태 관련 코드 완전 삭제
   }
 
   const handleCreateProperty = async (data: CreatePropertyData) => {
@@ -283,13 +280,6 @@ const PropertiesPageNew: React.FC = () => {
                 className="w-full sm:w-24 text-sm"
               />
 
-              {/* 상태 필터 */}
-              <Select
-                options={[...FILTER_STATUS_OPTIONS]}
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full sm:w-24 text-sm"
-              />
             </div>
 
             {/* 두 번째 줄: 뷰 모드와 초기화 */}
@@ -479,14 +469,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
                   }>
                     {property.transaction_type}
                   </Badge>
-                  <div className="mt-1">
-                    <Badge size="sm" variant={
-                      property.status === '거래중' ? 'success' : 
-                      property.status === '거래완료' ? 'default' : 'default'
-                    }>
-                      {property.status}
-                    </Badge>
-                  </div>
+                  {/* 매물 상태 배지 완전 삭제 */}
                 </div>
                 
                 {/* 매물정보 */}
@@ -570,12 +553,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
                     }>
                       {property.transaction_type}
                     </Badge>
-                    <Badge size="sm" variant={
-                      property.status === '거래중' ? 'success' : 
-                      property.status === '거래완료' ? 'default' : 'default'
-                    }>
-                      {property.status}
-                    </Badge>
+                    {/* 매물 상태 배지 완전 삭제 */}
                   </div>
                   <div className="font-bold text-primary-600 text-base">
                     {formatPrice(property)}

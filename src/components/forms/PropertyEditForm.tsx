@@ -5,8 +5,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
-import type { Property, PropertyType, TransactionType, PropertyStatus, UpdatePropertyData } from '@/types'
-import { PROPERTY_STATUS_OPTIONS } from '@/constants/propertyConstants'
+import type { Property, PropertyType, TransactionType, UpdatePropertyData } from '@/types'
 
 interface PropertyEditFormProps {
   isOpen: boolean
@@ -60,21 +59,13 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         landlord_name: property.landlord_name || '',
         landlord_phone: property.landlord_phone || '',
         exit_date: property.exit_date || '',
-        status: property.status
       })
       setErrors({})
     }
   }, [property, isOpen])
 
   const handleInputChange = useCallback((field: keyof UpdatePropertyData, value: any) => {
-    // 개발 환경에서 상태 변경 디버깅
-    if (import.meta.env.DEV && field === 'status') {
-      console.log('🔄 수정폼 매물 상태 변경:', { 
-        이전값: formData.status, 
-        새값: value,
-        매물제목: property.title 
-      })
-    }
+    // 매물 상태 관련 코드 완전 삭제
     
     setFormData(prev => ({
       ...prev,
@@ -88,7 +79,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         [field]: undefined
       }))
     }
-  }, [errors, formData.status, property.title])
+  }, [errors])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof UpdatePropertyData, string>> = {}
@@ -153,7 +144,6 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
       console.log('🔄 매물 수정 제출:', { 
         매물ID: property.id,
         제목: formData.title,
-        상태: formData.status,
         전체데이터: formData 
       })
     }
@@ -416,12 +406,6 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   onChange={(e) => handleInputChange('exit_date', e.target.value)}
                 />
                 
-                <Select
-                  label="매물 상태"
-                  value={formData.status || '거래중'}
-                  onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
-                  options={PROPERTY_STATUS_OPTIONS.map(status => ({ value: status, label: status }))}
-                />
               </div>
               
               <div>

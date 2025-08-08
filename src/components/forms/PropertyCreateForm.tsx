@@ -5,8 +5,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { X, Save } from 'lucide-react'
 import { Button, Input, Select, Card, CardHeader, CardTitle, CardContent, Modal } from '@/components/ui'
-import type { CreatePropertyData, PropertyType, TransactionType, PropertyStatus } from '@/types'
-import { PROPERTY_STATUS_OPTIONS } from '@/constants/propertyConstants'
+import type { CreatePropertyData, PropertyType, TransactionType } from '@/types'
 
 interface PropertyCreateFormProps {
   isOpen: boolean
@@ -55,8 +54,8 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     rooms: 1,
     bathrooms: 1,
     parking: false,
-    elevator: false,
-    status: '거래중'
+    elevator: false
+    // 매물 상태 관련 코드 완전 삭제
   })
 
   const [isVacant, setIsVacant] = useState(false)
@@ -65,10 +64,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInputChange = useCallback((field: keyof CreatePropertyData, value: any) => {
-    // 개발 환경에서 상태 변경 디버깅
-    if (import.meta.env.DEV && field === 'status') {
-      console.log('매물 상태 변경:', { 이전값: formData.status, 새값: value })
-    }
+    // 매물 상태 관련 코드 완전 삭제
     
     setFormData(prev => ({
       ...prev,
@@ -82,7 +78,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         [field]: undefined
       }))
     }
-  }, [errors, formData.status])
+  }, [errors])
 
   // 메모이제이션된 옵션들
   const propertyTypeOptions = useMemo(() => 
@@ -93,9 +89,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     TRANSACTION_TYPES.map(type => ({ value: type, label: type })), []
   )
   
-  const statusOptions = useMemo(() => 
-    PROPERTY_STATUS_OPTIONS.map(status => ({ value: status, label: status })), []
-  )
 
   // 샘플 데이터 기능 제거
 
@@ -170,10 +163,9 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     
     try {
       console.log('📡 onSubmit 함수 호출 중...')
-      // 매매가 및 상태 데이터 확인 (개발 환경에서만)
+      // 매매가 데이터 확인 (개발 환경에서만)
       if (import.meta.env.DEV) {
         console.log('Form 제출 데이터:', { 
-          status: formData.status, 
           transaction_type: formData.transaction_type,
           price: formData.price 
         })
@@ -194,8 +186,8 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         rooms: 1,
         bathrooms: 1,
         parking: false,
-        elevator: false,
-        status: '거래중'
+        elevator: false
+        // 매물 상태 관련 코드 완전 삭제
       })
       setErrors({})
       setIsVacant(false)
@@ -481,12 +473,6 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   </div>
                 </div>
                 
-                <Select
-                  label="매물 상태"
-                  value={formData.status || '거래중'}
-                  onChange={(e) => handleInputChange('status', e.target.value as PropertyStatus)}
-                  options={statusOptions}
-                />
               </div>
               
               <div>
