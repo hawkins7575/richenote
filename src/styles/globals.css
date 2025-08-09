@@ -15,6 +15,35 @@
     @apply bg-gray-50 text-gray-900;
   }
 
+  /* 모바일 우선 강제 적용 (크롬 모바일 특화) */
+  @media (max-width: 1023px) and (pointer: coarse), 
+         screen and (max-width: 768px),
+         screen and (orientation: portrait) and (max-width: 1023px) {
+    html {
+      /* 모바일 뷰포트 강제 설정 */
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+    
+    body {
+      /* 모바일 터치 최적화 */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  }
+
+  /* 안드로이드 크롬 특화 */
+  @supports (-webkit-appearance: none) and (not (display: -ms-grid)) {
+    @media (max-width: 1023px) {
+      html {
+        --mobile-vh: 1vh;
+        height: calc(var(--vh, 1vh) * 100);
+      }
+    }
+  }
+
   /* 스크롤바 스타일링 */
   ::-webkit-scrollbar {
     width: 6px;
