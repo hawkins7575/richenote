@@ -2,7 +2,7 @@
 // 대시보드 페이지
 // ============================================================================
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Home, Users, TrendingUp, Calendar } from "lucide-react";
 import { Card, CardContent, Badge } from "@/components/ui";
 import { useTenant } from "@/contexts/TenantContext";
@@ -13,6 +13,7 @@ import { StatCard } from "@/components/dashboard";
 import { PropertyCard, PropertyDetailModal } from "@/components/property";
 import { PropertyEditForm } from "@/components/forms/PropertyEditForm";
 import { Property, UpdatePropertyData } from "@/types/property";
+import * as teamService from "@/services/teamService";
 
 const DashboardPage: React.FC = () => {
   const { tenant } = useTenant();
@@ -25,6 +26,10 @@ const DashboardPage: React.FC = () => {
   const { properties, loading, updateProperty, deleteProperty, refreshProperties } =
     useProperties();
 
+  // 팀원 수 상태 관리
+  const [teamMemberCount, setTeamMemberCount] = useState<number>(1);
+  const [teamLoading, setTeamLoading] = useState(true);
+
   // 상세 모달 상태 관리
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
@@ -35,6 +40,26 @@ const DashboardPage: React.FC = () => {
   const [editFormOpen, setEditFormOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+
+  // 팀원 수 가져오기
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      if (!user?.id) return;
+
+      try {
+        setTeamLoading(true);
+        const members = await teamService.getTeamMembers(user.id);
+        setTeamMemberCount(members.length);
+      } catch (error) {
+        console.error("팀원 수 조회 실패:", error);
+        setTeamMemberCount(1); // 기본값
+      } finally {
+        setTeamLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, [user?.id]);
 
   // 매물 클릭 핸들러
   const handlePropertyClick = (property: Property) => {
@@ -126,8 +151,8 @@ const DashboardPage: React.FC = () => {
     },
     {
       title: "팀원",
-      value: (stats?.total_users ?? 1).toString(),
-      change: stats?.total_users && stats.total_users > 1 ? "+1" : "0",
+      value: teamMemberCount.toString(),
+      change: teamMemberCount > 1 ? `+${teamMemberCount - 1}` : "0",
       icon: Users,
       color: "text-purple-600",
     },
@@ -222,7 +247,7 @@ const DashboardPage: React.FC = () => {
               change={stat.change}
               icon={stat.icon}
               color={stat.color}
-              loading={statsLoading}
+              loading={stat.title === "팀원" ? teamLoading : statsLoading}
             />
           ))}
         </div>

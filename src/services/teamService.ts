@@ -338,15 +338,13 @@ export const addExistingMember = async (
       throw new Error("존재하지 않는 사용자입니다.");
     }
 
-    // 이미 팀의 멤버인지 확인
+    // 이미 같은 팀의 멤버인지 확인
     if (targetUser.tenant_id === userProfile.tenant_id) {
       throw new Error("이미 팀에 속한 회원입니다.");
     }
 
-    // 다른 팀에 속해있는지 확인 (한 번에 하나의 팀만 가능)
-    if (targetUser.tenant_id) {
-      throw new Error("이미 다른 팀에 속한 회원입니다.");
-    }
+    // 다른 팀에 속한 회원도 추가 가능
+    // 해당 사용자는 새로운 팀으로 이동하게 됩니다
 
     // 팀에 추가
     const { data: updatedMember, error: updateError } = await supabase
@@ -372,6 +370,8 @@ export const addExistingMember = async (
         added_user_id: memberData.user_id,
         added_user_name: targetUser.name,
         role: memberData.role,
+        previous_tenant_id: targetUser.tenant_id, // 이전 팀 정보 기록
+        transferred_from_team: targetUser.tenant_id ? true : false,
       },
     });
 

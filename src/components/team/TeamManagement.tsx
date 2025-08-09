@@ -687,9 +687,10 @@ export const TeamManagement: React.FC = () => {
                       <div className="flex items-start space-x-2">
                         <div className="text-blue-600 mt-0.5">💡</div>
                         <div className="text-sm text-blue-800">
-                          <p className="font-medium">검색 방법:</p>
+                          <p className="font-medium">기존 회원 추가:</p>
                           <p>• 이름 또는 이메일을 2글자 이상 입력하세요</p>
-                          <p>• 검색 결과에서 원하는 회원을 클릭하세요</p>
+                          <p>• 이미 다른 팀에 속한 회원도 추가할 수 있습니다</p>
+                          <p>• 해당 회원은 이 팀으로 이동하게 됩니다</p>
                         </div>
                       </div>
                     </div>
