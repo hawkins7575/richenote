@@ -39,7 +39,7 @@ export const StatCard: React.FC<StatCardProps> = memo(({
           </div>
         ) : (
           <>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold">
               {value}
             </div>
             {change && (

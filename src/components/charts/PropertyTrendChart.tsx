@@ -43,8 +43,8 @@ export const PropertyTrendChart: React.FC<PropertyTrendChartProps> = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 sm:p-4 border border-gray-200 rounded-lg shadow-lg text-xs sm:text-sm">
-          <p className="font-medium text-gray-900 mb-1 sm:mb-2">{`${label}`}</p>
+        <div className="tooltip bg-white p-2 sm:p-4 border border-gray-200 rounded-lg shadow-lg text-xs sm:text-sm">
+          <p className="font-medium mb-1 sm:mb-2">{`${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-xs sm:text-sm" style={{ color: entry.color }}>
               {`${entry.dataKey}: ${entry.value}건`}

@@ -168,7 +168,7 @@ const DashboardPage: React.FC = () => {
     <div className="space-y-6">
       {/* 페이지 헤더 */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold">
           안녕하세요, {user?.name}님! {tenant?.name || '리체 매물장'}에 오신 것을 환영합니다 👋
         </h1>
         <p className="text-gray-600 mt-1">
@@ -226,7 +226,7 @@ const DashboardPage: React.FC = () => {
       {/* 최근 등록 매물 - 새로운 카드 디자인 */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">최근 등록 매물</h2>
+          <h2 className="text-xl font-semibold mb-4">최근 등록 매물</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {properties?.slice(0, 4).map((property) => (
               <PropertyCard
@@ -237,10 +237,10 @@ const DashboardPage: React.FC = () => {
             )) || recentProperties.map((property) => (
               <div
                 key={property.id}
-                className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 space-y-3"
+                className="card bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer p-4 space-y-3"
                 onClick={() => {/* Mock 데이터이므로 실제 Property 객체로 변환 필요 */}}
               >
-                <h3 className="font-semibold text-gray-900 text-lg line-clamp-1">
+                <h3 className="font-semibold text-lg line-clamp-1">
                   {property.title}
                 </h3>
                 <div className="flex items-center text-gray-600">
@@ -275,7 +275,7 @@ const DashboardPage: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold">
                   {tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)} 플랜
                 </h3>
                 <p className="text-gray-600 mt-1">

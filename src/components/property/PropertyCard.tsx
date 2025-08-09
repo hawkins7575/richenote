@@ -25,7 +25,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
   return (
     <div 
       className={`
-        bg-white rounded-xl border border-gray-200 hover:border-blue-300 
+        card bg-white rounded-xl border border-gray-200 hover:border-blue-300 
         hover:shadow-md transition-all duration-200 cursor-pointer
         p-3 sm:p-4 space-y-3 group active:scale-[0.98] touch-target
         ${className}
@@ -34,7 +34,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
     >
       {/* 모바일 최적화된 헤더 - 매물명과 급매 태그 */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
+        <h3 className="font-semibold text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
           {property.title}
         </h3>
         {property.is_urgent && (

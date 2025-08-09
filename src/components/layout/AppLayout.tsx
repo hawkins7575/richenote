@@ -40,7 +40,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* 데스크톱 사이드바 */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 hidden lg:block',
+          'sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 hidden lg:block',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
@@ -57,7 +57,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <Home size={18} className="text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900">
+                <h1 className="text-lg font-bold">
                   {tenant?.name || '리체 매물장'}
                 </h1>
                 <p className="text-xs text-gray-500">{tenant?.plan} 플랜</p>
@@ -94,7 +94,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   key={item.name}
                   to={item.href}
                   className={cn(
-                    'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                    'nav-item flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
                     isCurrent
                       ? 'bg-primary-50 text-primary-700 border-primary-200'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -135,7 +135,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-target',
+                  'nav-item flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-target',
                   isCurrent
                     ? 'text-primary-600 bg-primary-50 border-t-2 border-primary-600'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -163,11 +163,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               >
                 <Home size={16} className="text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold">
                 {tenant?.name || '리체 매물장'}
               </h2>
             </div>
-            <h2 className="hidden lg:block text-lg font-semibold text-gray-900">
+            <h2 className="hidden lg:block text-lg font-semibold">
               매물장
             </h2>
           </div>
@@ -184,6 +184,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 등록
               </Button>
             </Link>
+            
             <UserMenu />
           </div>
         </header>

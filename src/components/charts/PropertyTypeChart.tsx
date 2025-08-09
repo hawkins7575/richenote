@@ -43,8 +43,8 @@ export const PropertyTypeChart: React.FC<PropertyTypeChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
-        <div className="bg-white p-2 sm:p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 text-xs sm:text-sm">{data.type}</p>
+        <div className="tooltip bg-white p-2 sm:p-4 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-medium text-xs sm:text-sm">{data.type}</p>
           <p className="text-xs sm:text-sm text-gray-600">{`${data.count}건 (${data.percentage}%)`}</p>
         </div>
       )

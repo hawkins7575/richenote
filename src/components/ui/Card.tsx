@@ -7,7 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/utils/cn'
 
 const cardVariants = cva(
-  'rounded-lg border bg-white transition-all duration-200',
+  'card rounded-lg border bg-white transition-all duration-200',
   {
     variants: {
       variant: {
@@ -70,7 +70,7 @@ export const CardTitle: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className }) => (
-  <h3 className={cn('text-lg font-semibold leading-none tracking-tight text-gray-900', className)}>
+  <h3 className={cn('text-lg font-semibold leading-none tracking-tight', className)}>
     {children}
   </h3>
 )

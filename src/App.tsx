@@ -23,34 +23,34 @@ function App() {
     <AuthProvider>
       <TenantProvider>
         <Router>
-          <Routes>
-            {/* 팀 초대 수락 페이지 - AuthGuard 없이 접근 가능 */}
-            <Route path="/team/invite" element={<InvitationAccept />} />
-            
-            {/* 인증이 필요한 페이지들 */}
-            <Route path="/*" element={
-              <AuthGuard>
-                <AppLayout>
-                  <Routes>
-                    <Route path="/" element={<DashboardPage />} />
-                    <Route path="/properties" element={<PropertiesPageNew />} />
-                    <Route path="/team" element={<TeamPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/guide" element={<UserGuidePage />} />
-                    
-                    {/* 테넌트별 라우팅 */}
-                    <Route path="/tenant/:tenantSlug/*" element={<TenantRoutes />} />
-                    
-                    {/* 404 처리 */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
+        <Routes>
+          {/* 팀 초대 수락 페이지 - AuthGuard 없이 접근 가능 */}
+          <Route path="/team/invite" element={<InvitationAccept />} />
+          
+          {/* 인증이 필요한 페이지들 */}
+          <Route path="/*" element={
+            <AuthGuard>
+              <AppLayout>
+                <Routes>
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/properties" element={<PropertiesPageNew />} />
+                  <Route path="/team" element={<TeamPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/guide" element={<UserGuidePage />} />
                   
-                  {/* PWA 설치 프롬프트 */}
-                  <InstallPrompt />
-                </AppLayout>
-              </AuthGuard>
-            } />
-          </Routes>
+                  {/* 테넌트별 라우팅 */}
+                  <Route path="/tenant/:tenantSlug/*" element={<TenantRoutes />} />
+                  
+                  {/* 404 처리 */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+                
+                {/* PWA 설치 프롬프트 */}
+                <InstallPrompt />
+              </AppLayout>
+            </AuthGuard>
+          } />
+        </Routes>
         </Router>
       </TenantProvider>
     </AuthProvider>
