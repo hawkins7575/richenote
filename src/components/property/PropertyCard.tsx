@@ -28,10 +28,20 @@ export const PropertyCard: React.FC<PropertyCardProps> = memo(({
         card bg-white rounded-xl border border-gray-200 hover:border-blue-300 
         hover:shadow-md transition-all duration-200 cursor-pointer
         p-3 sm:p-4 space-y-3 group active:scale-[0.98] touch-target
+        relative
         ${className}
       `}
       onClick={() => onClick?.(property)}
     >
+      {/* 거래완료 워터마크 오버레이 */}
+      {property.status === '거래완료' && (
+        <div className="absolute top-2 right-2 z-10">
+          <div className="bg-red-600/90 text-white px-3 py-1.5 rounded-lg transform rotate-12 shadow-lg">
+            <span className="text-sm sm:text-base font-bold tracking-wide">완료</span>
+          </div>
+        </div>
+      )}
+      
       {/* 모바일 최적화된 헤더 - 매물명과 급매 태그 */}
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">

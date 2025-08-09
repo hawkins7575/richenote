@@ -82,6 +82,28 @@ const PropertiesPageNew: React.FC = () => {
     deleteProperty 
   } = useProperties(filters)
 
+  // 거래완료된 매물을 리스트 맨뒤로 정렬
+  const sortedProperties = useMemo(() => {
+    if (!properties) return []
+    
+    return [...properties].sort((a, b) => {
+      // 거래완료 상태를 기준으로 정렬 (거래완료가 아닌 것이 먼저)
+      if (a.status === '거래완료' && b.status !== '거래완료') {
+        return 1 // a를 뒤로
+      }
+      if (a.status !== '거래완료' && b.status === '거래완료') {
+        return -1 // b를 뒤로
+      }
+      
+      // 둘 다 같은 상태면 기존 순서 유지 (생성일 기준)
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+      
+      return 0
+    })
+  }, [properties])
+
   const transactionTypeOptions = [
     { value: '전체', label: '전체' },
     { value: '매매', label: '매매' },
@@ -264,7 +286,7 @@ const PropertiesPageNew: React.FC = () => {
               <div className="flex items-baseline space-x-2">
                 <h1 className="text-base sm:text-2xl lg:text-3xl font-bold text-gray-900">매물 관리</h1>
                 <div className="flex items-center space-x-1">
-                  <span className="text-sm sm:text-lg font-bold text-blue-600">{properties.length}</span>
+                  <span className="text-sm sm:text-lg font-bold text-blue-600">{sortedProperties.length}</span>
                   <span className="text-xs sm:text-sm text-gray-600">개</span>
                 </div>
               </div>
@@ -409,7 +431,7 @@ const PropertiesPageNew: React.FC = () => {
       </div>
 
       {/* 매물 리스트 */}
-      {properties.length === 0 ? (
+      {sortedProperties.length === 0 ? (
         <Card className="p-12 text-center">
           <div className="text-gray-400 mb-4">
             <Search size={48} className="mx-auto" />
@@ -418,7 +440,7 @@ const PropertiesPageNew: React.FC = () => {
         </Card>
       ) : viewMode === 'card' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {properties.map(property => (
+          {sortedProperties.map(property => (
             <PropertyCard
               key={property.id}
               property={property}
@@ -428,7 +450,7 @@ const PropertiesPageNew: React.FC = () => {
         </div>
       ) : (
         <PropertyList
-          properties={properties}
+          properties={sortedProperties}
           onView={(property) => setDetailModalProperty(property)}
         />
       )}
@@ -536,9 +558,15 @@ const PropertyList: React.FC<PropertyListProps> = ({
         {properties.map(property => (
           <div 
             key={property.id} 
-            className="border-b border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer touch-target"
+            className="border-b border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer touch-target relative"
             onClick={() => onView(property)}
           >
+            {/* 거래완료 빨간줄 오버레이 */}
+            {property.status === '거래완료' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                <div className="w-full h-0.5 bg-red-500 opacity-60"></div>
+              </div>
+            )}
             {/* 데스크톱 레이아웃 */}
             <div className="hidden lg:block px-4 py-3">
               <div className="grid grid-cols-12 gap-2 items-center text-sm">

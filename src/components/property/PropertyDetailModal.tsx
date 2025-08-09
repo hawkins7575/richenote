@@ -2,7 +2,7 @@
 // 매물 상세 정보 팝업 모달 - 모든 매물 정보 표시
 // ============================================================================
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { X, MapPin, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
