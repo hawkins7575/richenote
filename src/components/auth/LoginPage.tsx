@@ -2,59 +2,73 @@
 // 로그인 페이지
 // ============================================================================
 
-import React, { useState } from 'react'
-import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react'
-import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
-import { useAuth } from '@/contexts/AuthContext'
-import { SignUpForm } from './SignUpForm'
-import type { SignInData } from '@/types'
+import React, { useState } from "react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
+import {
+  Button,
+  Input,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui";
+import { useAuth } from "@/contexts/AuthContext";
+import { SignUpForm } from "./SignUpForm";
+import type { SignInData } from "@/types";
 
 export const LoginPage: React.FC = () => {
-  const { signIn, resetPassword } = useAuth()
-  const [isSignUp, setIsSignUp] = useState(false)
-  const [isResetPassword, setIsResetPassword] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  const { signIn, resetPassword } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState<SignInData>({
-    email: '',
-    password: '',
-  })
+    email: "",
+    password: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
 
     if (isResetPassword) {
-      const { error } = await resetPassword(formData.email)
+      const { error } = await resetPassword(formData.email);
       if (error) {
-        setError(error.message)
+        setError(error.message);
       } else {
-        setSuccess('비밀번호 재설정 이메일을 보냈습니다.')
-        setIsResetPassword(false)
+        setSuccess("비밀번호 재설정 이메일을 보냈습니다.");
+        setIsResetPassword(false);
       }
     } else {
-      const { error } = await signIn(formData)
+      const { error } = await signIn(formData);
       if (error) {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.')
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
       }
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    setError(null)
-    setSuccess(null)
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null);
+    setSuccess(null);
+  };
 
   if (isSignUp) {
-    return <SignUpForm onBackToLogin={() => setIsSignUp(false)} />
+    return <SignUpForm onBackToLogin={() => setIsSignUp(false)} />;
   }
 
   return (
@@ -65,18 +79,14 @@ export const LoginPage: React.FC = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full text-white text-2xl font-bold mb-4">
             리
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            리체 매물장
-          </h1>
-          <p className="text-gray-600">
-            부동산 전문 관리 솔루션
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">리체 매물장</h1>
+          <p className="text-gray-600">부동산 전문 관리 솔루션</p>
         </div>
 
         <Card className="shadow-xl">
           <CardHeader>
             <CardTitle className="text-center">
-              {isResetPassword ? '비밀번호 재설정' : '로그인'}
+              {isResetPassword ? "비밀번호 재설정" : "로그인"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -88,7 +98,7 @@ export const LoginPage: React.FC = () => {
                   <span className="text-sm">{error}</span>
                 </div>
               )}
-              
+
               {success && (
                 <div className="flex items-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
                   <CheckCircle size={16} />
@@ -114,7 +124,7 @@ export const LoginPage: React.FC = () => {
                 <div>
                   <div className="relative">
                     <Input
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       name="password"
                       placeholder="비밀번호"
                       value={formData.password}
@@ -141,7 +151,7 @@ export const LoginPage: React.FC = () => {
                 className="w-full"
                 loading={loading}
               >
-                {isResetPassword ? '재설정 이메일 전송' : '로그인'}
+                {isResetPassword ? "재설정 이메일 전송" : "로그인"}
               </Button>
 
               {/* 비밀번호 재설정 링크 */}
@@ -163,9 +173,9 @@ export const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      setIsResetPassword(false)
-                      setError(null)
-                      setSuccess(null)
+                      setIsResetPassword(false);
+                      setError(null);
+                      setSuccess(null);
                     }}
                     className="text-sm text-gray-600 hover:text-gray-700 underline"
                   >
@@ -179,7 +189,7 @@ export const LoginPage: React.FC = () => {
             {!isResetPassword && (
               <div className="mt-6 pt-4 border-t border-gray-200 text-center">
                 <p className="text-sm text-gray-600">
-                  계정이 없으신가요?{' '}
+                  계정이 없으신가요?{" "}
                   <button
                     onClick={() => setIsSignUp(true)}
                     className="text-primary-600 hover:text-primary-700 font-medium underline"
@@ -198,5 +208,5 @@ export const LoginPage: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

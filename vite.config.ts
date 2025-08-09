@@ -23,7 +23,10 @@ export default defineConfig({
     host: 'localhost',
     open: false,
     strictPort: false,
-    cors: true
+    cors: true,
+    headers: {
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co;"
+    }
   },
   build: {
     outDir: 'dist',

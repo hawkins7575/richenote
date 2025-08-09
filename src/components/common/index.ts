@@ -2,4 +2,5 @@
 // 공통 컴포넌트 내보내기
 // ============================================================================
 
-export { PermissionGate } from './PermissionGate'
+export { PermissionGate } from "./PermissionGate";
+export { ErrorBoundary } from "./ErrorBoundary";

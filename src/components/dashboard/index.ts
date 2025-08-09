@@ -2,4 +2,4 @@
 // 대시보드 컴포넌트 익스포트
 // ============================================================================
 
-export { StatCard } from './StatCard'
+export { StatCard } from "./StatCard";

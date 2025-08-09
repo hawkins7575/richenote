@@ -2,62 +2,62 @@
 // 초대 링크 모달 컴포넌트
 // ============================================================================
 
-import React, { useState } from 'react'
-import { X, Copy, Mail, Check } from 'lucide-react'
+import React, { useState } from "react";
+import { X, Copy, Mail, Check } from "lucide-react";
 
 interface InviteLinkModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
   inviteData: {
-    email: string
-    inviteUrl: string
-    role: string
-    teamName?: string
-  }
+    email: string;
+    inviteUrl: string;
+    role: string;
+    teamName?: string;
+  };
 }
 
 export const InviteLinkModal: React.FC<InviteLinkModalProps> = ({
   isOpen,
   onClose,
-  inviteData
+  inviteData,
 }) => {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(inviteData.inviteUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(inviteData.inviteUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('클립보드 복사 실패:', error)
+      console.error("클립보드 복사 실패:", error);
     }
-  }
+  };
 
   const handleEmailShare = () => {
-    const subject = `[${inviteData.teamName || '팀'}] 초대 - ${getRoleLabel(inviteData.role)} 역할`
+    const subject = `[${inviteData.teamName || "팀"}] 초대 - ${getRoleLabel(inviteData.role)} 역할`;
     const body = `안녕하세요!
 
-${inviteData.teamName || '팀'}에서 ${getRoleLabel(inviteData.role)} 역할로 초대드립니다.
+${inviteData.teamName || "팀"}에서 ${getRoleLabel(inviteData.role)} 역할로 초대드립니다.
 
 아래 링크를 클릭하여 초대를 수락해주세요:
 ${inviteData.inviteUrl}
 
-감사합니다.`
+감사합니다.`;
 
-    const mailtoUrl = `mailto:${inviteData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.open(mailtoUrl)
-  }
+    const mailtoUrl = `mailto:${inviteData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoUrl);
+  };
 
   const getRoleLabel = (role: string) => {
     const labels = {
-      admin: '관리자',
-      member: '멤버',
-      viewer: '뷰어'
-    }
-    return labels[role as keyof typeof labels] || role
-  }
+      admin: "관리자",
+      member: "멤버",
+      viewer: "뷰어",
+    };
+    return labels[role as keyof typeof labels] || role;
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -67,7 +67,9 @@ ${inviteData.inviteUrl}
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">초대 링크 생성 완료</h2>
-              <p className="text-sm text-gray-600">팀원에게 링크를 전송해주세요</p>
+              <p className="text-sm text-gray-600">
+                팀원에게 링크를 전송해주세요
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -88,9 +90,17 @@ ${inviteData.inviteUrl}
                 <span className="font-medium text-blue-900">초대 정보</span>
               </div>
               <div className="text-sm text-blue-700">
-                <p><strong>이메일:</strong> {inviteData.email}</p>
-                <p><strong>역할:</strong> {getRoleLabel(inviteData.role)}</p>
-                {inviteData.teamName && <p><strong>팀:</strong> {inviteData.teamName}</p>}
+                <p>
+                  <strong>이메일:</strong> {inviteData.email}
+                </p>
+                <p>
+                  <strong>역할:</strong> {getRoleLabel(inviteData.role)}
+                </p>
+                {inviteData.teamName && (
+                  <p>
+                    <strong>팀:</strong> {inviteData.teamName}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -109,17 +119,23 @@ ${inviteData.inviteUrl}
                 <button
                   onClick={handleCopyLink}
                   className={`px-4 py-3 border border-l-0 border-gray-300 rounded-r-lg transition-colors ${
-                    copied 
-                      ? 'bg-green-100 text-green-700 border-green-300' 
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    copied
+                      ? "bg-green-100 text-green-700 border-green-300"
+                      : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                   }`}
                   title="클립보드에 복사"
                 >
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {copied && (
-                <p className="text-sm text-green-600 mt-1">✅ 클립보드에 복사되었습니다!</p>
+                <p className="text-sm text-green-600 mt-1">
+                  ✅ 클립보드에 복사되었습니다!
+                </p>
               )}
             </div>
 
@@ -158,5 +174,5 @@ ${inviteData.inviteUrl}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

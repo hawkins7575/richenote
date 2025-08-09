@@ -49,21 +49,25 @@ button:focus-visible {
     transform: translateY(100%);
     opacity: 0;
   }
-  
+
   .modal-enter-active {
     transform: translateY(0);
     opacity: 1;
-    transition: transform 300ms ease-out, opacity 300ms ease-out;
+    transition:
+      transform 300ms ease-out,
+      opacity 300ms ease-out;
   }
-  
+
   .modal-exit {
     transform: translateY(0);
     opacity: 1;
   }
-  
+
   .modal-exit-active {
     transform: translateY(100%);
     opacity: 0;
-    transition: transform 250ms ease-in, opacity 250ms ease-in;
+    transition:
+      transform 250ms ease-in,
+      opacity 250ms ease-in;
   }
 }

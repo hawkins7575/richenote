@@ -2,4 +2,4 @@
 // 커스텀 훅 익스포트
 // ============================================================================
 
-export { useProperties, usePropertyStats } from './useProperties'
+export { useProperties, usePropertyStats } from "./useProperties";

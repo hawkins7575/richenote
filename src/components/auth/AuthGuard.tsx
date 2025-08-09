@@ -2,34 +2,34 @@
 // 인증 가드 - 로그인 필수 컴포넌트
 // ============================================================================
 
-import React from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { LoginPage } from './LoginPage'
-import { Loading } from '@/components/ui'
+import React from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginPage } from "./LoginPage";
+import { Loading } from "@/components/ui";
 
 interface AuthGuardProps {
-  children: React.ReactNode
-  fallback?: React.ReactNode
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({ 
-  children, 
-  fallback = <LoginPage /> 
+export const AuthGuard: React.FC<AuthGuardProps> = ({
+  children,
+  fallback = <LoginPage />,
 }) => {
-  const { user, loading, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth();
 
   const handleForceSignOut = async () => {
     try {
-      await signOut()
-      window.location.reload()
+      await signOut();
+      window.location.reload();
     } catch (error) {
-      console.error('Force sign out error:', error)
+      console.error("Force sign out error:", error);
       // 강제로 로컬스토리지 정리
-      localStorage.clear()
-      sessionStorage.clear()
-      window.location.reload()
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload();
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -47,12 +47,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return <>{fallback}</>
+    return <>{fallback}</>;
   }
 
-  return <>{children}</>
-}
+  return <>{children}</>;
+};

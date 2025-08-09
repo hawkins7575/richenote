@@ -2,94 +2,99 @@
 // 팀 활동 로그 컴포넌트
 // ============================================================================
 
-import React, { useState, useEffect } from 'react'
-import { Activity, ChevronDown, ChevronUp } from 'lucide-react'
-import { getTeamActivityLogs } from '@/services/teamService'
-import { useAuth } from '@/contexts/AuthContext'
+import React, { useState, useEffect } from "react";
+import { Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { getTeamActivityLogs } from "@/services/teamService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ActivityLog {
-  id: string
-  action: string
-  details: any
-  created_at: string
-  user_id: string
-  user_name: string
+  id: string;
+  action: string;
+  details: any;
+  created_at: string;
+  user_id: string;
+  user_name: string;
 }
 
 const ACTION_LABELS: Record<string, string> = {
-  invitation_sent: '팀원 초대',
-  invitation_accepted: '초대 수락',
-  invitation_declined: '초대 거절',
-  invitation_cancelled: '초대 취소',
-  member_added: '팀원 추가',
-  member_removed: '팀원 제거',
-  role_changed: '역할 변경',
-  member_info_updated: '정보 수정',
-  member_status_changed: '상태 변경'
-}
+  invitation_sent: "팀원 초대",
+  invitation_accepted: "초대 수락",
+  invitation_declined: "초대 거절",
+  invitation_cancelled: "초대 취소",
+  member_added: "팀원 추가",
+  member_removed: "팀원 제거",
+  role_changed: "역할 변경",
+  member_info_updated: "정보 수정",
+  member_status_changed: "상태 변경",
+};
 
 interface TeamActivityLogProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({ isOpen, onClose }) => {
-  const { user } = useAuth()
-  const [logs, setLogs] = useState<ActivityLog[]>([])
-  const [loading, setLoading] = useState(true)
-  const [expandedLog, setExpandedLog] = useState<string | null>(null)
+export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const { user } = useAuth();
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedLog, setExpandedLog] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && user?.id) {
-      loadActivityLogs()
+      loadActivityLogs();
     }
-  }, [isOpen, user?.id])
+  }, [isOpen, user?.id]);
 
   const loadActivityLogs = async () => {
     try {
-      setLoading(true)
-      const data = await getTeamActivityLogs(user!.id)
-      setLogs(data)
+      setLoading(true);
+      const data = await getTeamActivityLogs(user!.id);
+      setLogs(data);
     } catch (error) {
-      console.error('활동 로그 조회 실패:', error)
+      console.error("활동 로그 조회 실패:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
-    if (diffInSeconds < 60) return '방금 전'
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}일 전`
-    
-    return date.toLocaleDateString('ko-KR')
-  }
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "방금 전";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}시간 전`;
+    if (diffInSeconds < 2592000)
+      return `${Math.floor(diffInSeconds / 86400)}일 전`;
+
+    return date.toLocaleDateString("ko-KR");
+  };
 
   const getActionDescription = (log: ActivityLog) => {
-    const baseAction = ACTION_LABELS[log.action] || log.action
-    
-    switch (log.action) {
-      case 'role_changed':
-        return `${log.details.target_user_name || '팀원'}의 역할을 변경했습니다`
-      case 'member_status_changed':
-        return `${log.details.target_user_name || '팀원'}의 상태를 변경했습니다`
-      case 'member_info_updated':
-        return `${log.details.target_user_name || '팀원'}의 정보를 수정했습니다`
-      case 'member_removed':
-        return `${log.details.target_user_name || '팀원'}을 팀에서 제거했습니다`
-      case 'invitation_sent':
-        return `${log.details.email}로 초대를 발송했습니다`
-      default:
-        return baseAction
-    }
-  }
+    const baseAction = ACTION_LABELS[log.action] || log.action;
 
-  if (!isOpen) return null
+    switch (log.action) {
+      case "role_changed":
+        return `${log.details.target_user_name || "팀원"}의 역할을 변경했습니다`;
+      case "member_status_changed":
+        return `${log.details.target_user_name || "팀원"}의 상태를 변경했습니다`;
+      case "member_info_updated":
+        return `${log.details.target_user_name || "팀원"}의 정보를 수정했습니다`;
+      case "member_removed":
+        return `${log.details.target_user_name || "팀원"}을 팀에서 제거했습니다`;
+      case "invitation_sent":
+        return `${log.details.email}로 초대를 발송했습니다`;
+      default:
+        return baseAction;
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -101,7 +106,9 @@ export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({ isOpen, onClos
               <Activity className="w-6 h-6 text-blue-600" />
               <div>
                 <h2 className="text-lg font-semibold">팀 활동 로그</h2>
-                <p className="text-sm text-gray-600">팀의 모든 활동을 확인할 수 있습니다</p>
+                <p className="text-sm text-gray-600">
+                  팀의 모든 활동을 확인할 수 있습니다
+                </p>
               </div>
             </div>
             <button
@@ -130,7 +137,9 @@ export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({ isOpen, onClos
                 <div key={log.id} className="border border-gray-200 rounded-lg">
                   <div
                     className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
+                    onClick={() =>
+                      setExpandedLog(expandedLog === log.id ? null : log.id)
+                    }
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -166,20 +175,29 @@ export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({ isOpen, onClos
                       <div className="text-sm text-gray-600">
                         <p className="font-medium mb-2">상세 정보:</p>
                         <div className="space-y-1">
-                          <p>• 시간: {new Date(log.created_at).toLocaleString('ko-KR')}</p>
+                          <p>
+                            • 시간:{" "}
+                            {new Date(log.created_at).toLocaleString("ko-KR")}
+                          </p>
                           <p>• 실행자: {log.user_name}</p>
-                          {log.details && Object.keys(log.details).length > 0 && (
-                            <div className="mt-2">
-                              <p className="font-medium">추가 정보:</p>
-                              <div className="mt-1 pl-4 space-y-1">
-                                {Object.entries(log.details).map(([key, value]) => (
-                                  <p key={key} className="text-xs">
-                                    • {key}: {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                  </p>
-                                ))}
+                          {log.details &&
+                            Object.keys(log.details).length > 0 && (
+                              <div className="mt-2">
+                                <p className="font-medium">추가 정보:</p>
+                                <div className="mt-1 pl-4 space-y-1">
+                                  {Object.entries(log.details).map(
+                                    ([key, value]) => (
+                                      <p key={key} className="text-xs">
+                                        • {key}:{" "}
+                                        {typeof value === "object"
+                                          ? JSON.stringify(value)
+                                          : String(value)}
+                                      </p>
+                                    ),
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
                         </div>
                       </div>
                     </div>
@@ -201,5 +219,5 @@ export const TeamActivityLog: React.FC<TeamActivityLogProps> = ({ isOpen, onClos
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -2,53 +2,54 @@
 // 팀 초대 수락 컴포넌트
 // ============================================================================
 
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check, X, Users, Building, Mail, Clock } from 'lucide-react'
-import { supabase } from '@/services/supabase'
-import { useAuth } from '@/contexts/AuthContext'
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Check, X, Users, Building, Mail, Clock } from "lucide-react";
+import { supabase } from "@/services/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface InvitationData {
-  id: string
-  email: string
-  role: string
-  status: string
-  expires_at: string
-  tenant_id: string
-  inviter_id: string
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  expires_at: string;
+  tenant_id: string;
+  inviter_id: string;
   tenant?: {
-    name: string
-  }
+    name: string;
+  };
   inviter?: {
-    name: string
-  }
+    name: string;
+  };
 }
 
 export const InvitationAccept: React.FC = () => {
-  const [searchParams] = useSearchParams()
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const [invitation, setInvitation] = useState<InvitationData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [processing, setProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [invitation, setInvitation] = useState<InvitationData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const token = searchParams.get('token')
+  const token = searchParams.get("token");
 
   useEffect(() => {
     if (token) {
-      loadInvitation()
+      loadInvitation();
     } else {
-      setError('유효하지 않은 초대 링크입니다.')
-      setLoading(false)
+      setError("유효하지 않은 초대 링크입니다.");
+      setLoading(false);
     }
-  }, [token])
+  }, [token]);
 
   const loadInvitation = async () => {
     try {
       const { data, error } = await supabase
-        .from('team_invitations')
-        .select(`
+        .from("team_invitations")
+        .select(
+          `
           id,
           email,
           role,
@@ -56,147 +57,152 @@ export const InvitationAccept: React.FC = () => {
           expires_at,
           tenant_id,
           inviter_id
-        `)
-        .eq('invitation_token', token)
-        .eq('status', 'pending')
-        .single()
+        `,
+        )
+        .eq("invitation_token", token)
+        .eq("status", "pending")
+        .single();
 
       if (error || !data) {
-        setError('초대를 찾을 수 없거나 이미 처리된 초대입니다.')
-        return
+        setError("초대를 찾을 수 없거나 이미 처리된 초대입니다.");
+        return;
       }
 
       // 만료 확인
       if (new Date(data.expires_at) < new Date()) {
-        setError('만료된 초대입니다.')
-        return
+        setError("만료된 초대입니다.");
+        return;
       }
 
       // 사용자 이메일 확인 (로그인한 사용자의 이메일과 일치하는지)
       if (user?.email !== data.email) {
-        setError('초대받은 이메일과 로그인한 계정이 다릅니다.')
-        return
+        setError("초대받은 이메일과 로그인한 계정이 다릅니다.");
+        return;
       }
 
       // 팀과 초대자 정보 추가로 가져오기
       const [tenantResponse, inviterResponse] = await Promise.all([
-        supabase.from('tenants').select('name').eq('id', data.tenant_id).single(),
-        supabase.from('user_profiles').select('name').eq('id', data.inviter_id).single()
-      ])
+        supabase
+          .from("tenants")
+          .select("name")
+          .eq("id", data.tenant_id)
+          .single(),
+        supabase
+          .from("user_profiles")
+          .select("name")
+          .eq("id", data.inviter_id)
+          .single(),
+      ]);
 
       const invitationWithDetails = {
         ...data,
-        tenant: { name: tenantResponse.data?.name || '알 수 없는 팀' },
-        inviter: { name: inviterResponse.data?.name || '알 수 없는 사용자' }
-      }
+        tenant: { name: tenantResponse.data?.name || "알 수 없는 팀" },
+        inviter: { name: inviterResponse.data?.name || "알 수 없는 사용자" },
+      };
 
-      setInvitation(invitationWithDetails)
+      setInvitation(invitationWithDetails);
     } catch (error) {
-      console.error('초대 정보 로드 실패:', error)
-      setError('초대 정보를 불러오는데 실패했습니다.')
+      console.error("초대 정보 로드 실패:", error);
+      setError("초대 정보를 불러오는데 실패했습니다.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAccept = async () => {
-    if (!invitation || !user) return
+    if (!invitation || !user) return;
 
     try {
-      setProcessing(true)
+      setProcessing(true);
 
       // 초대 상태를 'accepted'로 변경
       const { error: inviteError } = await supabase
-        .from('team_invitations')
-        .update({ 
-          status: 'accepted',
-          updated_at: new Date().toISOString()
+        .from("team_invitations")
+        .update({
+          status: "accepted",
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', invitation.id)
+        .eq("id", invitation.id);
 
-      if (inviteError) throw inviteError
+      if (inviteError) throw inviteError;
 
       // 초대 데이터에서 tenant_id 직접 사용
 
       const { error: profileError } = await supabase
-        .from('user_profiles')
+        .from("user_profiles")
         .update({
           tenant_id: invitation.tenant_id,
           role: invitation.role,
           joined_at: new Date().toISOString(),
-          status: 'active'
+          status: "active",
         })
-        .eq('id', user.id)
+        .eq("id", user.id);
 
-      if (profileError) throw profileError
+      if (profileError) throw profileError;
 
       // 활동 로그 기록
-      await supabase
-        .from('team_activity_logs')
-        .insert({
-          tenant_id: invitation.tenant_id,
-          user_id: user.id,
-          action: 'invitation_accepted',
-          details: {
-            invitation_id: invitation.id,
-            role: invitation.role
-          }
-        })
+      await supabase.from("team_activity_logs").insert({
+        tenant_id: invitation.tenant_id,
+        user_id: user.id,
+        action: "invitation_accepted",
+        details: {
+          invitation_id: invitation.id,
+          role: invitation.role,
+        },
+      });
 
-      alert('팀 초대를 수락했습니다! 잠시 후 대시보드로 이동합니다.')
-      
+      alert("팀 초대를 수락했습니다! 잠시 후 대시보드로 이동합니다.");
+
       // 대시보드로 리다이렉트
       setTimeout(() => {
-        navigate('/')
-      }, 1000)
-
+        navigate("/");
+      }, 1000);
     } catch (error: any) {
-      console.error('초대 수락 실패:', error)
-      setError(error.message || '초대 수락에 실패했습니다.')
+      console.error("초대 수락 실패:", error);
+      setError(error.message || "초대 수락에 실패했습니다.");
     } finally {
-      setProcessing(false)
+      setProcessing(false);
     }
-  }
+  };
 
   const handleDecline = async () => {
-    if (!invitation) return
+    if (!invitation) return;
 
-    if (!confirm('정말로 초대를 거절하시겠습니까?')) return
+    if (!confirm("정말로 초대를 거절하시겠습니까?")) return;
 
     try {
-      setProcessing(true)
+      setProcessing(true);
 
       // 초대 상태를 'declined'로 변경
       const { error } = await supabase
-        .from('team_invitations')
-        .update({ 
-          status: 'declined',
-          updated_at: new Date().toISOString()
+        .from("team_invitations")
+        .update({
+          status: "declined",
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', invitation.id)
+        .eq("id", invitation.id);
 
-      if (error) throw error
+      if (error) throw error;
 
-      alert('초대를 거절했습니다.')
-      navigate('/')
-
+      alert("초대를 거절했습니다.");
+      navigate("/");
     } catch (error: any) {
-      console.error('초대 거절 실패:', error)
-      setError(error.message || '초대 거절에 실패했습니다.')
+      console.error("초대 거절 실패:", error);
+      setError(error.message || "초대 거절에 실패했습니다.");
     } finally {
-      setProcessing(false)
+      setProcessing(false);
     }
-  }
+  };
 
   const getRoleLabel = (role: string) => {
     const labels = {
-      owner: '팀 소유자',
-      admin: '관리자',
-      member: '멤버',
-      viewer: '뷰어'
-    }
-    return labels[role as keyof typeof labels] || role
-  }
+      owner: "팀 소유자",
+      admin: "관리자",
+      member: "멤버",
+      viewer: "뷰어",
+    };
+    return labels[role as keyof typeof labels] || role;
+  };
 
   if (loading) {
     return (
@@ -206,7 +212,7 @@ export const InvitationAccept: React.FC = () => {
           <p className="text-gray-600">초대 정보를 확인하는 중...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -217,10 +223,12 @@ export const InvitationAccept: React.FC = () => {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <X className="w-8 h-8 text-red-600" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">오류가 발생했습니다</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              오류가 발생했습니다
+            </h2>
             <p className="text-gray-600 mb-6">{error}</p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               대시보드로 이동
@@ -228,11 +236,11 @@ export const InvitationAccept: React.FC = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!invitation) {
-    return null
+    return null;
   }
 
   return (
@@ -251,7 +259,9 @@ export const InvitationAccept: React.FC = () => {
             <Building className="w-5 h-5 text-gray-500" />
             <div>
               <p className="text-sm text-gray-600">팀</p>
-              <p className="font-medium text-gray-900">{invitation.tenant?.name || '알 수 없는 팀'}</p>
+              <p className="font-medium text-gray-900">
+                {invitation.tenant?.name || "알 수 없는 팀"}
+              </p>
             </div>
           </div>
 
@@ -259,7 +269,9 @@ export const InvitationAccept: React.FC = () => {
             <Mail className="w-5 h-5 text-gray-500" />
             <div>
               <p className="text-sm text-gray-600">초대자</p>
-              <p className="font-medium text-gray-900">{invitation.inviter?.name || '알 수 없는 사용자'}</p>
+              <p className="font-medium text-gray-900">
+                {invitation.inviter?.name || "알 수 없는 사용자"}
+              </p>
             </div>
           </div>
 
@@ -267,7 +279,9 @@ export const InvitationAccept: React.FC = () => {
             <Users className="w-5 h-5 text-gray-500" />
             <div>
               <p className="text-sm text-gray-600">역할</p>
-              <p className="font-medium text-gray-900">{getRoleLabel(invitation.role)}</p>
+              <p className="font-medium text-gray-900">
+                {getRoleLabel(invitation.role)}
+              </p>
             </div>
           </div>
 
@@ -276,7 +290,7 @@ export const InvitationAccept: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">만료일</p>
               <p className="font-medium text-gray-900">
-                {new Date(invitation.expires_at).toLocaleDateString('ko-KR')}
+                {new Date(invitation.expires_at).toLocaleDateString("ko-KR")}
               </p>
             </div>
           </div>
@@ -311,5 +325,5 @@ export const InvitationAccept: React.FC = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};

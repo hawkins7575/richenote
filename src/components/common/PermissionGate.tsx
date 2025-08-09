@@ -2,8 +2,11 @@
 // 권한 체크 컴포넌트
 // ============================================================================
 
-import React from 'react'
-import { usePermissions, type WithPermissionProps } from '@/hooks/usePermissions'
+import React from "react";
+import {
+  usePermissions,
+  type WithPermissionProps,
+} from "@/hooks/usePermissions";
 
 // 권한 체크 컴포넌트
 export const PermissionGate: React.FC<WithPermissionProps> = ({
@@ -11,19 +14,20 @@ export const PermissionGate: React.FC<WithPermissionProps> = ({
   permissions,
   requireAll = false,
   fallback = null,
-  children
+  children,
 }) => {
-  const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermissions()
+  const { hasPermission, hasAnyPermission, hasAllPermissions } =
+    usePermissions();
 
-  let hasAccess = false
+  let hasAccess = false;
 
   if (permission) {
-    hasAccess = hasPermission(permission)
+    hasAccess = hasPermission(permission);
   } else if (permissions) {
-    hasAccess = requireAll 
+    hasAccess = requireAll
       ? hasAllPermissions(permissions)
-      : hasAnyPermission(permissions)
+      : hasAnyPermission(permissions);
   }
 
-  return hasAccess ? <>{children}</> : <>{fallback}</>
-}
+  return hasAccess ? <>{children}</> : <>{fallback}</>;
+};

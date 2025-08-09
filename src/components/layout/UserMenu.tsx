@@ -2,37 +2,37 @@
 // 사용자 메뉴 컴포넌트
 // ============================================================================
 
-import React, { useState, useRef, useEffect } from 'react'
-import { User, Settings, LogOut, ChevronDown } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+import React, { useState, useRef, useEffect } from "react";
+import { User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const UserMenu: React.FC = () => {
-  const { user, signOut } = useAuth()
-  const [isOpen, setIsOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const { user, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSignOut = async () => {
     try {
-      await signOut()
+      await signOut();
     } catch (error) {
-      console.error('로그아웃 오류:', error)
+      console.error("로그아웃 오류:", error);
     }
-  }
+  };
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -45,8 +45,8 @@ export const UserMenu: React.FC = () => {
         {/* 아바타 */}
         <div className="w-8 h-8 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
           {user.avatar_url ? (
-            <img 
-              src={user.avatar_url} 
+            <img
+              src={user.avatar_url}
               alt={user.name}
               className="w-8 h-8 rounded-full object-cover"
             />
@@ -54,20 +54,27 @@ export const UserMenu: React.FC = () => {
             user.name.charAt(0).toUpperCase()
           )}
         </div>
-        
+
         {/* 사용자 정보 */}
         <div className="text-left hidden md:block">
           <p className="text-sm font-medium text-gray-900">{user.name}</p>
           <p className="text-xs text-gray-500">
-            {user.role === 'owner' ? '업체 대표' : 
-             user.role === 'manager' ? '팀장/실장' : 
-             user.role === 'agent' ? '중개사' : '조회자'}
+            {user.role === "owner"
+              ? "업체 대표"
+              : user.role === "manager"
+                ? "팀장/실장"
+                : user.role === "agent"
+                  ? "중개사"
+                  : "조회자"}
           </p>
         </div>
-        
-        <ChevronDown size={16} className={`text-gray-400 transition-transform hidden md:block ${
-          isOpen ? 'rotate-180' : ''
-        }`} />
+
+        <ChevronDown
+          size={16}
+          className={`text-gray-400 transition-transform hidden md:block ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {/* 드롭다운 메뉴 */}
@@ -89,10 +96,9 @@ export const UserMenu: React.FC = () => {
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              <User size={16} className="mr-3" />
-              내 프로필
+              <User size={16} className="mr-3" />내 프로필
             </a>
-            
+
             <a
               href="/settings"
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -117,5 +123,5 @@ export const UserMenu: React.FC = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
