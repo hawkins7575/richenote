@@ -10,10 +10,8 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProperties } from "@/hooks/useProperties";
 import {
-  exportProperties,
   formatAsCSV,
   formatAsJSON,
-  ExportOptions as ServiceExportOptions,
 } from "@/services/dataService";
 
 interface DataExportModalProps {

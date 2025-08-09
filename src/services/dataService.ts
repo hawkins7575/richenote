@@ -110,7 +110,7 @@ export const exportProperties = async (
   let query = supabase.from("properties").select("*").eq("tenant_id", tenantId);
 
   // 먼저 전체 매물 수 확인
-  const { data: allProperties, error: allError } = await supabase
+  const { data: allProperties } = await supabase
     .from("properties")
     .select("*")
     .eq("tenant_id", tenantId);
