@@ -181,8 +181,9 @@ export const InstallButton: React.FC = () => {
       console.log('❌ deferredPrompt가 없음 - 수동 설치 안내')
       
       // 수동 설치 안내
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-      const isAndroid = /Android/.test(navigator.userAgent)
+      const userAgent = navigator.userAgent.toLowerCase()
+      const isIOS = userAgent.includes('ipad') || userAgent.includes('iphone') || userAgent.includes('ipod')
+      const isAndroid = userAgent.includes('android')
       
       if (isIOS) {
         alert('iOS Safari에서 설치하기:\n\n1. 하단의 공유 버튼(⬆️) 터치\n2. "홈 화면에 추가" 선택\n3. "추가" 버튼 터치')

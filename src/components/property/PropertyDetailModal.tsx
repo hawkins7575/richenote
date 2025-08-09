@@ -7,6 +7,7 @@ import { X, MapPin, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
 import { PropertyStatusBadge } from '@/components/ui/Badge'
+import { useIsMobile } from '@/hooks/useMobileDetection'
 import '@/styles/mobile-modal.css'
 
 interface PropertyDetailModalProps {
@@ -24,23 +25,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onEdit,
   onDelete
 }) => {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const width = window.innerWidth
-      const userAgent = navigator.userAgent
-      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
-      const isMobileWidth = width < 1024 // lg breakpoint
-      
-      console.log('📱 모바일 감지:', { width, isMobileUA, isMobileWidth })
-      setIsMobile(isMobileWidth || isMobileUA)
-    }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  const isMobile = useIsMobile()
 
   if (!isOpen || !property) return null
 
