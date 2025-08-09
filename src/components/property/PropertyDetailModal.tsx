@@ -2,7 +2,7 @@
 // 매물 상세 정보 팝업 모달 - 모든 매물 정보 표시
 // ============================================================================
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { X, MapPin, User, Car, ChevronUp, Edit, Trash2 } from 'lucide-react'
 import { Property } from '@/types/property'
 import { formatPrice, formatArea, formatMoney } from '@/utils/propertyUtils'
@@ -24,6 +24,24 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onEdit,
   onDelete
 }) => {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const width = window.innerWidth
+      const userAgent = navigator.userAgent
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+      const isMobileWidth = width < 1024 // lg breakpoint
+      
+      console.log('📱 모바일 감지:', { width, isMobileUA, isMobileWidth })
+      setIsMobile(isMobileWidth || isMobileUA)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   if (!isOpen || !property) return null
 
   const price = formatPrice(property)
@@ -51,12 +69,15 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* 헤더 - 모바일 최적화 */}
         <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           {/* 모바일 스와이프 인디케이터 */}
-          <div className="lg:hidden flex justify-center pt-2 pb-1">
-            <div className="w-10 h-1 bg-gray-300 rounded-full"></div>
-          </div>
+          {isMobile && (
+            <div className="flex justify-center pt-2 pb-1">
+              <div className="w-10 h-1 bg-gray-300 rounded-full"></div>
+            </div>
+          )}
           
           {/* 모바일: 세로 배치 */}
-          <div className="lg:hidden p-3 sm:p-4 space-y-3">
+          {isMobile && (
+            <div className="p-3 sm:p-4 space-y-3">
             <div className="flex items-start justify-between">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex-1 pr-4">
                 {property.title}
@@ -104,9 +125,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <PropertyStatusBadge status={property.status} />
               </div>
             </div>
-          </div>
+            </div>
+          )}
           
           {/* 데스크톱: 개선된 가로 배치 */}
+          {!isMobile && (
           <div className="hidden lg:flex items-center justify-between p-6 space-x-6">
             <div className="flex-1 flex items-center space-x-6">
               <div className="flex-1">
@@ -141,6 +164,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <X className="w-6 h-6" />
             </button>
           </div>
+          )}
         </div>
 
         {/* 콘텐츠 - 모바일 최적화 */}
@@ -148,7 +172,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           <div className="px-3 py-2 sm:p-4 space-y-2 sm:space-y-4 pb-safe pb-24">
             
             {/* 모바일: 초컴팩트 레이아웃 */}
-            <div className="lg:hidden space-y-2">
+            {isMobile && (
+            <div className="space-y-2">
               
               {/* 기본 정보 - 초컴팩트 디자인 */}
               <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-2">
@@ -254,9 +279,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 </div>
               </div>
             </div>
+            )}
 
             {/* 데스크톱: 공간 최적화된 레이아웃 */}
-            <div className="hidden lg:block">
+            {!isMobile && (
+            <div className="block">
               
               {/* 첫 번째 행: 4열 그리드 - 더 큰 글씨와 여백 축소 */}
               <div className="grid grid-cols-4 gap-4 mb-4">
@@ -433,10 +460,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 </div>
               )}
             </div>
-
+            )}
 
             {/* 모바일: 임대인 정보 - 초컴팩트 */}
-            <div className="lg:hidden space-y-2">
+            {isMobile && (
+            <div className="space-y-2">
               <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-2">
                 <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
@@ -512,19 +540,20 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 </div>
               )}
             </div>
-
+            )}
 
             
           </div>
         </div>
 
-        {/* 액션 버튼 섹션 - 데스크톱 전용 */}
+        {/* 액션 버튼 섹션 */}
         <div className="border-t border-gray-200 bg-white lg:bg-gray-50">
           {/* 모바일: 간단한 안전 영역만 */}
-          <div className="lg:hidden pb-safe-4"></div>
+          {isMobile && <div className="pb-safe-4"></div>}
           
           {/* 데스크톱: 개선된 가로 레이아웃 */}
-          <div className="hidden lg:flex items-center justify-between p-6 bg-gray-50">
+          {!isMobile && (
+          <div className="flex items-center justify-between p-6 bg-gray-50">
             <div></div>
             
             {/* 액션 버튼들 */}
@@ -553,6 +582,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </button>
             </div>
           </div>
+          )}
         </div>
 
       </div>

@@ -326,7 +326,7 @@ const PropertiesPageNew: React.FC = () => {
             {/* 모바일 초컴팩트 필터 영역 */}
             <div className="space-y-2 sm:space-y-4">
               {/* 필터 드롭다운들 - 모바일 가로 3열 */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-3">
                 {/* 거래유형 필터 */}
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-gray-700 block sm:text-sm">거래유형</label>
