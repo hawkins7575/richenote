@@ -57,17 +57,33 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           
           {/* 모바일: 세로 배치 */}
           <div className="lg:hidden p-3 sm:p-4 space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex-1 pr-4">
                 {property.title}
               </h2>
-              <button
-                onClick={onClose}
-                className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                aria-label="닫기"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center space-x-1 flex-shrink-0">
+                <button
+                  onClick={handleEditClick}
+                  className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  aria-label="매물 수정"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  aria-label="매물 삭제"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  aria-label="닫기"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             
             <div className="flex items-start space-x-2">
@@ -502,41 +518,10 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         </div>
 
-        {/* 액션 버튼 섹션 - 모바일 최적화 */}
+        {/* 액션 버튼 섹션 - 데스크톱 전용 */}
         <div className="border-t border-gray-200 bg-white lg:bg-gray-50">
-          {/* 모바일: 세로 스택 레이아웃 */}
-          <div className="lg:hidden p-4 pb-safe-4 space-y-3">
-            
-            {/* 액션 버튼들 - 모바일 터치 최적화 */}
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={onClose}
-                className="py-4 px-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 active:scale-95 rounded-xl transition-all duration-200 border border-gray-300 hover:border-gray-400 min-h-[52px] flex flex-col items-center justify-center touch-target"
-                aria-label="모달 닫기"
-              >
-                <X className="w-4 h-4 mb-1" />
-                닫기
-              </button>
-              
-              <button
-                onClick={handleEditClick}
-                className="py-4 px-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 active:scale-95 transition-all duration-200 font-medium text-sm min-h-[52px] flex flex-col items-center justify-center touch-target shadow-lg"
-                aria-label="매물 정보 수정"
-              >
-                <Edit className="w-4 h-4 mb-1" />
-                수정
-              </button>
-              
-              <button
-                onClick={handleDeleteClick}
-                className="py-4 px-3 bg-red-600 text-white rounded-xl hover:bg-red-700 active:bg-red-800 active:scale-95 transition-all duration-200 font-medium text-sm min-h-[52px] flex flex-col items-center justify-center touch-target shadow-lg"
-                aria-label="매물 삭제"
-              >
-                <Trash2 className="w-4 h-4 mb-1" />
-                삭제
-              </button>
-            </div>
-          </div>
+          {/* 모바일: 간단한 안전 영역만 */}
+          <div className="lg:hidden pb-safe-4"></div>
           
           {/* 데스크톱: 개선된 가로 레이아웃 */}
           <div className="hidden lg:flex items-center justify-between p-6 bg-gray-50">
