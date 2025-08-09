@@ -105,29 +105,45 @@ export const exportProperties = async (
   tenantId: string,
   options: ExportOptions,
 ): Promise<Property[]> => {
+  console.log("🔍 내보내기 요청:", { tenantId, options });
+
   let query = supabase.from("properties").select("*").eq("tenant_id", tenantId);
+
+  // 먼저 전체 매물 수 확인
+  const { data: allProperties, error: allError } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("tenant_id", tenantId);
+
+  console.log("📊 전체 매물 수:", allProperties?.length || 0);
+  console.log("📊 전체 매물 샘플:", allProperties?.slice(0, 3));
 
   // 필터 적용
   if (options.filters) {
     const { filters } = options;
+    console.log("🔧 적용할 필터:", filters);
 
     // 매물 상태 필터
     if (filters.propertyStatus && filters.propertyStatus !== "all") {
+      console.log("🏷️ 상태 필터 적용:", filters.propertyStatus);
       query = query.eq("status", filters.propertyStatus);
     }
 
     // 매물 유형 필터
     if (filters.propertyType && filters.propertyType !== "all") {
+      console.log("🏠 유형 필터 적용:", filters.propertyType);
       query = query.eq("type", filters.propertyType);
     }
 
     // 날짜 범위 필터
     if (filters.dateRange && filters.dateRange !== "all") {
       const now = new Date();
+      console.log("📅 날짜 필터 적용:", filters.dateRange);
 
       switch (filters.dateRange) {
         case "thisMonth":
           const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          console.log("📅 이번 달 시작:", thisMonthStart.toISOString());
           query = query.gte("created_at", thisMonthStart.toISOString());
           break;
 
@@ -138,6 +154,7 @@ export const exportProperties = async (
             1,
           );
           const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+          console.log("📅 지난 달:", lastMonthStart.toISOString(), "~", lastMonthEnd.toISOString());
           query = query
             .gte("created_at", lastMonthStart.toISOString())
             .lte("created_at", lastMonthEnd.toISOString());
@@ -145,10 +162,13 @@ export const exportProperties = async (
 
         case "custom":
           if (filters.customDateFrom) {
+            console.log("📅 사용자 지정 시작:", filters.customDateFrom);
             query = query.gte("created_at", filters.customDateFrom);
           }
           if (filters.customDateTo) {
-            query = query.lte("created_at", filters.customDateTo + "T23:59:59");
+            const endDate = filters.customDateTo + "T23:59:59";
+            console.log("📅 사용자 지정 끝:", endDate);
+            query = query.lte("created_at", endDate);
           }
           break;
       }
@@ -160,7 +180,11 @@ export const exportProperties = async (
 
   const { data, error } = await query;
 
+  console.log("📊 필터링된 매물 수:", data?.length || 0);
+  console.log("📊 필터링된 매물 샘플:", data?.slice(0, 3));
+
   if (error) {
+    console.error("❌ 데이터베이스 오류:", error);
     throw new Error(`데이터 내보내기 실패: ${error.message}`);
   }
 

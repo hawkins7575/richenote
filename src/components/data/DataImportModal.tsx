@@ -115,21 +115,20 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // useTenant을 안전하게 호출
-  let tenant = null;
+  // 기본값으로 user.id를 tenant.id로 사용
+  let tenant = user?.id ? { id: user.id, name: "PropertyDesk" } : null;
   let tenantLoading = false;
 
+  // useTenant을 안전하게 호출해서 실제 테넌트 정보가 있으면 사용
   try {
     const tenantContext = useTenant();
-    tenant = tenantContext?.tenant;
-    tenantLoading = tenantContext?.isLoading || false;
+    if (tenantContext?.tenant?.id) {
+      tenant = tenantContext.tenant;
+      tenantLoading = tenantContext?.isLoading || false;
+    }
   } catch (error) {
     console.log("TenantContext 오류, 사용자 ID를 테넌트 ID로 사용:", error);
-    // TenantContext가 실패하면 user.id를 tenant.id로 사용
-    if (user?.id) {
-      tenant = { id: user.id, name: "PropertyDesk" };
-      tenantLoading = false;
-    }
+    // 이미 위에서 user.id를 설정했으므로 추가 처리 불필요
   }
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<

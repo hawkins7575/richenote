@@ -95,21 +95,20 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // useTenant을 안전하게 호출
-  let tenant = null;
+  // 기본값으로 user.id를 tenant.id로 사용
+  let tenant = user?.id ? { id: user.id, name: "PropertyDesk" } : null;
   let tenantLoading = false;
 
+  // useTenant을 안전하게 호출해서 실제 테넌트 정보가 있으면 사용
   try {
     const tenantContext = useTenant();
-    tenant = tenantContext?.tenant;
-    tenantLoading = tenantContext?.isLoading || false;
+    if (tenantContext?.tenant?.id) {
+      tenant = tenantContext.tenant;
+      tenantLoading = tenantContext?.isLoading || false;
+    }
   } catch (error) {
     console.log("TenantContext 오류, 사용자 ID를 테넌트 ID로 사용:", error);
-    // TenantContext가 실패하면 user.id를 tenant.id로 사용
-    if (user?.id) {
-      tenant = { id: user.id, name: "PropertyDesk" };
-      tenantLoading = false;
-    }
+    // 이미 위에서 user.id를 설정했으므로 추가 처리 불필요
   }
 
   const { properties } = useProperties();
@@ -242,33 +241,12 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
         options: exportOptions,
       });
 
-      // 서비스에서 데이터 가져오기
-      const serviceOptions: ServiceExportOptions = {
-        format: exportOptions.format,
-        includeFields: exportOptions.includeFields,
-        filters: {
-          dateRange: exportOptions.dateRange,
-          customDateFrom: exportOptions.customDateFrom,
-          customDateTo: exportOptions.customDateTo,
-          propertyStatus:
-            exportOptions.propertyStatus === "all"
-              ? undefined
-              : exportOptions.propertyStatus,
-          propertyType:
-            exportOptions.propertyType === "all"
-              ? undefined
-              : exportOptions.propertyType,
-        },
-      };
+      // 현재 메모리에 있는 매물 데이터를 기반으로 내보내기
+      // (useProperties에서 가져온 데이터와 동일한 소스)
+      const filteredProperties = getFilteredProperties();
+      console.log("내보낼 매물 수:", filteredProperties.length);
 
-      console.log("서비스 옵션:", serviceOptions);
-      const exportedProperties = await exportProperties(
-        tenant.id,
-        serviceOptions,
-      );
-      console.log("조회된 매물 수:", exportedProperties.length);
-
-      if (exportedProperties.length === 0) {
+      if (filteredProperties.length === 0) {
         setError(
           "선택한 조건에 맞는 매물이 없습니다. 필터 조건을 확인해보세요.",
         );
@@ -288,7 +266,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
         case "csv":
         case "excel":
           content = formatAsCSV(
-            exportedProperties,
+            filteredProperties,
             exportOptions.includeFields,
           );
           filename = `매물데이터_${timestamp}.csv`;
@@ -297,7 +275,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
 
         case "json":
           content = formatAsJSON(
-            exportedProperties,
+            filteredProperties,
             exportOptions.includeFields,
           );
           filename = `매물데이터_${timestamp}.json`;
