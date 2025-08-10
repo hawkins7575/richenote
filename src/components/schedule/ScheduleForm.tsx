@@ -3,13 +3,12 @@
 // ============================================================================
 
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, MapPin, Users, Tag, AlertCircle } from "lucide-react";
+import { Calendar, MapPin, Users, Tag, AlertCircle } from "lucide-react";
 import { Button, Input, Modal } from "@/components/ui";
 import { Schedule, ScheduleFormData, ScheduleCategory, SchedulePriority } from "@/types/schedule";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTenant } from "@/contexts/TenantContext";
+// import { useTenant } from "@/contexts/TenantContext"; // 현재 사용하지 않음
 import { scheduleService } from "@/services/scheduleService";
-import { supabase } from "@/lib/supabase";
 import { useProperties } from "@/hooks/useProperties";
 
 interface ScheduleFormProps {
@@ -28,7 +27,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
   selectedDate,
 }) => {
   const { user, loading: authLoading, session, getCurrentUser } = useAuth();
-  const { tenant } = useTenant();
+  // const { tenant } = useTenant(); // 현재 사용하지 않음
   const { properties } = useProperties();
   
   const [isSubmitting, setIsSubmitting] = useState(false);

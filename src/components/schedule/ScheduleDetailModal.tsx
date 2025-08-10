@@ -15,7 +15,7 @@ import {
   X
 } from "lucide-react";
 import { Button, Modal } from "@/components/ui";
-import { Schedule, ScheduleCategory, SchedulePriority } from "@/types/schedule";
+import { Schedule } from "@/types/schedule";
 import { useIsMobile } from "@/hooks/useMobileDetection";
 
 interface ScheduleDetailModalProps {

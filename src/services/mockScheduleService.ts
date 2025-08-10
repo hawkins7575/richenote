@@ -47,7 +47,7 @@ class MockScheduleService {
    * 모든 스케줄 조회 (필터 적용)
    */
   async getSchedules(
-    tenantId: string,
+    _tenantId: string,
     filters?: ScheduleFilters
   ): Promise<Schedule[]> {
     // 임시로 딜레이 추가 (실제 API 호출 시뮬레이션)
@@ -93,11 +93,11 @@ class MockScheduleService {
    * 특정 기간의 스케줄 조회
    */
   async getSchedulesByDateRange(
-    tenantId: string,
+    _tenantId: string,
     startDate: string,
     endDate: string
   ): Promise<Schedule[]> {
-    return this.getSchedules(tenantId, {
+    return this.getSchedules(_tenantId, {
       date_range: { start: startDate, end: endDate }
     });
   }
@@ -204,7 +204,7 @@ class MockScheduleService {
    * 다가오는 스케줄 조회 (대시보드용)
    */
   async getUpcomingSchedules(
-    tenantId: string,
+    _tenantId: string,
     limit: number = 5
   ): Promise<Schedule[]> {
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -223,7 +223,7 @@ class MockScheduleService {
   /**
    * 스케줄 통계 조회
    */
-  async getScheduleStats(tenantId: string): Promise<{
+  async getScheduleStats(_tenantId: string): Promise<{
     total: number;
     scheduled: number;
     inProgress: number;

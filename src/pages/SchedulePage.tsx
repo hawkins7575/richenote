@@ -19,14 +19,14 @@ import { ScheduleForm } from "@/components/schedule";
 import { ScheduleDetailModal } from "@/components/schedule/ScheduleDetailModal";
 import { useIsMobile } from "@/hooks/useMobileDetection";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTenant } from "@/contexts/TenantContext";
+// import { useTenant } from "@/contexts/TenantContext"; // 현재 사용하지 않음
 import { Schedule, CalendarView, ScheduleCategory } from "@/types/schedule";
 import { scheduleService } from "@/services/scheduleService";
 
 const SchedulePage: React.FC = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { tenant } = useTenant();
+  // const { tenant } = useTenant(); // 현재 사용하지 않음
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
@@ -38,7 +38,7 @@ const SchedulePage: React.FC = () => {
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | "all">("all");
-  const [loading, setLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false); // 현재 사용하지 않음
 
   // 카테고리별 색상 매핑
   const categoryColors = {
@@ -69,7 +69,7 @@ const SchedulePage: React.FC = () => {
         return;
       }
       
-      setLoading(true);
+      // setIsLoading(true); // 로딩 상태 사용하지 않음
       try {
         console.log("📅 스케줄 데이터 로드 시작:", {
           userId: user.id,
@@ -84,7 +84,7 @@ const SchedulePage: React.FC = () => {
         console.error("❌ 스케줄 로드 실패:", error);
         setSchedules([]); // 오류 시 빈 배열로 설정
       } finally {
-        setLoading(false);
+        // setIsLoading(false); // 로딩 상태 사용하지 않음
       }
     };
 

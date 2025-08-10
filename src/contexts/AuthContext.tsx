@@ -283,7 +283,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // 1. 컨텍스트에 사용자가 있으면 반환
       if (user && !loading) {
-        logger.info("✅ 컨텍스트에서 사용자 반환:", user.id);
+        logger.info("✅ 컨텍스트에서 사용자 반환", { userId: user.id });
         return user;
       }
       

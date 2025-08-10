@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover, shrink-to-fit=no" />
     <meta name="theme-color" content="#3b82f6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -86,11 +86,11 @@
         100% { transform: rotate(360deg); }
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-DncJwFnw.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-DE-6VouJ.js">
-    <link rel="modulepreload" crossorigin href="/assets/supabase-CoeAqQAf.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-CiHP99Of.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-Sn-sqElY.css">
+    <script type="module" crossorigin src="/assets/index-BLTBtcGA.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-C1JoJ-56.js">
+    <link rel="modulepreload" crossorigin href="/assets/supabase-B7vP6efo.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-DRkL5ZQc.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CCalv2k5.css">
   </head>
   <body>
     <div id="root">
@@ -98,6 +98,49 @@
         <div class="loading-spinner"></div>
       </div>
     </div>
+    
+    <!-- 모바일 크롬 브라우저 감지 및 뷰포트 설정 -->
+    <script>
+      (function() {
+        // 모바일 감지 및 뷰포트 동적 설정
+        var userAgent = navigator.userAgent.toLowerCase();
+        var isMobile = 
+          /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) ||
+          (userAgent.includes('chrome') && userAgent.includes('mobile')) ||
+          (userAgent.includes('chrome') && userAgent.includes('android')) ||
+          userAgent.includes('mobile') ||
+          window.innerWidth < 768 ||
+          ('ontouchstart' in window);
+        
+        if (isMobile) {
+          console.log('📱 모바일 디바이스 감지됨:', userAgent);
+          
+          // 동적 뷰포트 높이 설정 (모바일 브라우저 주소창 문제 해결)
+          function setVh() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', vh + 'px');
+          }
+          
+          setVh();
+          window.addEventListener('resize', setVh);
+          window.addEventListener('orientationchange', function() {
+            setTimeout(setVh, 100);
+          });
+          
+          // 모바일 메타 태그 강화
+          var existingMeta = document.querySelector('meta[name="viewport"]');
+          if (existingMeta) {
+            existingMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover, shrink-to-fit=no, minimal-ui';
+          }
+          
+          // 모바일 전용 클래스 추가
+          document.documentElement.classList.add('mobile-detected');
+        } else {
+          console.log('💻 데스크톱 디바이스 감지됨');
+          document.documentElement.classList.add('desktop-detected');
+        }
+      })();
+    </script>
     
     <!-- 카카오톡 인앱 브라우저 감지 및 처리 -->
     <script>
