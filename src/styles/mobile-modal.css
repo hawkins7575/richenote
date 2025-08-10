@@ -1,9 +1,13 @@
 /* 모바일 모달 전용 CSS */
 
-/* iOS Safari 뷰포트 처리 */
+/* iOS Safari 뷰포트 처리 - 개선된 Safe Area 지원 */
 @supports (padding: max(0px)) {
   .pb-safe {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -30,10 +34,19 @@
   user-select: none;
 }
 
-/* 모바일 터치 피드백 */
+/* 모바일 터치 피드백 - 개선된 햅틱 효과 */
 @media (hover: none) and (pointer: coarse) {
-  button:active {
-    transform: scale(0.98);
+  button:active,
+  .touch-target:active,
+  [role="button"]:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease-out;
+  }
+  
+  /* 네비게이션 아이템 특별 처리 */
+  .nav-item:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-out;
   }
 }
 

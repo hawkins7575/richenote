@@ -193,7 +193,7 @@ const SchedulePage: React.FC = () => {
                 return (
                   <div
                     key={dayIndex}
-                    className={`min-h-[80px] p-1 border-r border-gray-100 last:border-r-0 cursor-pointer hover:bg-gray-50 transition-colors ${
+                    className={`min-h-[60px] sm:min-h-[80px] p-1 sm:p-2 border-r border-gray-100 last:border-r-0 cursor-pointer hover:bg-gray-50 transition-colors ${
                       !isCurrentMonth ? "bg-gray-25 text-gray-400" : ""
                     }`}
                     onClick={() => {
@@ -201,12 +201,12 @@ const SchedulePage: React.FC = () => {
                       setShowCreateModal(true);
                     }}
                   >
-                    <div className={`text-sm mb-1 ${
+                    <div className={`text-xs sm:text-sm mb-1 ${
                       isToday 
-                        ? "w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"
+                        ? "w-5 h-5 sm:w-6 sm:h-6 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs"
                         : "font-medium"
                     }`}>
-                      {isToday ? day.getDate() : day.getDate()}
+                      {day.getDate()}
                     </div>
                     
                     {/* 스케줄 표시 */}
@@ -214,7 +214,7 @@ const SchedulePage: React.FC = () => {
                       {daySchedules.slice(0, isMobile ? 1 : 3).map((schedule, idx) => (
                         <div
                           key={idx}
-                          className={`text-xs px-1 py-0.5 rounded text-white truncate cursor-pointer hover:opacity-80 ${
+                          className={`text-xs px-1 py-0.5 sm:px-2 sm:py-1 rounded text-white truncate cursor-pointer hover:opacity-80 touch-target ${
                             categoryColors[schedule.category]
                           }`}
                           onClick={(e) => {

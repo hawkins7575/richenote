@@ -249,40 +249,42 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 페이지 헤더 */}
-      <div>
-        <h1 className="text-2xl font-bold">
-          안녕하세요, {user?.name || "사용자"}님! {tenant?.name || "리체 매물장"}에 오신
-          것을 환영합니다 👋
+    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-6">
+      {/* 페이지 헤더 - 모바일 최적화 */}
+      <div className="px-1 sm:px-0">
+        <h1 className="text-lg sm:text-2xl font-bold leading-tight">
+          안녕하세요, {user?.name || "사용자"}님! 👋
         </h1>
-        <p className="text-gray-600 mt-1">오늘의 매물 현황을 확인해보세요</p>
+        <h2 className="text-sm sm:text-base text-gray-600 mt-1 lg:hidden">
+          {tenant?.name || "리체 매물장"}
+        </h2>
+        <h2 className="hidden lg:block text-2xl font-bold mt-1">
+          {tenant?.name || "리체 매물장"}에 오신 것을 환영합니다 👋
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">오늘의 매물 현황을 확인해보세요</p>
       </div>
 
-      {/* 통계 카드 - 모바일 최적화: 4개씩 한 줄 */}
+      {/* 통계 카드 - 모바일 최적화 */}
       {statsLoading ? (
-        <div className="grid grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
-              <CardContent className="p-2 sm:p-4 lg:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                  <div className="space-y-1 lg:space-y-2">
-                    <div className="h-3 lg:h-4 bg-gray-200 rounded w-full lg:w-20"></div>
-                    <div className="h-6 lg:h-8 bg-gray-200 rounded w-full lg:w-16"></div>
-                    <div className="h-3 lg:h-4 bg-gray-200 rounded w-full lg:w-12 hidden sm:block"></div>
-                  </div>
-                  <div className="w-8 h-8 lg:w-12 lg:h-12 bg-gray-200 rounded-lg mt-2 lg:mt-0 mx-auto lg:mx-0"></div>
+              <CardContent className="p-3 sm:p-4 lg:p-6">
+                <div className="flex flex-col space-y-2">
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/3 hidden sm:block"></div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : statsError ? (
-        <Card className="p-6">
-          <p className="text-red-600 text-center">{statsError}</p>
+        <Card className="p-4 sm:p-6">
+          <p className="text-red-600 text-center text-sm sm:text-base">{statsError}</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {dashboardStats.map((stat, index) => (
             <StatCard
               key={index}

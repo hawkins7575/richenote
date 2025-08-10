@@ -130,8 +130,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* 모바일 하단 네비게이션 - 고정 */}
-      <div className="lg:hidden bottom-nav-fixed bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
+      {/* 모바일 하단 네비게이션 - 개선된 터치 최적화 */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg pb-safe">
         <div className="grid grid-cols-6 h-16 bg-white">
           {navigation.map((item) => {
             const isCurrent = location.pathname === item.href;
@@ -140,14 +140,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "nav-item flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-target",
+                  "nav-item flex flex-col items-center justify-center px-1 py-2 text-xs font-medium transition-all duration-200 touch-manipulation active:scale-95",
+                  "min-h-[44px] relative",
                   isCurrent
-                    ? "text-primary-600 bg-primary-50 border-t-2 border-primary-600"
+                    ? "text-primary-600 bg-primary-50"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50",
                 )}
               >
+                {isCurrent && (
+                  <div className="absolute top-0 left-1/2 w-8 h-1 bg-primary-600 rounded-b-full transform -translate-x-1/2" />
+                )}
                 <item.icon size={18} className="mb-1 flex-shrink-0" />
-                <span className="truncate text-center leading-tight">
+                <span className="truncate text-center leading-tight max-w-full">
                   {item.name.split(" ")[0]}
                 </span>
               </Link>

@@ -199,6 +199,40 @@
    프린트 스타일
    ============================================================================ */
 
+/* ============================================================================
+   모바일 최적화 스타일
+   ============================================================================ */
+
+/* 모바일 전용 간격 조정 */
+@media (max-width: 640px) {
+  .mobile-compact {
+    @apply space-y-3 p-3;
+  }
+  
+  .mobile-text-sm {
+    @apply text-sm leading-tight;
+  }
+  
+  .mobile-grid-2 {
+    @apply grid-cols-2 gap-3;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .hover-none-scale:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+  }
+}
+
+/* PWA 상태바 처리 */
+@media (display-mode: standalone) {
+  .pwa-status-padding {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
