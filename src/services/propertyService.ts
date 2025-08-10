@@ -772,7 +772,7 @@ export const getPropertyStats = async (userId: string) => {
 
     const { data, error } = await supabase
       .from("properties")
-      .select("transaction_type, created_at")
+      .select("transaction_type, created_at, status")
       .eq("tenant_id", actualTenantId); // 정확한 tenant_id로 필터링
 
     if (error) {
@@ -780,11 +780,14 @@ export const getPropertyStats = async (userId: string) => {
       throw error;
     }
 
+    // 완료된 매물 수 계산 (거래완료 상태)
+    const completedCount = data.filter((p) => p.status === "거래완료").length;
+    
     const stats = {
       total: data.length,
-      active: data.length, // 모든 매물을 활성으로 간주
+      active: data.length - completedCount, // 총 매물 - 완료 매물
       reserved: 0,
-      sold: 0,
+      sold: completedCount, // 거래완료 매물 수
       this_month: data.filter((p) => {
         const created = new Date(p.created_at);
         const now = new Date();

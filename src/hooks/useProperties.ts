@@ -236,9 +236,9 @@ export const usePropertyStats = () => {
           console.log("🔧 개발환경: 모사 통계 데이터 사용");
           const mockStats = {
             total: 2,
-            active: 2,
+            active: 2, // 모사 데이터에서는 완료된 매물이 없으므로 전체가 활성
             reserved: 0,
-            sold: 0,
+            sold: 0, // 거래완료 매물 없음
             this_month: 2,
             total_users: 1,
             active_users: 1,
@@ -261,9 +261,9 @@ export const usePropertyStats = () => {
         console.log("🔧 오류로 인한 모사 통계 데이터 사용");
         const mockStats = {
           total: 2,
-          active: 2,
+          active: 2, // 모사 데이터에서는 완료된 매물이 없으므로 전체가 활성
           reserved: 0,
-          sold: 0,
+          sold: 0, // 거래완료 매물 없음
           this_month: 2,
           total_users: 1,
           active_users: 1,
