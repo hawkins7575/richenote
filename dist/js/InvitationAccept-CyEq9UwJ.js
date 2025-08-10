@@ -1,4 +1,4 @@
-import{d as S,s as r,j as e}from"./index-CshFh5IW.js";import{f as k,e as D,r as n}from"./react-vendor-DS3Z5Hf_.js";import{X as q,g,B as E,c as I,j as C,J as R}from"./ui-vendor-DnkZPEX2.js";import"./supabase-vendor-CCigGT7m.js";import"./utils-vendor-BJeS7sC5.js";const F=()=>{const[h]=k(),{user:l}=S(),d=D(),[s,f]=n.useState(null),[p,x]=n.useState(!0),[o,c]=n.useState(!1),[u,a]=n.useState(null),m=h.get("token");n.useEffect(()=>{m?j():(a("유효하지 않은 초대 링크입니다."),x(!1))},[m]);const j=async()=>{try{const{data:t,error:i}=await r.from("team_invitations").select(`
+import{d as S,s as r,j as e}from"./index-NWa438vT.js";import{f as k,e as D,r as n}from"./react-vendor-DS3Z5Hf_.js";import{X as q,g,B as E,c as I,j as C,J as R}from"./ui-vendor-DnkZPEX2.js";import"./supabase-vendor-CCigGT7m.js";import"./utils-vendor-BJeS7sC5.js";const F=()=>{const[h]=k(),{user:l}=S(),d=D(),[s,f]=n.useState(null),[p,x]=n.useState(!0),[o,c]=n.useState(!1),[u,a]=n.useState(null),m=h.get("token");n.useEffect(()=>{m?j():(a("유효하지 않은 초대 링크입니다."),x(!1))},[m]);const j=async()=>{try{const{data:t,error:i}=await r.from("team_invitations").select(`
           id,
           email,
           role,
