@@ -321,45 +321,46 @@ export const TeamManagement: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        {/* 헤더 */}
-        <div className="border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 pb-20 sm:pb-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {/* 헤더 - 모바일 최적화 */}
+        <div className="border-b border-gray-200 p-4 sm:px-6 sm:py-4">
+          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center space-x-3">
-              <Users className="w-6 h-6 text-blue-600" />
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">팀 관리</h1>
-                <p className="text-sm text-gray-600">팀원 초대 및 관리</p>
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-semibold text-gray-900">팀 관리</h1>
+                <p className="text-sm text-gray-600 hidden sm:block">팀원 초대 및 관리</p>
               </div>
             </div>
 
             {canManageTeam && (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <button
                   onClick={() => setShowActivityLog(true)}
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                  className="text-gray-600 hover:text-gray-800 px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 touch-target"
                 >
-                  <Activity className="w-4 h-4" />
-                  <span>활동 로그</span>
+                  <Activity className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm sm:text-base hidden sm:inline">활동 로그</span>
+                  <span className="text-sm sm:hidden">로그</span>
                 </button>
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                  className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 touch-target"
                 >
-                  <UserPlus className="w-4 h-4" />
-                  <span>팀원 초대</span>
+                  <UserPlus className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm sm:text-base">초대</span>
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* 팀원 목록 */}
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">
-              팀원 ({members.length}명)
+        {/* 팀원 목록 - 모바일 최적화 */}
+        <div className="p-4 sm:px-6 sm:py-4">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-medium text-gray-900">
+              팀원 <span className="text-blue-600">({members.length}명)</span>
             </h2>
           </div>
 
@@ -367,49 +368,68 @@ export const TeamManagement: React.FC = () => {
             {members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                className="bg-gray-50 rounded-lg p-3 sm:p-4"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-blue-600" />
+                {/* 모바일 최적화된 팀원 카드 레이아웃 */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-medium text-gray-900">
-                        {member.name}
-                      </h3>
-                      {getRoleIcon(member.role)}
-                      <span className="text-sm text-gray-600">
+                  <div className="flex-1 min-w-0">
+                    {/* 첫 번째 줄: 이름, 역할 아이콘, 상태 */}
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center space-x-2 min-w-0 flex-1">
+                        <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                          {member.name}
+                        </h3>
+                        <div className="flex items-center space-x-1 flex-shrink-0">
+                          {getRoleIcon(member.role)}
+                          <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+                            {ROLE_LABELS[member.role]}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                          member.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : member.status === "inactive"
+                              ? "bg-gray-100 text-gray-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {STATUS_LABELS[member.status]}
+                      </span>
+                    </div>
+                    
+                    {/* 두 번째 줄: 이메일 (있는 경우) */}
+                    {member.email && (
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1 truncate">{member.email}</p>
+                    )}
+                    
+                    {/* 세 번째 줄: 가입일 + 역할 라벨 (모바일용) */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-400">
+                        {new Date(member.joined_at).toLocaleDateString("ko-KR", {
+                          year: "2-digit",
+                          month: "short",
+                          day: "numeric"
+                        })}{" "}
+                        가입
+                      </p>
+                      <span className="text-xs text-gray-600 sm:hidden">
                         {ROLE_LABELS[member.role]}
                       </span>
                     </div>
-                    {member.email && (
-                      <p className="text-sm text-gray-500">{member.email}</p>
-                    )}
-                    <p className="text-xs text-gray-400">
-                      {new Date(member.joined_at).toLocaleDateString("ko-KR")}{" "}
-                      가입
-                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      member.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : member.status === "inactive"
-                          ? "bg-gray-100 text-gray-800"
-                          : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {STATUS_LABELS[member.status]}
-                  </span>
-
+                {/* 액션 버튼들 - 모바일 최적화 */}
+                <div className="flex items-center justify-end space-x-1 mt-3 pt-3 border-t border-gray-200">
                   {/* 수정 버튼 */}
                   <button
                     onClick={() => handleEditMember(member)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors touch-target"
                     title="정보 수정"
                   >
                     <Edit className="w-4 h-4" />
@@ -424,30 +444,16 @@ export const TeamManagement: React.FC = () => {
                       onClick={() =>
                         handleRemoveMemberClick(member.id, member.name)
                       }
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-target"
                       title="팀에서 제거"
                       disabled={actionLoading}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  ) : (
-                    /* 삭제 조건이 맞지 않을 때 - 개발 환경에서만 정보 표시 */
-                    import.meta.env.DEV && (
-                      <div
-                        className="text-xs text-gray-400 p-2"
-                        title="삭제 불가 사유"
-                      >
-                        {currentUserRole !== "owner" &&
-                          currentUserRole !== "admin" &&
-                          "권한없음"}
-                        {member.role === "owner" && "Owner"}
-                        {member.id === user?.id && "본인"}
-                      </div>
-                    )
-                  )}
+                  ) : null}
 
-                  {/* 더보기 메뉴 (필요시) */}
-                  <div className="relative">
+                  {/* 더보기 메뉴 (모바일에서는 숨김) */}
+                  <div className="relative hidden sm:block">
                     <button
                       onClick={() =>
                         setMemberMenuOpen(
@@ -484,73 +490,90 @@ export const TeamManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* 초대 목록 */}
+        {/* 초대 목록 - 모바일 최적화 */}
         {invitations.length > 0 && (
-          <div className="border-t border-gray-200 px-6 py-4">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              대기 중인 초대 ({invitations.length}개)
+          <div className="border-t border-gray-200 p-4 sm:px-6 sm:py-4">
+            <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
+              대기 중인 초대 <span className="text-yellow-600">({invitations.length}개)</span>
             </h2>
 
             <div className="space-y-3">
               {invitations.map((invitation) => (
                 <div
                   key={invitation.id}
-                  className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg"
+                  className="bg-yellow-50 rounded-lg p-3 sm:p-4"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-yellow-600" />
+                  {/* 모바일 최적화된 초대 카드 레이아웃 */}
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
                     </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-gray-900">
-                          {invitation.email}
-                        </h3>
-                        {getRoleIcon(invitation.role)}
-                        <span className="text-sm text-gray-600">
-                          {ROLE_LABELS[invitation.role]}
+                    <div className="flex-1 min-w-0">
+                      {/* 첫 번째 줄: 이메일, 역할 아이콘, 상태 */}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center space-x-2 min-w-0 flex-1">
+                          <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                            {invitation.email}
+                          </h3>
+                          <div className="flex items-center space-x-1 flex-shrink-0">
+                            {getRoleIcon(invitation.role)}
+                            <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+                              {ROLE_LABELS[invitation.role]}
+                            </span>
+                          </div>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                            invitation.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : invitation.status === "accepted"
+                                ? "bg-green-100 text-green-800"
+                                : invitation.status === "declined"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {INVITATION_STATUS_LABELS[invitation.status]}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500">
+                      
+                      {/* 두 번째 줄: 초대자 정보 */}
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">
                         {invitation.inviter_name}님이 초대 •{" "}
                         {new Date(invitation.created_at).toLocaleDateString(
                           "ko-KR",
+                          { month: "short", day: "numeric" }
                         )}
                       </p>
-                      <p className="text-xs text-gray-400">
-                        만료일:{" "}
-                        {new Date(invitation.expires_at).toLocaleDateString(
-                          "ko-KR",
-                        )}
-                      </p>
+                      
+                      {/* 세 번째 줄: 만료일 + 역할 라벨 (모바일용) */}
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-gray-400">
+                          만료일:{" "}
+                          {new Date(invitation.expires_at).toLocaleDateString(
+                            "ko-KR",
+                            { month: "short", day: "numeric" }
+                          )}
+                        </p>
+                        <span className="text-xs text-gray-600 sm:hidden">
+                          {ROLE_LABELS[invitation.role]}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        invitation.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : invitation.status === "accepted"
-                            ? "bg-green-100 text-green-800"
-                            : invitation.status === "declined"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {INVITATION_STATUS_LABELS[invitation.status]}
-                    </span>
-
-                    {canManageTeam && invitation.status === "pending" && (
+                  {/* 액션 버튼 - 모바일 최적화 */}
+                  {canManageTeam && invitation.status === "pending" && (
+                    <div className="flex justify-end mt-3 pt-3 border-t border-yellow-200">
                       <button
                         onClick={() => handleCancelInvitation(invitation.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-target"
                         title="초대 취소"
                       >
                         <X className="w-4 h-4" />
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -558,31 +581,31 @@ export const TeamManagement: React.FC = () => {
         )}
       </div>
 
-      {/* 초대 모달 */}
+      {/* 초대 모달 - 모바일 최적화 */}
       {showInviteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md mx-4">
-            <div className="border-b border-gray-200 px-6 py-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-gray-200 px-4 sm:px-6 py-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">팀원 초대</h2>
+                <h2 className="text-base sm:text-lg font-semibold">팀원 초대</h2>
                 <button
                   onClick={() => setShowInviteModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 p-2 touch-target"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="px-6 py-4 space-y-4">
-              {/* 초대 방식 선택 */}
+            <div className="px-4 sm:px-6 py-4 space-y-4">
+              {/* 초대 방식 선택 - 모바일 최적화 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   초대 방식 선택
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label
-                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-start p-3 sm:p-4 border rounded-lg cursor-pointer transition-colors touch-target ${
                       inviteType === "email"
                         ? "border-blue-500 bg-blue-50 text-blue-700"
                         : "border-gray-300 hover:bg-gray-50"
@@ -594,17 +617,17 @@ export const TeamManagement: React.FC = () => {
                       value="email"
                       checked={inviteType === "email"}
                       onChange={(e) => setInviteType(e.target.value as "email")}
-                      className="mr-3"
+                      className="mr-3 mt-1 flex-shrink-0"
                     />
-                    <div>
-                      <div className="font-medium">📧 이메일 초대</div>
-                      <div className="text-xs text-gray-600">
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm sm:text-base">📧 이메일 초대</div>
+                      <div className="text-xs text-gray-600 mt-1">
                         새로운 사용자를 초대
                       </div>
                     </div>
                   </label>
                   <label
-                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-start p-3 sm:p-4 border rounded-lg cursor-pointer transition-colors touch-target ${
                       inviteType === "existing"
                         ? "border-blue-500 bg-blue-50 text-blue-700"
                         : "border-gray-300 hover:bg-gray-50"
@@ -618,11 +641,11 @@ export const TeamManagement: React.FC = () => {
                       onChange={(e) =>
                         setInviteType(e.target.value as "existing")
                       }
-                      className="mr-3"
+                      className="mr-3 mt-1 flex-shrink-0"
                     />
-                    <div>
-                      <div className="font-medium">👥 기존 회원 추가</div>
-                      <div className="text-xs text-gray-600">
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm sm:text-base">👥 기존 회원 추가</div>
+                      <div className="text-xs text-gray-600 mt-1">
                         이미 가입한 회원 검색
                       </div>
                     </div>
@@ -772,10 +795,10 @@ export const TeamManagement: React.FC = () => {
               )}
             </div>
 
-            <div className="border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+            <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={() => setShowInviteModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors touch-target"
               >
                 취소
               </button>
@@ -789,7 +812,7 @@ export const TeamManagement: React.FC = () => {
                   actionLoading ||
                   (inviteType === "email" ? !inviteEmail.trim() : !selectedUser)
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-target"
               >
                 {actionLoading
                   ? "처리중..."
@@ -837,17 +860,17 @@ export const TeamManagement: React.FC = () => {
         />
       )}
 
-      {/* 팀원 삭제 확인 모달 */}
+      {/* 팀원 삭제 확인 모달 - 모바일 최적화 */}
       {showDeleteConfirm && memberToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md mx-4">
-            <div className="border-b border-gray-200 px-6 py-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-gray-200 px-4 sm:px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <Trash2 className="w-4 h-4 text-red-600" />
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                     팀원 제거 확인
                   </h2>
                 </div>
@@ -856,62 +879,70 @@ export const TeamManagement: React.FC = () => {
                     setShowDeleteConfirm(false);
                     setMemberToDelete(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 p-2 touch-target"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="px-6 py-4">
+            <div className="px-4 sm:px-6 py-4">
               <div className="mb-4">
-                <div className="flex items-center space-x-3 p-4 bg-red-50 rounded-lg mb-4">
-                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-red-600" />
+                {/* 제거될 팀원 정보 - 모바일 최적화 */}
+                <div className="flex items-center space-x-3 p-3 sm:p-4 bg-red-50 rounded-lg mb-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                   </div>
-                  <div>
-                    <h3 className="font-medium text-red-900">
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-red-900 text-sm sm:text-base">
                       {memberToDelete.name}
                     </h3>
-                    <p className="text-sm text-red-700">제거할 팀원</p>
+                    <p className="text-xs sm:text-sm text-red-700">제거할 팀원</p>
                   </div>
                 </div>
 
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                {/* 주의사항 - 모바일 최적화 */}
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 sm:p-4 mb-4">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <span className="text-yellow-400 text-lg">⚠️</span>
+                      <span className="text-yellow-400 text-base sm:text-lg">⚠️</span>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-800">
+                    <div className="ml-3 min-w-0">
+                      <p className="text-xs sm:text-sm text-yellow-800 mb-2">
                         <strong>주의사항:</strong>
                       </p>
-                      <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside space-y-1">
-                        <li>
-                          제거된 팀원은 더 이상 이 팀의 데이터에 접근할 수
-                          없습니다.
+                      <ul className="text-xs sm:text-sm text-yellow-700 space-y-1">
+                        <li className="flex items-start">
+                          <span className="mr-2 mt-0.5">•</span>
+                          <span>제거된 팀원은 더 이상 이 팀의 데이터에 접근할 수 없습니다.</span>
                         </li>
-                        <li>이 작업은 되돌릴 수 없습니다.</li>
-                        <li>필요시 나중에 다시 초대할 수 있습니다.</li>
+                        <li className="flex items-start">
+                          <span className="mr-2 mt-0.5">•</span>
+                          <span>이 작업은 되돌릴 수 없습니다.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2 mt-0.5">•</span>
+                          <span>필요시 나중에 다시 초대할 수 있습니다.</span>
+                        </li>
                       </ul>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-center">
-                  <strong>{memberToDelete.name}님</strong>을 정말로 팀에서
-                  제거하시겠습니까?
+                {/* 확인 메시지 - 모바일 최적화 */}
+                <p className="text-gray-600 text-center text-sm sm:text-base leading-relaxed">
+                  <strong className="text-red-800">{memberToDelete.name}님</strong>을 정말로 팀에서 제거하시겠습니까?
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+            <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setMemberToDelete(null);
                 }}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors touch-target"
                 disabled={actionLoading}
               >
                 취소
@@ -919,17 +950,17 @@ export const TeamManagement: React.FC = () => {
               <button
                 onClick={handleConfirmRemoveMember}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2 touch-target"
               >
                 {actionLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>제거중...</span>
+                    <span className="text-sm sm:text-base">제거중...</span>
                   </>
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4" />
-                    <span>팀에서 제거</span>
+                    <span className="text-sm sm:text-base">팀에서 제거</span>
                   </>
                 )}
               </button>
