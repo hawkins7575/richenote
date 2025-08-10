@@ -22,6 +22,7 @@ interface AuthContextType {
   signIn: (data: SignInData) => Promise<any>;
   signOut: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  getCurrentUser: () => Promise<AuthUser | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -276,6 +277,76 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const getCurrentUser = async (): Promise<AuthUser | null> => {
+    try {
+      logger.info("🔍 getCurrentUser 호출됨");
+      
+      // 1. 컨텍스트에 사용자가 있으면 반환
+      if (user && !loading) {
+        logger.info("✅ 컨텍스트에서 사용자 반환:", user.id);
+        return user;
+      }
+      
+      // 2. Supabase에서 직접 확인 (세션 새로고침 포함)
+      logger.info("🔄 Supabase 세션 새로고침 시도...");
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError) {
+        logger.warn("⚠️ 세션 새로고침 실패, 직접 사용자 확인:", { error: refreshError.message });
+      } else if (refreshData.session) {
+        logger.info("✅ 세션 새로고침 성공");
+      }
+      
+      const { data: { user: supabaseUser }, error } = await supabase.auth.getUser();
+      
+      if (error || !supabaseUser) {
+        logger.error("❌ getCurrentUser 실패:", { error: error?.message });
+        return null;
+      }
+      
+      // 3. 프로필 정보와 함께 AuthUser 객체 생성
+      try {
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("*")
+          .eq("id", supabaseUser.id)
+          .single();
+
+        const authUser: AuthUser = {
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          name: profile?.name || supabaseUser.user_metadata?.name || "",
+          role: profile?.role || "owner",
+          tenant_id: supabaseUser.id,
+          avatar_url: profile?.avatar_url || null,
+          created_at: supabaseUser.created_at,
+          last_sign_in_at: supabaseUser.last_sign_in_at || null,
+        };
+
+        logger.info("✅ getCurrentUser 성공:", { userId: authUser.id });
+        return authUser;
+      } catch (profileError) {
+        logger.error("프로필 조회 실패, 기본 사용자 정보 반환:", { error: profileError });
+        
+        const authUser: AuthUser = {
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          name: supabaseUser.user_metadata?.name || supabaseUser.email!,
+          role: "owner",
+          tenant_id: supabaseUser.id,
+          avatar_url: null,
+          created_at: supabaseUser.created_at,
+          last_sign_in_at: supabaseUser.last_sign_in_at || null,
+        };
+
+        return authUser;
+      }
+    } catch (error) {
+      logger.error("getCurrentUser 전체 실패:", { error });
+      return null;
+    }
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -285,6 +356,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       signIn,
       signOut,
       resetPassword,
+      getCurrentUser,
     }),
     [user, session, loading],
   );

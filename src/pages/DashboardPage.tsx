@@ -4,18 +4,22 @@
 
 import React, { useState, useEffect } from "react";
 import { Home, Users, TrendingUp, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Badge } from "@/components/ui";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePropertyStats, useProperties } from "@/hooks/useProperties";
-import { PropertyTrendChart, PropertyTypeChart } from "@/components/charts";
-import { StatCard } from "@/components/dashboard";
+// import { PropertyTrendChart, PropertyTypeChart } from "@/components/charts"; // 차트 제거
+import { StatCard, ScheduleSummary } from "@/components/dashboard";
 import { PropertyCard, PropertyDetailModal } from "@/components/property";
 import { PropertyEditForm } from "@/components/forms/PropertyEditForm";
 import { Property, UpdatePropertyData } from "@/types/property";
+import { Schedule } from "@/types/schedule";
 import * as teamService from "@/services/teamService";
+import { scheduleService } from "@/services/scheduleService";
 
 const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
   const { tenant } = useTenant();
   const { user } = useAuth();
   const {
@@ -29,6 +33,11 @@ const DashboardPage: React.FC = () => {
   // 팀원 수 상태 관리
   const [teamMemberCount, setTeamMemberCount] = useState<number>(1);
   const [teamLoading, setTeamLoading] = useState(true);
+
+  // 일정 상태 관리
+  const [todaySchedules, setTodaySchedules] = useState<Schedule[]>([]);
+  const [upcomingSchedules, setUpcomingSchedules] = useState<Schedule[]>([]);
+  const [schedulesLoading, setSchedulesLoading] = useState(true);
 
   // 상세 모달 상태 관리
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
@@ -60,6 +69,41 @@ const DashboardPage: React.FC = () => {
 
     fetchTeamMembers();
   }, [user?.id]);
+
+  // 일정 데이터 가져오기
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      if (!user?.id) return;
+
+      try {
+        setSchedulesLoading(true);
+        
+        // 사용자 ID를 테넌트 ID로 사용
+        const tenantId = user.id;
+        
+        const [todayData, upcomingData] = await Promise.all([
+          scheduleService.getTodaySchedules(tenantId, 3),
+          scheduleService.getUpcomingSchedules(tenantId, 3)
+        ]);
+        
+        setTodaySchedules(todayData);
+        setUpcomingSchedules(upcomingData);
+      } catch (error) {
+        console.error("일정 조회 실패:", error);
+        setTodaySchedules([]);
+        setUpcomingSchedules([]);
+      } finally {
+        setSchedulesLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [user?.id]);
+
+  // 일정 페이지로 이동 핸들러
+  const handleViewAllSchedules = () => {
+    navigate('/schedule');
+  };
 
   // 매물 클릭 핸들러
   const handlePropertyClick = (property: Property) => {
@@ -253,12 +297,33 @@ const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* 차트 섹션 - 모바일 최적화 */}
+
+      {/* 일정 섹션 */}
       <div className="space-y-4 lg:space-y-6">
-        {/* 매물 트렌드 및 유형 분포 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-          <PropertyTrendChart className="lg:col-span-2" />
-          <PropertyTypeChart />
+        <div>
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+            일정 관리
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+            {/* 당일 일정 */}
+            <ScheduleSummary
+              title="오늘 일정"
+              schedules={todaySchedules}
+              loading={schedulesLoading}
+              emptyMessage="오늘 등록된 일정이 없습니다."
+              onViewAll={handleViewAllSchedules}
+            />
+            
+            {/* 다가올 일정 */}
+            <ScheduleSummary
+              title="다가올 일정"
+              schedules={upcomingSchedules}
+              loading={schedulesLoading}
+              emptyMessage="예정된 일정이 없습니다."
+              onViewAll={handleViewAllSchedules}
+            />
+          </div>
         </div>
       </div>
 
@@ -323,7 +388,7 @@ const DashboardPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold">
-                  {tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)}{" "}
+                  {tenant.plan ? (tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)) : "기본"}{" "}
                   플랜
                 </h3>
                 <p className="text-gray-600 mt-1">

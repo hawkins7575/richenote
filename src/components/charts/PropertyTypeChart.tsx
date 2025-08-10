@@ -2,7 +2,7 @@
 // 매물 유형별 분포 차트 컴포넌트
 // ============================================================================
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -12,13 +12,8 @@ import {
   Legend,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
-// import { usePropertyTypeDistribution } from '@/hooks/useChartData'
-
-interface PropertyTypeData {
-  type: string;
-  count: number;
-  percentage: number;
-}
+import { useAuth } from "@/contexts/AuthContext";
+import { chartService, PropertyTypeData } from "@/services/chartService";
 
 // 차트 색상
 const COLORS = [
@@ -35,18 +30,47 @@ interface PropertyTypeChartProps {
   className?: string;
 }
 
-// 임시 샘플 데이터
-const typeData: PropertyTypeData[] = [
-  { type: "아파트", count: 145, percentage: 45.2 },
-  { type: "오피스텔", count: 89, percentage: 27.8 },
-  { type: "빌라/연립", count: 52, percentage: 16.2 },
-  { type: "단독주택", count: 23, percentage: 7.2 },
-  { type: "상가/사무실", count: 12, percentage: 3.6 },
-];
-
 export const PropertyTypeChart: React.FC<PropertyTypeChartProps> = ({
   className = "",
 }) => {
+  const { user } = useAuth();
+  const [typeData, setTypeData] = useState<PropertyTypeData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 실제 데이터 로드
+  useEffect(() => {
+    const loadTypeData = async () => {
+      if (!user?.id) {
+        console.log("⏳ 사용자 인증 대기 중...");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log("📊 매물 유형 분포 데이터 로드 시작:", { userId: user.id });
+        const data = await chartService.getPropertyTypeData(user.id);
+        console.log("📊 로드된 유형 분포 데이터:", data);
+        console.log("📊 유형 분포 총 개수:", data.reduce((sum, item) => sum + item.count, 0));
+        
+        setTypeData(data);
+      } catch (err) {
+        console.error("❌ 유형 분포 데이터 로드 실패:", err);
+        setError("유형 분포 데이터를 불러올 수 없습니다.");
+        
+        // 오류 시 기본 데이터 설정
+        setTypeData([
+          { type: "아파트", count: 0, percentage: 0 }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTypeData();
+  }, [user?.id]);
   const CustomTooltip = ({
     active,
     payload,
@@ -99,57 +123,93 @@ export const PropertyTypeChart: React.FC<PropertyTypeChartProps> = ({
     );
   };
 
+  // 로딩 상태 처리
+  if (loading) {
+    return (
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>매물 유형별 분포</span>
+            <span className="text-sm font-normal text-gray-500">로딩 중...</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-6">
+          <div className="h-64 sm:h-80 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const totalCount = typeData.reduce((sum, item) => sum + item.count, 0);
+
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>매물 유형별 분포</span>
-          <span className="text-sm font-normal text-gray-500">
-            총 {typeData.reduce((sum, item) => sum + item.count, 0)}건
-          </span>
+          <div className="text-right">
+            <span className="text-sm font-normal text-gray-500">
+              총 {totalCount}건
+            </span>
+            {error && (
+              <div className="text-xs text-red-500 mt-1">{error}</div>
+            )}
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-3 sm:p-6">
         <div className="h-64 sm:h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={typeData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={CustomLabel}
-                outerRadius={80}
-                innerRadius={20}
-                fill="#8884d8"
-                dataKey="count"
-              >
-                {typeData.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend
-                wrapperStyle={{ paddingTop: "10px", fontSize: "11px" }}
-                iconSize={10}
-                formatter={(value: string, entry: any) => {
-                  const color = entry?.color || "#000";
-                  const count = entry?.payload?.count || 0;
-                  return (
-                    <span
-                      style={{ color, fontSize: "11px" }}
-                      className="sm:text-sm"
-                    >
-                      {value} ({count}건)
-                    </span>
-                  );
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {totalCount === 0 ? (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <div className="text-center">
+                <div className="text-sm mb-2">📊</div>
+                <div className="text-xs">매물 데이터가 없습니다</div>
+                <div className="text-xs">매물을 등록해보세요</div>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={typeData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={CustomLabel}
+                  outerRadius={80}
+                  innerRadius={20}
+                  fill="#8884d8"
+                  dataKey="count"
+                >
+                  {typeData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  wrapperStyle={{ paddingTop: "10px", fontSize: "11px" }}
+                  iconSize={10}
+                  formatter={(value: string, entry: any) => {
+                    const color = entry?.color || "#000";
+                    const count = entry?.payload?.count || 0;
+                    return (
+                      <span
+                        style={{ color, fontSize: "11px" }}
+                        className="sm:text-sm"
+                      >
+                        {value} ({count}건)
+                      </span>
+                    );
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </CardContent>
     </Card>

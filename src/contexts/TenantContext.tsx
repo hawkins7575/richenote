@@ -219,8 +219,36 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
           console.log("🔍 조회 결과:", { existingTenant, queryError });
 
           if (existingTenant && !queryError) {
-            // 기존 테넌트가 있으면 상태에 설정
-            setTenant(existingTenant);
+            // 기존 테넌트가 있으면 상태에 설정 (추가 속성 포함)
+            const fullTenant = {
+              ...existingTenant,
+              branding: {
+                primary_color: "#3b82f6",
+                secondary_color: "#1d4ed8",
+                accent_color: "#f59e0b",
+              },
+              limits: {
+                max_properties: 50,
+                max_users: 2,
+                max_storage_gb: 1,
+                max_api_calls_per_month: 1000,
+                features_enabled: ["basic"],
+              },
+              settings: {
+                timezone: "Asia/Seoul",
+                date_format: "YYYY-MM-DD",
+                currency: "KRW",
+                language: "ko",
+                require_exit_date: true,
+                require_landlord_info: true,
+                email_notifications: true,
+                sms_notifications: false,
+                browser_notifications: true,
+                require_2fa: false,
+                session_timeout_minutes: 480,
+              },
+            };
+            setTenant(fullTenant);
             setError(null);
             console.log("✅ 기존 테넌트 조회 완료:", existingTenant.name);
             setIsLoading(false);
@@ -279,13 +307,6 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
           const userTenant = {
             id: user.id, // 사용자 ID = 테넌트 ID
             name: "PropertyDesk 베타",
-            slug: `user-${user.id.slice(0, 8)}`,
-            plan: "professional",
-            status: "trial",
-            trial_ends_at: new Date(
-              Date.now() + 30 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            created_by: user.id,
           };
 
           console.log("📝 테넌트 생성 시작:", userTenant);

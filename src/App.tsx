@@ -17,6 +17,7 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { InstallPrompt } from "@/components/ui/InstallPrompt";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { PropertiesPageNew } from "@/pages/PropertiesPageNew";
+import SchedulePage from "@/pages/SchedulePage";
 import { TeamPage } from "@/pages/TeamPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { UserGuidePage } from "@/pages/UserGuidePage";
@@ -45,6 +46,7 @@ function App() {
                           path="/properties"
                           element={<PropertiesPageNew />}
                         />
+                        <Route path="/schedule" element={<SchedulePage />} />
                         <Route path="/team" element={<TeamPage />} />
                         <Route path="/settings" element={<SettingsPage />} />
                         <Route path="/guide" element={<UserGuidePage />} />
@@ -79,6 +81,7 @@ const TenantRoutes: React.FC = () => {
     <Routes>
       <Route path="/" element={<DashboardPage />} />
       <Route path="/properties" element={<PropertiesPageNew />} />
+      <Route path="/schedule" element={<SchedulePage />} />
       <Route path="/team" element={<TeamPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/guide" element={<UserGuidePage />} />

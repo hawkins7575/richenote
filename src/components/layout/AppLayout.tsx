@@ -4,7 +4,7 @@
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Plus, Users, Settings, X, BookOpen } from "lucide-react";
+import { Home, Plus, Users, Settings, X, BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useTenant } from "@/contexts/TenantContext";
 import { UserMenu } from "./UserMenu";
@@ -22,6 +22,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigation = [
     { name: "대시보드", href: "/", icon: Home },
     { name: "매물 관리", href: "/properties", icon: Home },
+    { name: "일정 관리", href: "/schedule", icon: Calendar },
     { name: "팀 관리", href: "/team", icon: Users },
     { name: "설정", href: "/settings", icon: Settings },
     { name: "사용설명서", href: "/guide", icon: BookOpen },
@@ -131,7 +132,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* 모바일 하단 네비게이션 - 고정 */}
       <div className="lg:hidden bottom-nav-fixed bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
-        <div className="grid grid-cols-5 h-16 bg-white">
+        <div className="grid grid-cols-6 h-16 bg-white">
           {navigation.map((item) => {
             const isCurrent = location.pathname === item.href;
             return (
