@@ -47,11 +47,29 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
   // 초기 데이터 설정
   useEffect(() => {
     if (initialData) {
+      // 수정 시: DB에서 받은 UTC 시간을 로컬 시간으로 변환하여 datetime-local 형식으로 표시
+      const startDate = new Date(initialData.start_date);
+      const endDate = new Date(initialData.end_date);
+      
+      const startDateTimeLocal = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000))
+        .toISOString().slice(0, 16);
+      const endDateTimeLocal = new Date(endDate.getTime() - (endDate.getTimezoneOffset() * 60000))
+        .toISOString().slice(0, 16);
+      
+      console.log("📝 수정 모드 날짜 변환:", {
+        DB시작: initialData.start_date,
+        DB종료: initialData.end_date,
+        로컬시작: startDate.toLocaleString('ko-KR'),
+        로컬종료: endDate.toLocaleString('ko-KR'),
+        폼시작: startDateTimeLocal,
+        폼종료: endDateTimeLocal
+      });
+
       setFormData({
         title: initialData.title,
         description: initialData.description || "",
-        start_date: initialData.start_date,
-        end_date: initialData.end_date,
+        start_date: startDateTimeLocal,
+        end_date: endDateTimeLocal,
         all_day: initialData.all_day,
         category: initialData.category,
         priority: initialData.priority,
@@ -196,7 +214,34 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
       
       console.log("🧹 정리된 폼 데이터:", cleanedFormData);
 
-      // 4. 스케줄 생성/수정
+      // 4. 날짜를 올바른 형식으로 변환 (로컬 시간을 ISO 문자열로)
+      const processedFormData = { ...cleanedFormData };
+      
+      if (!formData.all_day) {
+        // datetime-local 입력값을 로컬 시간으로 해석하여 올바른 ISO 문자열 생성
+        const startDateTime = new Date(cleanedFormData.start_date);
+        const endDateTime = new Date(cleanedFormData.end_date);
+        
+        console.log("📅 날짜 처리:", {
+          입력시작: cleanedFormData.start_date,
+          입력종료: cleanedFormData.end_date,
+          파싱된시작: startDateTime.toLocaleString('ko-KR'),
+          파싱된종료: endDateTime.toLocaleString('ko-KR'),
+          ISO시작: startDateTime.toISOString(),
+          ISO종료: endDateTime.toISOString()
+        });
+        
+        processedFormData.start_date = startDateTime.toISOString();
+        processedFormData.end_date = endDateTime.toISOString();
+      } else {
+        // 종일 일정은 날짜만 사용 (시간은 이미 설정됨)
+        const startDate = new Date(cleanedFormData.start_date);
+        const endDate = new Date(cleanedFormData.end_date);
+        processedFormData.start_date = startDate.toISOString();
+        processedFormData.end_date = endDate.toISOString();
+      }
+
+      // 5. 스케줄 생성/수정
       let schedule: Schedule;
       
       if (initialData) {
@@ -215,13 +260,13 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
           return;
         }
         
-        schedule = await scheduleService.updateSchedule(initialData.id, cleanedFormData, currentUser.id);
+        schedule = await scheduleService.updateSchedule(initialData.id, processedFormData, currentUser.id);
       } else {
         console.log("➕ 일정 생성 중...");
         schedule = await scheduleService.createSchedule(
           tenantId, // 사용자 ID를 테넌트 ID로 사용
           currentUser.id,
-          cleanedFormData
+          processedFormData
         );
       }
       
@@ -409,8 +454,15 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
               type={formData.all_day ? "date" : "datetime-local"}
               value={formData.all_day ? formData.start_date.split('T')[0] : formData.start_date}
               onChange={(e) => {
-                const value = formData.all_day ? `${e.target.value}T00:00` : e.target.value;
-                handleChange("start_date", value);
+                if (formData.all_day) {
+                  const value = `${e.target.value}T00:00`;
+                  handleChange("start_date", value);
+                } else {
+                  // datetime-local 값을 로컬 시간으로 처리하여 UTC 이중 변환 방지
+                  const localDateTime = e.target.value;
+                  console.log("🕐 시작일시 입력:", localDateTime);
+                  handleChange("start_date", localDateTime);
+                }
               }}
               required
             />
@@ -424,8 +476,15 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
               type={formData.all_day ? "date" : "datetime-local"}
               value={formData.all_day ? formData.end_date.split('T')[0] : formData.end_date}
               onChange={(e) => {
-                const value = formData.all_day ? `${e.target.value}T23:59` : e.target.value;
-                handleChange("end_date", value);
+                if (formData.all_day) {
+                  const value = `${e.target.value}T23:59`;
+                  handleChange("end_date", value);
+                } else {
+                  // datetime-local 값을 로컬 시간으로 처리하여 UTC 이중 변환 방지
+                  const localDateTime = e.target.value;
+                  console.log("🕐 종료일시 입력:", localDateTime);
+                  handleChange("end_date", localDateTime);
+                }
               }}
               required
             />
