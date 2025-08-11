@@ -2,7 +2,7 @@
 // Button 컴포넌트 - SaaS 디자인 시스템 기반
 // ============================================================================
 
-import React from "react";
+import React, { memo } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/utils/cn";
 
@@ -52,7 +52,7 @@ export interface ButtonProps
   rightIcon?: React.ReactNode;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = memo(React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
@@ -109,7 +109,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </button>
     );
   },
-);
+)); // memo wrapper added for performance
 
 Button.displayName = "Button";
 

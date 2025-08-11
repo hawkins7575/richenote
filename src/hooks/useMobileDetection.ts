@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { useState, useEffect } from "react";
+import { logger } from "@/utils/logger";
 
 export interface MobileDetectionResult {
   isMobile: boolean;
@@ -84,8 +85,7 @@ export const useMobileDetection = (): MobileDetectionResult => {
       const isTouchDevice =
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
-        // @ts-ignore - IE 호환성
-        navigator.msMaxTouchPoints > 0;
+        (navigator as any).msMaxTouchPoints > 0;
 
       // 4. 화면 비율 감지 (모바일은 보통 세로가 더 김)
       const isPortraitOrientation = height > width;
@@ -147,7 +147,7 @@ export const useMobileDetection = (): MobileDetectionResult => {
 
       // 디버깅 정보 출력 (크롬 모바일 특화)
       if (process.env.NODE_ENV === "development") {
-        console.log("📱 강화된 모바일 감지 결과:", {
+        logger.debug("📱 강화된 모바일 감지 결과", {
           width,
           height,
           finalIsMobile,

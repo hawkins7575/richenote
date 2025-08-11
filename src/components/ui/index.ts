@@ -23,3 +23,4 @@ export {
 } from "./Badge";
 export { Loading, Skeleton, CardSkeleton, ListSkeleton } from "./Loading";
 export { InstallPrompt, InstallButton } from "./InstallPrompt";
+export { LazyImage } from "./LazyImage";

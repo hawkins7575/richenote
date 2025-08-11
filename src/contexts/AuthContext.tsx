@@ -60,10 +60,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const {
           data: { session },
           error,
-        } = (await Promise.race([sessionPromise, timeoutPromise])) as any;
+        } = await Promise.race([sessionPromise, timeoutPromise]) as { data: { session: Session | null }, error: AuthError | null };
 
         if (error) {
-          logger.error("Error getting session:", error);
+          logger.error("Error getting session:", { message: error.message });
           setLoading(false);
           return;
         }
@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               id: session.user.id,
               email: session.user.email!,
               name: profile?.name || session.user.user_metadata?.name || "",
-              role: profile?.role || "owner",
+              role: (profile?.role as "owner" | "manager" | "agent" | "viewer") || "owner",
               tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
               avatar_url: profile?.avatar_url || null,
               created_at: session.user.created_at,
@@ -149,16 +149,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setTimeout(() => reject(new Error("Profile fetch timeout")), 3000),
           );
 
-          const { data: profile } = (await Promise.race([
+          const { data: profile } = await Promise.race([
             profilePromise,
             profileTimeoutPromise,
-          ])) as any;
+          ]) as { data: { id: string; name?: string; role?: string; avatar_url?: string } | null };
 
           setUser({
             id: session.user.id,
             email: session.user.email!,
             name: profile?.name || session.user.user_metadata?.name || "",
-            role: profile?.role || "owner",
+            role: (profile?.role as "owner" | "manager" | "agent" | "viewer") || "owner",
             tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
             avatar_url: profile?.avatar_url || null,
             created_at: session.user.created_at,

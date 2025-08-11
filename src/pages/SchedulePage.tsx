@@ -19,14 +19,13 @@ import { ScheduleForm } from "@/components/schedule";
 import { ScheduleDetailModal } from "@/components/schedule/ScheduleDetailModal";
 import { useIsMobile } from "@/hooks/useMobileDetection";
 import { useAuth } from "@/contexts/AuthContext";
-// import { useTenant } from "@/contexts/TenantContext"; // 현재 사용하지 않음
 import { Schedule, CalendarView, ScheduleCategory } from "@/types/schedule";
 import { scheduleService } from "@/services/scheduleService";
+import { logger } from "@/utils/logger";
 
 const SchedulePage: React.FC = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  // const { tenant } = useTenant(); // 현재 사용하지 않음
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("month");
@@ -38,7 +37,6 @@ const SchedulePage: React.FC = () => {
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ScheduleCategory | "all">("all");
-  // const [isLoading, setIsLoading] = useState(false); // 현재 사용하지 않음
 
   // 카테고리별 색상 매핑
   const categoryColors = {
@@ -65,26 +63,23 @@ const SchedulePage: React.FC = () => {
   useEffect(() => {
     const loadSchedules = async () => {
       if (!user) {
-        console.log("⏳ 사용자 인증 대기 중...");
+        logger.info("⏳ 사용자 인증 대기 중...");
         return;
       }
       
-      // setIsLoading(true); // 로딩 상태 사용하지 않음
       try {
-        console.log("📅 스케줄 데이터 로드 시작:", {
+        logger.info("📅 스케줄 데이터 로드 시작", {
           userId: user.id,
-          tenantId: user.id // 사용자 ID가 테넌트 ID
+          tenantId: user.id
         });
         
         // 사용자 ID를 테넌트 ID로 사용하여 완전한 데이터 분리
         const data = await scheduleService.getSchedules(user.id);
-        console.log("📅 로드된 스케줄:", data.length, "개");
+        logger.info("📅 로드된 스케줄", { count: data.length });
         setSchedules(data);
       } catch (error) {
-        console.error("❌ 스케줄 로드 실패:", error);
+        logger.error("❌ 스케줄 로드 실패", { error });
         setSchedules([]); // 오류 시 빈 배열로 설정
-      } finally {
-        // setIsLoading(false); // 로딩 상태 사용하지 않음
       }
     };
 
@@ -111,7 +106,7 @@ const SchedulePage: React.FC = () => {
 
   // 스케줄 수정
   const handleScheduleEdit = (schedule: Schedule) => {
-    console.log("📝 스케줄 수정 요청:", {
+    logger.info("📝 스케줄 수정 요청", {
       id: schedule.id,
       title: schedule.title,
       tenant_id: schedule.tenant_id,
@@ -125,12 +120,12 @@ const SchedulePage: React.FC = () => {
   // 스케줄 삭제
   const handleScheduleDelete = async (scheduleId: string) => {
     try {
-      console.log("🗑️ 스케줄 삭제 요청:", { scheduleId, currentUserId: user?.id });
+      logger.info("🗑️ 스케줄 삭제 요청", { scheduleId, currentUserId: user?.id });
       await scheduleService.deleteSchedule(scheduleId, user?.id);
       setSchedules(prev => prev.filter(s => s.id !== scheduleId));
-      console.log("✅ 스케줄 삭제 완료:", scheduleId);
+      logger.info("✅ 스케줄 삭제 완료", { scheduleId });
     } catch (error) {
-      console.error("❌ 스케줄 삭제 실패:", error);
+      logger.error("❌ 스케줄 삭제 실패", { error });
       throw error;
     }
   };

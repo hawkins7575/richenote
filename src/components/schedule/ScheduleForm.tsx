@@ -7,7 +7,6 @@ import { Calendar, MapPin, Users, Tag, AlertCircle } from "lucide-react";
 import { Button, Input, Modal } from "@/components/ui";
 import { Schedule, ScheduleFormData, ScheduleCategory, SchedulePriority } from "@/types/schedule";
 import { useAuth } from "@/contexts/AuthContext";
-// import { useTenant } from "@/contexts/TenantContext"; // 현재 사용하지 않음
 import { scheduleService } from "@/services/scheduleService";
 import { useProperties } from "@/hooks/useProperties";
 
@@ -27,7 +26,6 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
   selectedDate,
 }) => {
   const { user, loading: authLoading, session, getCurrentUser } = useAuth();
-  // const { tenant } = useTenant(); // 현재 사용하지 않음
   const { properties } = useProperties();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
