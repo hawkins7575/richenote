@@ -174,7 +174,7 @@ PropertyDesk System
 
 ## 📞 지원
 
-- **이메일**: support@propertydesk.com
+- **이메일**: daesung75@gmail.com
 - **문서**: [개발 가이드](./docs/DEVELOPMENT_PLAN.md)
 - **이슈**: [GitHub Issues](https://github.com/your-username/propertydesk-saas/issues)
 
