@@ -4,7 +4,7 @@
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Plus, Users, Settings, X, BookOpen, Calendar } from "lucide-react";
+import { Home, Plus, Users, Settings, X, BookOpen, Calendar, Building2 } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useTenant } from "@/contexts/TenantContext";
 import { UserMenu } from "./UserMenu";
@@ -21,7 +21,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const navigation = [
     { name: "대시보드", href: "/", icon: Home },
-    { name: "매물 관리", href: "/properties", icon: Home },
+    { name: "매물 관리", href: "/properties", icon: Building2 },
     { name: "일정 관리", href: "/schedule", icon: Calendar },
     { name: "팀 관리", href: "/team", icon: Users },
     { name: "설정", href: "/settings", icon: Settings },
