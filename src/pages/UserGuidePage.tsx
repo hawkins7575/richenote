@@ -28,6 +28,7 @@ const UserGuidePage: React.FC = () => {
     { id: "overview", title: "개요", icon: Home },
     { id: "dashboard", title: "대시보드", icon: TrendingUp },
     { id: "properties", title: "매물 관리", icon: Building2 },
+    { id: "schedule", title: "일정 관리", icon: Bell },
     { id: "team", title: "팀 관리", icon: Users },
     { id: "settings", title: "설정", icon: Settings },
     { id: "tips", title: "사용 팁", icon: BookOpen },
@@ -108,6 +109,8 @@ const UserGuidePage: React.FC = () => {
                     </h4>
                     <ul className="space-y-2 text-sm text-gray-600">
                       <li>• 매물 등록 및 관리</li>
+                      <li>• 공실/퇴실 상태 관리</li>
+                      <li>• 일정 관리 (캘린더형)</li>
                       <li>• 실시간 대시보드</li>
                       <li>• 통계 및 차트 분석</li>
                       <li>• 팀원 관리 및 권한 설정</li>
@@ -228,12 +231,43 @@ const UserGuidePage: React.FC = () => {
                     <li>기본 정보 입력 (제목, 주소, 유형, 거래유형)</li>
                     <li>상세 정보 입력 (면적, 층수, 룸 구조)</li>
                     <li>가격 정보 입력 (매매가, 전세금, 월세)</li>
-                    <li>임대인 정보 및 기타 옵션 설정</li>
+                    <li>임대인 정보 및 공실/퇴실 관리</li>
+                    <li>공실 상태 또는 퇴실 예정일 설정</li>
                     <li>"매물 등록" 버튼으로 완료</li>
                   </ol>
                   <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
                     💡 <strong>팁:</strong> "샘플 데이터 입력" 버튼을 사용하면
                     예시 데이터가 자동으로 입력됩니다.
+                  </div>
+                </div>
+
+                {/* 공실/퇴실 관리 */}
+                <div className="border-l-4 border-indigo-500 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <Home className="w-4 h-4 mr-2 text-indigo-600" />
+                    공실/퇴실 상태 관리
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 rounded p-3">
+                      <p className="text-sm text-gray-600 mb-2"><strong>공실 상태 설정:</strong></p>
+                      <ul className="text-xs text-gray-600 space-y-1 ml-4">
+                        <li>• "현재 공실" 체크박스 선택 시 즉시 공실 상태로 표시</li>
+                        <li>• 공실 상태에서는 퇴실날짜 필드가 비활성화됨</li>
+                        <li>• 매물 목록에서 "공실" 라벨로 구분 표시</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded p-3">
+                      <p className="text-sm text-gray-600 mb-2"><strong>퇴실 예정일 관리:</strong></p>
+                      <ul className="text-xs text-gray-600 space-y-1 ml-4">
+                        <li>• 임차인이 있는 경우 퇴실 예정일 설정</li>
+                        <li>• 퇴실일까지 며칠 남았는지 자동 계산</li>
+                        <li>• 퇴실 임박 시 대시보드에서 알림 표시</li>
+                        <li>• 계약 갱신 또는 새 임차인 준비에 활용</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="mt-2 p-2 bg-indigo-50 rounded text-xs text-indigo-700">
+                    📋 <strong>관리 팁:</strong> 퇴실 예정일을 미리 설정해두면 임대 공백을 최소화할 수 있습니다.
                   </div>
                 </div>
 
@@ -303,6 +337,103 @@ const UserGuidePage: React.FC = () => {
                   </div>
                   <div className="mt-2 p-2 bg-orange-50 rounded text-xs text-orange-700">
                     ⚠️ <strong>주의:</strong> 삭제된 매물은 복구할 수 없습니다.
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case "schedule":
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Bell className="w-5 h-5 mr-2" />
+                  일정 관리 사용법
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* 일정 등록 */}
+                <div className="border-l-4 border-blue-500 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <Plus className="w-4 h-4 mr-2 text-blue-600" />
+                    일정 등록하기
+                  </h4>
+                  <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                    <li>일정 관리 페이지의 "일정 등록" 버튼 클릭</li>
+                    <li>일정 제목 및 카테고리 선택 (매물 보기, 계약 체결, 고객 미팅 등)</li>
+                    <li>날짜 및 시간 설정 (종일 일정 선택 가능)</li>
+                    <li>위치 정보 및 상세 설명 입력</li>
+                    <li>우선순위 설정 (일반, 높음, 긴급)</li>
+                    <li>"일정 등록" 버튼으로 완료</li>
+                  </ol>
+                  <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                    💡 <strong>팁:</strong> 캘린더에서 날짜를 클릭하면 해당 날짜로 일정을 바로 등록할 수 있습니다.
+                  </div>
+                </div>
+
+                {/* 캘린더 뷰 */}
+                <div className="border-l-4 border-green-500 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <Grid className="w-4 h-4 mr-2 text-green-600" />
+                    캘린더 뷰 사용법
+                  </h4>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p><strong>월간 캘린더:</strong> 한 달 단위로 일정을 시각적으로 확인</p>
+                    <p><strong>일정 표시:</strong> 각 날짜에 색상별로 일정 카테고리 구분</p>
+                    <p><strong>일정 클릭:</strong> 캘린더의 일정을 클릭하여 상세 정보 확인</p>
+                    <p><strong>날짜 이동:</strong> 좌우 화살표로 월 단위 이동, "오늘" 버튼으로 현재 날짜로 이동</p>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                      <span>매물 보기</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                      <span>계약 체결</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+                      <span>고객 미팅</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
+                      <span>유지보수</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 목록 뷰 */}
+                <div className="border-l-4 border-purple-500 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <AlignLeft className="w-4 h-4 mr-2 text-purple-600" />
+                    목록 뷰 사용법
+                  </h4>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p><strong>한 줄 압축 표시:</strong> 모든 일정 정보를 한 줄에 효율적으로 표시</p>
+                    <p><strong>카테고리 필터링:</strong> 필터 버튼으로 특정 카테고리만 표시</p>
+                    <p><strong>우선순위 표시:</strong> 긴급/높음 우선순위 일정에 색상 배지 표시</p>
+                    <p><strong>상세 정보:</strong> 제목, 카테고리, 날짜, 위치, 설명을 한눈에 확인</p>
+                  </div>
+                </div>
+
+                {/* 일정 관리 */}
+                <div className="border-l-4 border-orange-500 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                    <Edit className="w-4 h-4 mr-2 text-orange-600" />
+                    일정 편집 및 삭제
+                  </h4>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p><strong>상세보기:</strong> 캘린더나 목록에서 일정 클릭 → 상세 정보 모달 표시</p>
+                    <p><strong>편집:</strong> 상세보기 모달에서 편집 버튼 클릭</p>
+                    <p><strong>삭제:</strong> 상세보기 모달에서 삭제 버튼 클릭 (확인 필요)</p>
+                    <p><strong>뷰 전환:</strong> 월간/목록 버튼으로 캘린더와 목록 뷰 전환</p>
+                  </div>
+                  <div className="mt-2 p-2 bg-orange-50 rounded text-xs text-orange-700">
+                    ⚠️ <strong>주의:</strong> 삭제된 일정은 복구할 수 없습니다.
                   </div>
                 </div>
               </CardContent>
@@ -465,8 +596,10 @@ const UserGuidePage: React.FC = () => {
                       고객 신뢰도 향상
                     </li>
                     <li>
-                      • <strong>퇴실예정일 활용:</strong> 임차인 관리 및 계약
-                      갱신 준비
+                      • <strong>공실/퇴실 상태 관리:</strong> 공실 체크박스와 퇴실예정일을 적극 활용
+                    </li>
+                    <li>
+                      • <strong>일정 관리 연계:</strong> 매물 보기, 계약 일정을 캘린더로 관리
                     </li>
                     <li>
                       • <strong>정기적인 상태 업데이트:</strong> 매물 상태를
@@ -491,6 +624,9 @@ const UserGuidePage: React.FC = () => {
                     <li>
                       • <strong>필터 활용:</strong> 원하는 조건의 매물을 빠르게
                       찾기
+                    </li>
+                    <li>
+                      • <strong>일정 캘린더 활용:</strong> 월간/목록 뷰를 전환하여 효율적인 스케줄 관리
                     </li>
                     <li>
                       • <strong>리스트형 보기:</strong> 많은 매물을 한 번에

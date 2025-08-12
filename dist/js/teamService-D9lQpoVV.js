@@ -1,4 +1,4 @@
-import{s as o,l as c}from"./index-DERAfINP.js";const f=async n=>{const{data:r,error:e}=await o.functions.invoke("send-team-invitation",{body:n});if(e)throw c.error("Email sending failed",{error:e instanceof Error?e.message:"Unknown error",component:"teamService",action:"sendInvitationEmail"}),e;return r},u=async n=>{try{const{data:r,error:e}=await o.from("user_profiles").select("tenant_id").eq("id",n).single();if(e)throw e;const{data:t,error:i}=await o.from("user_profiles").select(`
+import{s as o,l as c}from"./index-DmqqP2-K.js";const f=async n=>{const{data:r,error:e}=await o.functions.invoke("send-team-invitation",{body:n});if(e)throw c.error("Email sending failed",{error:e instanceof Error?e.message:"Unknown error",component:"teamService",action:"sendInvitationEmail"}),e;return r},u=async n=>{try{const{data:r,error:e}=await o.from("user_profiles").select("tenant_id").eq("id",n).single();if(e)throw e;const{data:t,error:i}=await o.from("user_profiles").select(`
         id,
         tenant_id,
         name,

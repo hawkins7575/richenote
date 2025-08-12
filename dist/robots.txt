@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+
+# 검색엔진이 접근하지 않았으면 하는 경로들
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /signup
+Disallow: /settings/
+Disallow: /team/
+Disallow: /invitation/
+Disallow: /reset-password
+
+# 정적 파일들은 허용
+Allow: /assets/
+Allow: /icons/
+Allow: /images/
+Allow: /*.css
+Allow: /*.js
+
+# 사이트맵 위치 명시
+Sitemap: https://summi3-ijj9m73jz-daesung75-6440s-projects.vercel.app/sitemap.xml
+
+# 크롤링 속도 조절 (1초에 1번 요청)
+Crawl-delay: 1
+
+# 주요 검색엔진별 설정
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Naverbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
