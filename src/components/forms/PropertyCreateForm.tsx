@@ -452,12 +452,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="면적 (m²)"
                       type="number"
                       value={formData.area || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "area",
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("area", 0);
+                        } else {
+                          const numValue = Number(value);
+                          handleInputChange("area", isNaN(numValue) ? 0 : numValue);
+                        }
+                      }}
                       error={errors.area}
                       placeholder="85.0"
                       min="0"
@@ -470,12 +473,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="층수"
                       type="number"
                       value={formData.floor || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "floor",
-                          parseInt(e.target.value) || undefined,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("floor", undefined);
+                        } else {
+                          const numValue = Math.floor(Number(value));
+                          handleInputChange("floor", isNaN(numValue) ? undefined : numValue);
+                        }
+                      }}
                       error={errors.floor}
                       placeholder="15"
                       min="1"
@@ -486,12 +492,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="전체 층수"
                       type="number"
                       value={formData.total_floors || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "total_floors",
-                          parseInt(e.target.value) || undefined,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("total_floors", undefined);
+                        } else {
+                          const numValue = Math.floor(Number(value));
+                          handleInputChange("total_floors", isNaN(numValue) ? undefined : numValue);
+                        }
+                      }}
                       error={errors.total_floors}
                       placeholder="25"
                       min="1"
@@ -504,12 +513,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                     <Select
                       label="방 개수"
                       value={formData.rooms?.toString() || "1"}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "rooms",
-                          parseInt(e.target.value) || 1,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = Math.floor(Number(value));
+                        handleInputChange("rooms", isNaN(numValue) ? 1 : numValue);
+                      }}
                       error={errors.rooms}
                       options={ROOM_OPTIONS}
                       className="text-sm sm:text-base h-11 sm:h-12"
@@ -519,12 +527,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="화장실 개수"
                       type="number"
                       value={formData.bathrooms || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "bathrooms",
-                          parseInt(e.target.value) || 1,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("bathrooms", 1);
+                        } else {
+                          const numValue = Math.floor(Number(value));
+                          handleInputChange("bathrooms", isNaN(numValue) ? 1 : numValue);
+                        }
+                      }}
                       error={errors.bathrooms}
                       placeholder="2"
                       min="1"
@@ -592,12 +603,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="매매가 (만원)"
                       type="number"
                       value={formData.price || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "price",
-                          parseInt(e.target.value) || undefined,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("price", undefined);
+                        } else {
+                          const numValue = Number(value);
+                          handleInputChange("price", isNaN(numValue) ? undefined : numValue);
+                        }
+                      }}
                       error={errors.price}
                       placeholder="35000"
                       min="0"
@@ -616,12 +630,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       }
                       type="number"
                       value={formData.deposit || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "deposit",
-                          parseInt(e.target.value) || undefined,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("deposit", undefined);
+                        } else {
+                          const numValue = Number(value);
+                          handleInputChange("deposit", isNaN(numValue) ? undefined : numValue);
+                        }
+                      }}
                       error={errors.deposit}
                       placeholder="21000"
                       min="0"
@@ -635,12 +652,15 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       label="월세 (만원)"
                       type="number"
                       value={formData.monthly_rent || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "monthly_rent",
-                          parseInt(e.target.value) || undefined,
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handleInputChange("monthly_rent", undefined);
+                        } else {
+                          const numValue = Number(value);
+                          handleInputChange("monthly_rent", isNaN(numValue) ? undefined : numValue);
+                        }
+                      }}
                       error={errors.monthly_rent}
                       placeholder="65"
                       min="0"

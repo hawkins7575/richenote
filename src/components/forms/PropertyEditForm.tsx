@@ -345,9 +345,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   label="면적 (m²)"
                   type="number"
                   value={formData.area || ""}
-                  onChange={(e) =>
-                    handleInputChange("area", parseFloat(e.target.value) || 0)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      handleInputChange("area", 0);
+                    } else {
+                      const numValue = Number(value);
+                      handleInputChange("area", isNaN(numValue) ? 0 : numValue);
+                    }
+                  }}
                   error={errors.area}
                   placeholder="85.0"
                   min="0"
@@ -359,9 +365,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   label="층수"
                   type="number"
                   value={formData.floor || ""}
-                  onChange={(e) =>
-                    handleInputChange("floor", parseInt(e.target.value) || undefined)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      handleInputChange("floor", undefined);
+                    } else {
+                      const numValue = Math.floor(Number(value));
+                      handleInputChange("floor", isNaN(numValue) ? undefined : numValue);
+                    }
+                  }}
                   error={errors.floor}
                   placeholder="15"
                   min="1"
@@ -375,7 +387,12 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   onChange={(e) =>
                     handleInputChange(
                       "total_floors",
-                      parseInt(e.target.value) || undefined,
+                      (() => {
+                        const value = e.target.value;
+                        if (value === "") return undefined;
+                        const numValue = Math.floor(Number(value));
+                        return isNaN(numValue) ? undefined : numValue;
+                      })()
                     )
                   }
                   error={errors.total_floors}
@@ -388,9 +405,11 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   label="방 개수"
                   type="number"
                   value={formData.rooms || ""}
-                  onChange={(e) =>
-                    handleInputChange("rooms", parseInt(e.target.value) || 1)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numValue = Math.floor(Number(value));
+                    handleInputChange("rooms", isNaN(numValue) ? 1 : numValue);
+                  }}
                   error={errors.rooms}
                   placeholder="3"
                   min="1"
@@ -404,7 +423,12 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   onChange={(e) =>
                     handleInputChange(
                       "bathrooms",
-                      parseInt(e.target.value) || 1,
+                      (() => {
+                        const value = e.target.value;
+                        if (value === "") return 1;
+                        const numValue = Math.floor(Number(value));
+                        return isNaN(numValue) ? 1 : numValue;
+                      })()
                     )
                   }
                   error={errors.bathrooms}
@@ -455,12 +479,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                     label="매매가 (만원)"
                     type="number"
                     value={formData.price || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "price",
-                        parseInt(e.target.value) || undefined,
-                      )
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "") {
+                        handleInputChange("price", undefined);
+                      } else {
+                        const numValue = Number(value);
+                        handleInputChange("price", isNaN(numValue) ? undefined : numValue);
+                      }
+                    }}
                     error={errors.price}
                     placeholder="35000"
                     min="0"
@@ -478,11 +505,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                     }
                     type="number"
                     value={formData.deposit || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "deposit",
-                        parseInt(e.target.value) || undefined,
-                      )
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "") {
+                        handleInputChange("deposit", undefined);
+                      } else {
+                        const numValue = Number(value);
+                        handleInputChange("deposit", isNaN(numValue) ? undefined : numValue);
+                      }
+                    }
                     }
                     error={errors.deposit}
                     placeholder="21000"
@@ -496,12 +527,15 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                     label="월세 (만원)"
                     type="number"
                     value={formData.monthly_rent || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "monthly_rent",
-                        parseInt(e.target.value) || undefined,
-                      )
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "") {
+                        handleInputChange("monthly_rent", undefined);
+                      } else {
+                        const numValue = Number(value);
+                        handleInputChange("monthly_rent", isNaN(numValue) ? undefined : numValue);
+                      }
+                    }}
                     error={errors.monthly_rent}
                     placeholder="65"
                     min="0"
