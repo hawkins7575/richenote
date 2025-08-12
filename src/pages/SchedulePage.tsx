@@ -204,12 +204,12 @@ const SchedulePage: React.FC = () => {
                       {day.getDate()}
                     </div>
                     
-                    {/* 스케줄 표시 */}
-                    <div className="space-y-1">
+                    {/* 스케줄 표시 - 텍스트 높이와 동일한 압축된 사이즈 */}
+                    <div className="space-y-0.5">
                       {daySchedules.slice(0, isMobile ? 1 : 3).map((schedule, idx) => (
                         <div
                           key={idx}
-                          className={`text-xs px-1 py-0.5 sm:px-2 sm:py-1 rounded text-white truncate cursor-pointer hover:opacity-80 touch-target ${
+                          className={`text-xs px-1.5 py-0.5 rounded text-white truncate cursor-pointer hover:opacity-80 leading-tight ${
                             categoryColors[schedule.category]
                           }`}
                           onClick={(e) => {
@@ -217,12 +217,13 @@ const SchedulePage: React.FC = () => {
                             handleScheduleClick(schedule);
                           }}
                           title={`${schedule.title} - 클릭하여 상세보기`}
+                          style={{ lineHeight: '1.2' }}
                         >
                           {schedule.title}
                         </div>
                       ))}
                       {daySchedules.length > (isMobile ? 1 : 3) && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 leading-tight" style={{ lineHeight: '1.2' }}>
                           +{daySchedules.length - (isMobile ? 1 : 3)}개 더
                         </div>
                       )}
