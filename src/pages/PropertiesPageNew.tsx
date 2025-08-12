@@ -498,7 +498,7 @@ const PropertiesPageNew: React.FC = () => {
           <p className="text-gray-500">검색 조건에 맞는 매물이 없습니다.</p>
         </Card>
       ) : viewMode === "card" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4">
           {sortedProperties.map((property) => (
             <PropertyCard
               key={property.id}
