@@ -237,7 +237,7 @@ const SchedulePage: React.FC = () => {
     );
   };
 
-  // 일정 리스트 뷰 렌더링
+  // 일정 리스트 뷰 렌더링 (한 줄 압축 버전)
   const renderAgendaView = () => {
     const filteredSchedules = schedules.filter(schedule => 
       selectedCategory === "all" || schedule.category === selectedCategory
@@ -259,7 +259,7 @@ const SchedulePage: React.FC = () => {
             filteredSchedules.map((schedule) => (
               <div 
                 key={schedule.id} 
-                className="p-4 hover:bg-blue-50 cursor-pointer transition-all duration-200 border-l-4 border-transparent hover:border-blue-400 hover:shadow-sm"
+                className="px-4 py-2.5 hover:bg-blue-50 cursor-pointer transition-all duration-200 border-l-4 border-transparent hover:border-blue-400 hover:shadow-sm"
                 onClick={() => handleScheduleClick(schedule)}
                 role="button"
                 tabIndex={0}
@@ -272,49 +272,59 @@ const SchedulePage: React.FC = () => {
                 aria-label={`${schedule.title} 일정 상세보기`}
                 title="클릭하여 일정 상세보기"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1 min-w-0">
-                    <div className={`w-3 h-3 rounded-full mt-1 ${categoryColors[schedule.category]} flex-shrink-0`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
-                          {schedule.title}
-                        </h4>
-                        {schedule.priority === 'urgent' && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600">
-                            긴급
-                          </span>
-                        )}
-                        {schedule.priority === 'high' && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-600">
-                            높음
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500 mb-2">
-                        {categoryLabels[schedule.category]}
-                      </p>
-                      <div className="flex items-center text-xs text-gray-400 mb-1">
-                        <CalendarIcon className="w-4 h-4 mr-1" />
-                        {new Date(schedule.start_date).toLocaleDateString("ko-KR", {
-                          month: "short",
-                          day: "numeric",
-                          hour: schedule.all_day ? undefined : "2-digit",
-                          minute: schedule.all_day ? undefined : "2-digit",
-                        })}
-                        {schedule.location && (
-                          <>
-                            <MapPin className="w-3 h-3 ml-3 mr-1" />
-                            <span className="truncate">{schedule.location}</span>
-                          </>
-                        )}
-                      </div>
-                      {schedule.description && (
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-2">
-                          {schedule.description}
-                        </p>
-                      )}
+                {/* 한 줄로 모든 정보 표시 */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    {/* 카테고리 컬러 도트 */}
+                    <div className={`w-3 h-3 rounded-full ${categoryColors[schedule.category]} flex-shrink-0`} />
+                    
+                    {/* 일정 제목 */}
+                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                      {schedule.title}
+                    </h4>
+                    
+                    {/* 우선순위 배지 */}
+                    {schedule.priority === 'urgent' && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600 flex-shrink-0">
+                        긴급
+                      </span>
+                    )}
+                    {schedule.priority === 'high' && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-600 flex-shrink-0">
+                        높음
+                      </span>
+                    )}
+                    
+                    {/* 카테고리 */}
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                      {categoryLabels[schedule.category]}
+                    </span>
+                    
+                    {/* 날짜/시간 */}
+                    <div className="flex items-center text-xs text-gray-400 flex-shrink-0">
+                      <CalendarIcon className="w-3 h-3 mr-1" />
+                      {new Date(schedule.start_date).toLocaleDateString("ko-KR", {
+                        month: "short",
+                        day: "numeric",
+                        hour: schedule.all_day ? undefined : "2-digit",
+                        minute: schedule.all_day ? undefined : "2-digit",
+                      })}
                     </div>
+                    
+                    {/* 위치 정보 (있는 경우만) */}
+                    {schedule.location && (
+                      <div className="flex items-center text-xs text-gray-400 flex-shrink-0">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        <span className="truncate max-w-32">{schedule.location}</span>
+                      </div>
+                    )}
+                    
+                    {/* 설명 (있는 경우만, 매우 짧게) */}
+                    {schedule.description && (
+                      <span className="text-xs text-gray-400 truncate max-w-48 hidden md:inline">
+                        - {schedule.description}
+                      </span>
+                    )}
                   </div>
                   
                   {/* 클릭 힌트 아이콘 */}
