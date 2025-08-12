@@ -45,8 +45,8 @@ export interface Property {
   // 물리적 정보
   area: number; // 전용면적 (m²)
   area_common?: number; // 공용면적 (m²)
-  floor: number;
-  total_floors: number;
+  floor?: number;
+  total_floors?: number;
   rooms: number;
   bathrooms: number;
 
@@ -296,8 +296,8 @@ export interface CreatePropertyData {
   address: string;
   detailed_address?: string;
   area: number;
-  floor: number;
-  total_floors: number;
+  floor?: number;
+  total_floors?: number;
   rooms: number;
   bathrooms: number;
   parking: boolean;

@@ -156,7 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const { data: profile } = await Promise.race([
             profilePromise,
             profileTimeoutPromise,
-          ]) as { data: { id: string; name?: string; role?: string; avatar_url?: string } | null };
+          ]) as { data: { id: string; name?: string; role?: string; avatar_url?: string; tenant_id?: string } | null };
 
           setUser({
             id: session.user.id,
