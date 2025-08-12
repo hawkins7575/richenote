@@ -90,12 +90,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               profileTimeoutPromise,
             ])) as any;
 
+            console.log("🔍 [DEBUG] AuthContext 프로필 데이터:", profile);
+            const finalTenantId = profile?.tenant_id || session.user.id;
+            console.log("🔍 [DEBUG] AuthContext 최종 tenant_id:", finalTenantId);
+            
             setUser({
               id: session.user.id,
               email: session.user.email!,
               name: profile?.name || session.user.user_metadata?.name || "",
               role: (profile?.role as "owner" | "manager" | "agent" | "viewer") || "owner",
-              tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
+              tenant_id: finalTenantId, // 프로필의 tenant_id 우선, 없으면 사용자 ID
               avatar_url: profile?.avatar_url || null,
               created_at: session.user.created_at,
               last_sign_in_at: session.user.last_sign_in_at || null,
@@ -159,7 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: session.user.email!,
             name: profile?.name || session.user.user_metadata?.name || "",
             role: (profile?.role as "owner" | "manager" | "agent" | "viewer") || "owner",
-            tenant_id: session.user.id, // 사용자 ID를 tenant_id로 사용
+            tenant_id: profile?.tenant_id || session.user.id, // 프로필의 tenant_id 우선, 없으면 사용자 ID
             avatar_url: profile?.avatar_url || null,
             created_at: session.user.created_at,
             last_sign_in_at: session.user.last_sign_in_at || null,
@@ -317,7 +321,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: supabaseUser.email!,
           name: profile?.name || supabaseUser.user_metadata?.name || "",
           role: profile?.role || "owner",
-          tenant_id: supabaseUser.id,
+          tenant_id: profile?.tenant_id || supabaseUser.id, // 프로필의 tenant_id 우선, 없으면 사용자 ID
           avatar_url: profile?.avatar_url || null,
           created_at: supabaseUser.created_at,
           last_sign_in_at: supabaseUser.last_sign_in_at || null,

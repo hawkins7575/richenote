@@ -62,6 +62,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
     Partial<Record<keyof UpdatePropertyData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVacant, setIsVacant] = useState(false); // 공실 상태 관리
 
   // 프로퍼티가 변경될 때 폼 데이터 초기화
   useEffect(() => {
@@ -88,9 +89,20 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         landlord_phone: property.landlord_phone || "",
         exit_date: property.exit_date || "",
       });
+      // 공실 상태 초기화 (퇴실날짜가 없으면 공실로 간주)
+      setIsVacant(!property.exit_date);
       setErrors({});
     }
   }, [property, isOpen]);
+
+  // 공실 체크박스 핸들러
+  const handleVacantChange = useCallback((checked: boolean) => {
+    setIsVacant(checked);
+    if (checked) {
+      // 공실 체크 시 퇴실날짜 초기화
+      handleInputChange("exit_date", "");
+    }
+  }, []);
 
   const handleInputChange = useCallback(
     (field: keyof UpdatePropertyData, value: any) => {
@@ -98,6 +110,11 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
         ...prev,
         [field]: value,
       }));
+
+      // 퇴실날짜가 입력되면 공실 체크 해제
+      if (field === "exit_date" && value) {
+        setIsVacant(false);
+      }
 
       // 에러 제거
       if (errors[field]) {
@@ -125,13 +142,16 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
       newErrors.area = "면적은 0보다 커야 합니다";
     }
 
-    if (!formData.floor || formData.floor < 1) {
+    // 층수가 입력된 경우에만 검증
+    if (formData.floor && formData.floor < 1) {
       newErrors.floor = "층수는 1층 이상이어야 합니다";
     }
 
+    // 전체 층수가 입력된 경우에만 검증
     if (
-      !formData.total_floors ||
-      formData.total_floors < (formData.floor || 1)
+      formData.total_floors &&
+      formData.floor &&
+      formData.total_floors < formData.floor
     ) {
       newErrors.total_floors = "전체 층수는 해당 층수보다 크거나 같아야 합니다";
     }
@@ -340,7 +360,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   type="number"
                   value={formData.floor || ""}
                   onChange={(e) =>
-                    handleInputChange("floor", parseInt(e.target.value) || 1)
+                    handleInputChange("floor", parseInt(e.target.value) || undefined)
                   }
                   error={errors.floor}
                   placeholder="15"
@@ -355,7 +375,7 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
                   onChange={(e) =>
                     handleInputChange(
                       "total_floors",
-                      parseInt(e.target.value) || 1,
+                      parseInt(e.target.value) || undefined,
                     )
                   }
                   error={errors.total_floors}
@@ -520,15 +540,54 @@ export const PropertyEditForm: React.FC<PropertyEditFormProps> = ({
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">기타 정보</h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="퇴실 예정일"
-                  type="date"
-                  value={formData.exit_date || ""}
-                  onChange={(e) =>
-                    handleInputChange("exit_date", e.target.value)
-                  }
-                />
+              <div className="space-y-4">
+                {/* 공실 체크박스 */}
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isVacant}
+                      onChange={(e) => handleVacantChange(e.target.checked)}
+                      className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      ✨ 현재 공실 (즉시 입주 가능)
+                    </span>
+                  </label>
+                  
+                  {/* 상태 표시 배지 */}
+                  <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                    isVacant || !formData.exit_date
+                      ? "bg-green-100 text-green-800 border border-green-200" 
+                      : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                  }`}>
+                    {isVacant || !formData.exit_date ? "즉시 입주 가능" : "퇴실 예정"}
+                  </div>
+                </div>
+
+                {/* 퇴실날짜 입력 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="퇴실 예정일"
+                    type="date"
+                    value={formData.exit_date || ""}
+                    onChange={(e) =>
+                      handleInputChange("exit_date", e.target.value)
+                    }
+                    disabled={isVacant}
+                    className={isVacant ? "opacity-50 cursor-not-allowed" : ""}
+                  />
+                  
+                  {/* 안내 텍스트 */}
+                  <div className="flex items-center justify-center md:justify-start">
+                    <p className="text-sm text-gray-500 text-center md:text-left">
+                      {isVacant 
+                        ? "공실로 체크되어 날짜 입력이 비활성화됩니다"
+                        : "퇴실 예정일이 있으면 입력하세요"
+                      }
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div>

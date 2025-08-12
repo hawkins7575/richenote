@@ -126,10 +126,21 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
         throw new Error("사용자 인증 정보가 없습니다. 다시 로그인 해주세요.");
       }
 
+      console.log("🔍 [DEBUG] useProperties.createNewProperty 시작");
+      console.log("👤 [DEBUG] 사용자 정보:", { 
+        userId: user.id, 
+        tenantId: user.tenant_id 
+      });
+
+      if (!user.tenant_id) {
+        throw new Error("사용자의 테넌트 정보가 없습니다. 관리자에게 문의하세요.");
+      }
+
       try {
+        console.log("📞 [DEBUG] createProperty 서비스 호출...");
         const newProperty = await createProperty(
           propertyData,
-          user.id,
+          user.tenant_id,  // 올바른 tenant_id 사용
           user.id,
         );
 
@@ -162,7 +173,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
 
   const updateExistingProperty = useCallback(
     async (propertyId: string, propertyData: UpdatePropertyData) => {
-      if (!user?.id) {
+      if (!user?.id || !user.tenant_id) {
         throw new Error("사용자 정보가 없습니다.");
       }
 
@@ -188,7 +199,7 @@ export const useProperties = (filters?: SimplePropertyFilters) => {
 
   const deleteExistingProperty = useCallback(
     async (propertyId: string) => {
-      if (!user?.id) {
+      if (!user?.id || !user.tenant_id) {
         throw new Error("사용자 정보가 없습니다.");
       }
 

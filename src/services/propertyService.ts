@@ -29,6 +29,7 @@ export const getProperties = async (
       component: "propertyService",
       action: "getProperties",
     });
+    console.log("🔍 [DEBUG] getProperties 호출됨 - userId:", userId);
     // 개발 환경에서 필터 로깅
     logger.debug("Service getProperties 필터", {
       filters,
@@ -94,7 +95,8 @@ export const getProperties = async (
       throw new Error("사용자에게 할당된 테넌트가 없습니다.");
     }
 
-    console.log("📋 실제 tenant_id:", actualTenantId);
+    console.log("📋 [DEBUG] user_profiles 조회 결과:", userProfile);
+    console.log("📋 [DEBUG] 실제 tenant_id:", actualTenantId);
 
     // 사용자의 실제 tenant_id로 매물 조회
     let query = supabase

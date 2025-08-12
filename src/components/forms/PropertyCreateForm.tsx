@@ -74,18 +74,29 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
     status: "거래중",
     address: "",
     area: 0,
-    floor: 1,
-    total_floors: 1,
+    floor: undefined,
+    total_floors: undefined,
     rooms: 1,
     bathrooms: 1,
     parking: false,
     elevator: false,
+    exit_date: "",
   });
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreatePropertyData, string>>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVacant, setIsVacant] = useState(false); // 공실 상태 관리
+
+  // 공실 체크박스 핸들러
+  const handleVacantChange = useCallback((checked: boolean) => {
+    setIsVacant(checked);
+    if (checked) {
+      // 공실 체크 시 퇴실날짜 초기화
+      handleInputChange("exit_date", "");
+    }
+  }, []);
 
   const handleInputChange = useCallback(
     (field: keyof CreatePropertyData, value: any) => {
@@ -93,6 +104,11 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         ...prev,
         [field]: value,
       }));
+
+      // 퇴실날짜가 입력되면 공실 체크 해제
+      if (field === "exit_date" && value) {
+        setIsVacant(false);
+      }
 
       // 에러 제거
       if (errors[field]) {
@@ -223,14 +239,16 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
         status: "거래중",
         address: "",
         area: 0,
-        floor: 1,
-        total_floors: 1,
+        floor: undefined,
+        total_floors: undefined,
         rooms: 1,
         bathrooms: 1,
         parking: false,
         elevator: false,
+        exit_date: "",
       });
       setErrors({});
+      setIsVacant(false);
       console.log("🚪 폼 닫기...");
       onClose();
     } catch (error) {
@@ -455,7 +473,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       onChange={(e) =>
                         handleInputChange(
                           "floor",
-                          parseInt(e.target.value) || 1,
+                          parseInt(e.target.value) || undefined,
                         )
                       }
                       error={errors.floor}
@@ -471,7 +489,7 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                       onChange={(e) =>
                         handleInputChange(
                           "total_floors",
-                          parseInt(e.target.value) || 1,
+                          parseInt(e.target.value) || undefined,
                         )
                       }
                       error={errors.total_floors}
@@ -688,19 +706,76 @@ export const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                    매물 설명
-                  </label>
-                  <textarea
-                    value={formData.description || ""}
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
-                    }
-                    placeholder="매물에 대한 상세한 설명을 입력해주세요&#10;예: 남향, 풀옵션, 교통 편리, 학군 좋음 등"
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-xs sm:text-sm resize-none transition-colors"
-                  />
+                <div className="space-y-4">
+                  {/* 거주현황 및 퇴실날짜 */}
+                  <div className="space-y-4">
+                    {/* 공실 체크박스 */}
+                    <div className="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-gray-200">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isVacant}
+                          onChange={(e) => handleVacantChange(e.target.checked)}
+                          className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4"
+                        />
+                        <span className="text-sm font-medium text-gray-700">
+                          ✨ 현재 공실 (즉시 입주 가능)
+                        </span>
+                      </label>
+                      
+                      {/* 상태 표시 배지 */}
+                      <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                        isVacant || !formData.exit_date
+                          ? "bg-green-100 text-green-800 border border-green-200" 
+                          : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                      }`}>
+                        {isVacant || !formData.exit_date ? "즉시 입주 가능" : "퇴실 예정"}
+                      </div>
+                    </div>
+
+                    {/* 퇴실날짜 입력 */}
+                    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-3">
+                      <Input
+                        label="퇴실 예정일"
+                        type="date"
+                        value={formData.exit_date || ""}
+                        onChange={(e) =>
+                          handleInputChange("exit_date", e.target.value)
+                        }
+                        disabled={isVacant}
+                        className={`text-sm sm:text-base h-11 sm:h-12 ${
+                          isVacant ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        placeholder="퇴실 예정일을 선택하세요"
+                      />
+                      
+                      {/* 안내 텍스트 */}
+                      <div className="flex items-center justify-center sm:justify-start">
+                        <p className="text-xs text-gray-500 text-center sm:text-left">
+                          {isVacant 
+                            ? "공실로 체크되어 날짜 입력이 비활성화됩니다"
+                            : "퇴실 예정일이 있으면 입력하세요"
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 매물 설명 */}
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                      매물 설명
+                    </label>
+                    <textarea
+                      value={formData.description || ""}
+                      onChange={(e) =>
+                        handleInputChange("description", e.target.value)
+                      }
+                      placeholder="매물에 대한 상세한 설명을 입력해주세요&#10;예: 남향, 풀옵션, 교통 편리, 학군 좋음 등"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-xs sm:text-sm resize-none transition-colors"
+                    />
+                  </div>
                 </div>
               </div>
 
