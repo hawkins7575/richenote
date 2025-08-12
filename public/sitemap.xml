@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- 메인 페이지 -->
+  <url>
+    <loc>https://summi3-ijj9m73jz-daesung75-6440s-projects.vercel.app/</loc>
+    <lastmod>2025-08-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 로그인 페이지 -->
+  <url>
+    <loc>https://summi3-ijj9m73jz-daesung75-6440s-projects.vercel.app/login</loc>
+    <lastmod>2025-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 회원가입 페이지 -->
+  <url>
+    <loc>https://summi3-ijj9m73jz-daesung75-6440s-projects.vercel.app/signup</loc>
+    <lastmod>2025-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
